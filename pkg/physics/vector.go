@@ -67,3 +67,23 @@ func FromAngle(angle float64, magnitude float64) Vector2D {
 		Y: magnitude * math.Sin(angle),
 	}
 }
+
+// Dot returns the dot product of two vectors
+func (v Vector2D) Dot(other Vector2D) float64 {
+	return v.X*other.X + v.Y*other.Y
+}
+
+// Rotate rotates the vector by angle (in radians)
+func (v Vector2D) Rotate(angle float64) Vector2D {
+	cos := math.Cos(angle)
+	sin := math.Sin(angle)
+	return Vector2D{
+		X: v.X*cos - v.Y*sin,
+		Y: v.X*sin + v.Y*cos,
+	}
+}
+
+// LengthSquared returns magnitude squared (optimization for comparisons)
+func (v Vector2D) LengthSquared() float64 {
+	return v.X*v.X + v.Y*v.Y
+}
