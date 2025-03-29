@@ -51,3 +51,16 @@ func (e *BaseEntity) Update(deltaTime float64) {
 	// Update collider position
 	e.Collider.Center = e.Position
 }
+
+// Then implement the Entity.Render() method in each entity type:
+func (s *Ship) Render(r Renderer) {
+	r.RenderShip(s)
+}
+
+func (p *Planet) Render(r Renderer) {
+	r.RenderPlanet(p)
+}
+
+func (p *Projectile) Render(r Renderer) {
+	r.RenderProjectile(p)
+}

@@ -14,6 +14,15 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/physics"
 )
 
+// pkg/engine/game.go
+type GameStatus int
+
+const (
+	GameStatusWaiting GameStatus = iota
+	GameStatusActive
+	GameStatusEnded
+)
+
 // Game represents the core game state and logic
 type Game struct {
 	Config       *config.GameConfig
@@ -28,6 +37,11 @@ type Game struct {
 	LastUpdate   time.Time
 	EventBus     *event.Bus
 	SpatialIndex *physics.QuadTree
+	Status       GameStatus
+	WinningTeam  int // Team ID of winner, -1 if no winner
+	EndTime      time.Time
+	StartTime    time.Time
+	ElapsedTime  float64 // seconds
 }
 
 // Team represents a player team in the game

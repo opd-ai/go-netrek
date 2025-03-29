@@ -32,6 +32,7 @@ type GameClient struct {
 	reconnectDelay       time.Duration
 	reconnectAttempts    int
 	maxReconnectAttempts int
+	DesiredShipClass     entity.ShipClass
 }
 
 // NewGameClient creates a new game client
@@ -43,6 +44,19 @@ func NewGameClient(eventBus *event.Bus) *GameClient {
 		reconnectDelay:       time.Second * 3,
 		maxReconnectAttempts: 5,
 	}
+}
+
+func (c *GameClient) RequestShipClass(class entity.ShipClass) error {
+	c.DesiredShipClass = class
+
+	// Send request to server
+	request := struct {
+		ShipClass entity.ShipClass `json:"shipClass"`
+	}{
+		ShipClass: class,
+	}
+
+	return c.sendMessage(RequestShipClass, request)
 }
 
 // Connect connects to the game server

@@ -14,6 +14,7 @@ import (
 
 	"github.com/opd-ai/go-netrek/pkg/engine"
 	"github.com/opd-ai/go-netrek/pkg/entity"
+	"github.com/opd-ai/go-netrek/pkg/physics"
 )
 
 // MessageType defines the type of network message
@@ -28,6 +29,7 @@ const (
 	ChatMessage
 	PingRequest
 	PingResponse
+	RequestShipClass
 )
 
 // GameServer handles network communication and game state
@@ -405,9 +407,59 @@ func (s *GameServer) sendFullStateUpdate() {
 
 // sendPartialStateUpdate sends only changed game state to clients
 func (s *GameServer) sendPartialStateUpdate() {
-	// This would be implemented to send only what has changed
-	// For simplicity, we'll just call the full update
-	s.sendFullStateUpdate()
+	currentState := s.game.GetGameState()
+
+	// For each client, create a custom partial update
+	s.clientsLock.RLock()
+	for _, client := range s.clients {
+		if !client.Connected {
+			continue
+		}
+
+		// Create partial state with only nearby entities
+		partialState := &engine.GameState{
+			Tick:        currentState.Tick,
+			Ships:       make(map[entity.ID]engine.ShipState),
+			Planets:     make(map[entity.ID]engine.PlanetState),
+			Projectiles: make(map[entity.ID]engine.ProjectileState),
+			Teams:       currentState.Teams, // Teams always included
+		}
+
+		// Get player's ship position for visibility check
+		var playerShipPos physics.Vector2D
+		var viewRadius float64 = 3000 // Default view radius
+
+		// Find player's ship
+		for _, player := range s.game.Teams[client.TeamID].Players {
+			if player.ID == client.PlayerID {
+				if ship, ok := currentState.Ships[player.ShipID]; ok {
+					playerShipPos = ship.Position
+					break
+				}
+			}
+		}
+
+		// Add nearby ships
+		for id, ship := range currentState.Ships {
+			if ship.Position.Distance(playerShipPos) <= viewRadius {
+				partialState.Ships[id] = ship
+			}
+		}
+
+		// Add nearby projectiles
+		for id, proj := range currentState.Projectiles {
+			if proj.Position.Distance(playerShipPos) <= viewRadius {
+				partialState.Projectiles[id] = proj
+			}
+		}
+
+		// Always include all planets
+		partialState.Planets = currentState.Planets
+
+		// Send the partial state
+		s.sendMessage(client.Conn, GameStateUpdate, partialState)
+	}
+	s.clientsLock.RUnlock()
 }
 
 // readMessage reads a message from a connection
