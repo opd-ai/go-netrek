@@ -136,6 +136,8 @@ func NewGame(config *config.GameConfig) *Game {
 // Start begins the game update loop
 func (g *Game) Start() {
 	g.Running = true
+	g.Status = GameStatusActive
+	g.StartTime = time.Now()
 	g.LastUpdate = time.Now()
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.GameStarted,
@@ -155,6 +157,16 @@ func (g *Game) Stop() {
 // Update advances the game state by one tick
 func (g *Game) Update() {
 	now := time.Now()
+	if g.Status == GameStatusActive {
+		g.ElapsedTime = now.Sub(g.StartTime).Seconds()
+
+		// Check for time limit
+		if g.Config.GameRules.TimeLimit > 0 &&
+			g.ElapsedTime >= float64(g.Config.GameRules.TimeLimit) {
+			// Game ended due to time limit
+			g.endGame()
+		}
+	}
 	deltaTime := now.Sub(g.LastUpdate).Seconds()
 	g.LastUpdate = now
 
@@ -866,31 +878,77 @@ func (g *Game) registerEventHandlers() {
 	// Handle ship destruction
 	g.EventBus.Subscribe(event.ShipDestroyed, func(e event.Event) {
 		if shipEvent, ok := e.(*event.ShipEvent); ok {
-			shipID := entity.ID(shipEvent.ShipID)
+			//shipID
+			_ = entity.ID(shipEvent.ShipID)
 
 			// Check if any teams have no ships left
 			for _, team := range g.Teams {
 				if team.ShipCount == 0 {
-					// Could trigger game end or team elimination
-				}
-			}
-		}
-	})
+					// Set game status to ended with winning team
+					g.Status = GameStatusEnded
 
-	// Handle planet capture
-	g.EventBus.Subscribe(event.PlanetCaptured, func(e event.Event) {
-		if planetEvent, ok := e.(*event.PlanetEvent); ok {
-			// Check if any team has captured all planets
-			totalPlanets := len(g.Planets)
-			for _, team := range g.Teams {
-				if team.PlanetCount == totalPlanets {
-					// Team has won the game
+					// Find the winning team (team with most planets or ships)
+					var winnerID int = -1
+					maxPlanets := 0
+
+					for id, t := range g.Teams {
+						if t.PlanetCount > maxPlanets {
+							maxPlanets = t.PlanetCount
+							winnerID = id
+						}
+					}
+
+					g.WinningTeam = winnerID
+					g.EndTime = time.Now()
+
+					// Publish game ended event
 					g.EventBus.Publish(&event.BaseEvent{
 						EventType: event.GameEnded,
-						Source:    team,
+						Source:    g.Teams[winnerID],
 					})
+
+					// Stop the game
+					g.Running = false
 				}
 			}
 		}
 	})
+}
+
+
+// Add helper method for ending the game
+func (g *Game) endGame() {
+    g.Status = GameStatusEnded
+    g.EndTime = time.Now()
+    g.Running = false
+    
+    // Determine winner based on score or planets
+    var winnerID int = -1
+    maxScore := 0
+    
+    for id, team := range g.Teams {
+        if team.Score > maxScore || 
+           (g.Config.GameRules.WinCondition == "conquest" && team.PlanetCount > maxScore) {
+            maxScore = team.Score
+            if g.Config.GameRules.WinCondition == "conquest" {
+                maxScore = team.PlanetCount
+            }
+            winnerID = id
+        }
+    }
+    
+    g.WinningTeam = winnerID
+    
+    // Publish game ended event
+    if winnerID >= 0 {
+        g.EventBus.Publish(&event.BaseEvent{
+            EventType: event.GameEnded,
+            Source:    g.Teams[winnerID],
+        })
+    } else {
+        g.EventBus.Publish(&event.BaseEvent{
+            EventType: event.GameEnded,
+            Source:    g,
+        })
+    }
 }
