@@ -14,7 +14,7 @@ type Entity interface {
 	GetPosition() physics.Vector2D
 	GetCollider() physics.Circle
 	Update(deltaTime float64)
-	Render() // Interface for rendering
+	Render(r Renderer) // Interface for rendering
 }
 
 // BaseEntity contains common functionality for all entities
@@ -50,6 +50,11 @@ func (e *BaseEntity) Update(deltaTime float64) {
 	e.Position = e.Position.Add(e.Velocity.Scale(deltaTime))
 	// Update collider position
 	e.Collider.Center = e.Position
+}
+
+// Implement the missing method in BaseEntity
+func (e *BaseEntity) Render(r Renderer) {
+    // Base implementation does nothing, derived types will implement
 }
 
 // Then implement the Entity.Render() method in each entity type:
