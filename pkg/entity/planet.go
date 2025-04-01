@@ -125,7 +125,7 @@ func (p *Planet) Bomb(damage int) int {
 }
 
 // BeamDownArmies transfers armies from a ship to the planet
-func (p *Planet) BeamDownArmies(shipTeamID int, amount int) (transferred int, captured bool) {
+func (p *Planet) BeamDownArmies(shipTeamID, amount int) (transferred int, captured bool) {
 	// Can't beam to enemy planets without conquering
 	if p.TeamID >= 0 && p.TeamID != shipTeamID {
 		return 0, false
@@ -154,7 +154,7 @@ func (p *Planet) BeamDownArmies(shipTeamID int, amount int) (transferred int, ca
 }
 
 // BeamUpArmies transfers armies from the planet to a ship
-func (p *Planet) BeamUpArmies(shipTeamID int, maxAmount int) int {
+func (p *Planet) BeamUpArmies(shipTeamID, maxAmount int) int {
 	// Can only beam up from friendly planets
 	if p.TeamID != shipTeamID || p.Armies <= 0 {
 		return 0

@@ -157,7 +157,8 @@ func (c *GameClient) Disconnect() error {
 
 // SendInput sends player input to the server
 func (c *GameClient) SendInput(thrust, turnLeft, turnRight bool, fireWeapon int,
-	beamDown, beamUp bool, beamAmount int, targetID entity.ID) error {
+	beamDown, beamUp bool, beamAmount int, targetID entity.ID,
+) error {
 	if !c.connected {
 		return errors.New("not connected")
 	}

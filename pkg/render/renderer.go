@@ -8,8 +8,7 @@ import (
 )
 
 // NullRenderer is a simple implementation of entity.Renderer.
-type NullRenderer struct {
-}
+type NullRenderer struct{}
 
 // Clear implements entity.Renderer.
 func (d *NullRenderer) Clear() {

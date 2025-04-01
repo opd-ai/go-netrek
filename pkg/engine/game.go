@@ -609,7 +609,7 @@ func (g *Game) RespawnShip(playerID entity.ID) error {
 }
 
 // BeamArmies beams armies between a ship and a planet
-func (g *Game) BeamArmies(shipID entity.ID, planetID entity.ID, direction string, amount int) (int, error) {
+func (g *Game) BeamArmies(shipID, planetID entity.ID, direction string, amount int) (int, error) {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
@@ -878,7 +878,7 @@ func (g *Game) registerEventHandlers() {
 	// Handle ship destruction
 	g.EventBus.Subscribe(event.ShipDestroyed, func(e event.Event) {
 		if shipEvent, ok := e.(*event.ShipEvent); ok {
-			//shipID
+			// shipID
 			_ = entity.ID(shipEvent.ShipID)
 
 			// Check if any teams have no ships left
@@ -915,40 +915,39 @@ func (g *Game) registerEventHandlers() {
 	})
 }
 
-
 // Add helper method for ending the game
 func (g *Game) endGame() {
-    g.Status = GameStatusEnded
-    g.EndTime = time.Now()
-    g.Running = false
-    
-    // Determine winner based on score or planets
-    var winnerID int = -1
-    maxScore := 0
-    
-    for id, team := range g.Teams {
-        if team.Score > maxScore || 
-           (g.Config.GameRules.WinCondition == "conquest" && team.PlanetCount > maxScore) {
-            maxScore = team.Score
-            if g.Config.GameRules.WinCondition == "conquest" {
-                maxScore = team.PlanetCount
-            }
-            winnerID = id
-        }
-    }
-    
-    g.WinningTeam = winnerID
-    
-    // Publish game ended event
-    if winnerID >= 0 {
-        g.EventBus.Publish(&event.BaseEvent{
-            EventType: event.GameEnded,
-            Source:    g.Teams[winnerID],
-        })
-    } else {
-        g.EventBus.Publish(&event.BaseEvent{
-            EventType: event.GameEnded,
-            Source:    g,
-        })
-    }
+	g.Status = GameStatusEnded
+	g.EndTime = time.Now()
+	g.Running = false
+
+	// Determine winner based on score or planets
+	var winnerID int = -1
+	maxScore := 0
+
+	for id, team := range g.Teams {
+		if team.Score > maxScore ||
+			(g.Config.GameRules.WinCondition == "conquest" && team.PlanetCount > maxScore) {
+			maxScore = team.Score
+			if g.Config.GameRules.WinCondition == "conquest" {
+				maxScore = team.PlanetCount
+			}
+			winnerID = id
+		}
+	}
+
+	g.WinningTeam = winnerID
+
+	// Publish game ended event
+	if winnerID >= 0 {
+		g.EventBus.Publish(&event.BaseEvent{
+			EventType: event.GameEnded,
+			Source:    g.Teams[winnerID],
+		})
+	} else {
+		g.EventBus.Publish(&event.BaseEvent{
+			EventType: event.GameEnded,
+			Source:    g,
+		})
+	}
 }

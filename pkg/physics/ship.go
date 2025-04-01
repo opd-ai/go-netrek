@@ -10,7 +10,7 @@ type MovementState struct {
 	MaxSpeed float64
 }
 
-func UpdateMovement(state *MovementState, deltaTime float64, thrustInput float64, turnInput float64) {
+func UpdateMovement(state *MovementState, deltaTime, thrustInput, turnInput float64) {
 	// Apply rotation
 	state.Heading += turnInput * deltaTime
 

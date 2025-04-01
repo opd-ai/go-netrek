@@ -54,7 +54,7 @@ func (e *BaseEntity) Update(deltaTime float64) {
 
 // Implement the missing method in BaseEntity
 func (e *BaseEntity) Render(r Renderer) {
-    // Base implementation does nothing, derived types will implement
+	// Base implementation does nothing, derived types will implement
 }
 
 // Then implement the Entity.Render() method in each entity type:

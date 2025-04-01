@@ -61,7 +61,7 @@ func (v Vector2D) Angle() float64 {
 }
 
 // FromAngle creates a vector from an angle and magnitude
-func FromAngle(angle float64, magnitude float64) Vector2D {
+func FromAngle(angle, magnitude float64) Vector2D {
 	return Vector2D{
 		X: magnitude * math.Cos(angle),
 		Y: magnitude * math.Sin(angle),
