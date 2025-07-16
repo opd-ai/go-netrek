@@ -64,9 +64,12 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.connected {
-		return errors.New("already connected")
+	// Close any existing connection before establishing a new one
+	if c.conn != nil {
+		c.conn.Close()
+		c.conn = nil
 	}
+	c.connected = false
 
 	c.serverAddress = address
 
@@ -87,19 +90,19 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	}
 
 	if err := c.sendMessage(ConnectRequest, connectReq); err != nil {
-		c.conn.Close()
+		c.cleanupConnection()
 		return fmt.Errorf("failed to send connect request: %w", err)
 	}
 
 	// Wait for connect response
 	msgType, data, err := c.readMessage()
 	if err != nil {
-		c.conn.Close()
+		c.cleanupConnection()
 		return fmt.Errorf("failed to read connect response: %w", err)
 	}
 
 	if msgType != ConnectResponse {
-		c.conn.Close()
+		c.cleanupConnection()
 		return fmt.Errorf("unexpected response type: %d", msgType)
 	}
 
@@ -112,12 +115,12 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	}
 
 	if err := json.Unmarshal(data, &connectResp); err != nil {
-		c.conn.Close()
+		c.cleanupConnection()
 		return fmt.Errorf("failed to parse connect response: %w", err)
 	}
 
 	if !connectResp.Success {
-		c.conn.Close()
+		c.cleanupConnection()
 		return fmt.Errorf("server rejected connection: %s", connectResp.Error)
 	}
 
@@ -134,6 +137,15 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	return nil
 }
 
+// cleanupConnection safely closes the connection and resets state (must be called with lock held)
+func (c *GameClient) cleanupConnection() {
+	if c.conn != nil {
+		c.conn.Close()
+		c.conn = nil
+	}
+	c.connected = false
+}
+
 // Disconnect disconnects from the game server
 func (c *GameClient) Disconnect() error {
 	c.mu.Lock()
@@ -146,12 +158,8 @@ func (c *GameClient) Disconnect() error {
 	// Send disconnect notification
 	c.sendMessage(DisconnectNotification, nil)
 
-	// Close connection
-	if c.conn != nil {
-		c.conn.Close()
-	}
-
-	c.connected = false
+	// Clean up connection
+	c.cleanupConnection()
 	return nil
 }
 
