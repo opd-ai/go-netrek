@@ -1,0 +1,58 @@
+{
+  "worldSize": 10000,
+  "maxPlayers": 16,
+  "teams": [
+    {
+      "name": "Federation",
+      "color": "#0000FF",
+      "maxShips": 8,
+      "startingShip": "Scout"
+    },
+    {
+      "name": "Romulans",
+      "color": "#00FF00",
+      "maxShips": 8,
+      "startingShip": "Scout"
+    }
+  ],
+  "planets": [
+    {
+      "name": "Earth",
+      "x": -4000,
+      "y": 0,
+      "type": 3,
+      "homeWorld": true,
+      "teamID": 0,
+      "initialArmies": 30
+    },
+    {
+      "name": "Romulus",
+      "x": 4000,
+      "y": 0,
+      "type": 3,
+      "homeWorld": true,
+      "teamID": 1,
+      "initialArmies": 30
+    }
+  ],
+  "physics": {
+    "gravity": 0,
+    "friction": 0.1,
+    "collisionDamage": 20
+  },
+  "network": {
+    "updateRate": 20,
+    "ticksPerState": 3,
+    "usePartialState": true,
+    "serverPort": 4566,
+    "serverAddress": "localhost:4566"
+  },
+  "gameRules": {
+    "winCondition": "conquest",
+    "timeLimit": 1800,
+    "maxScore": 100,
+    "respawnDelay": 5,
+    "friendlyFire": false,
+    "startingArmies": 0
+  }
+}

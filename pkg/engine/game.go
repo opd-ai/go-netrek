@@ -176,6 +176,7 @@ func (g *Game) Update() {
 	}
 
 	g.EntityLock.Lock()
+	defer g.EntityLock.Unlock()
 
 	// Clear spatial index for this frame
 	g.SpatialIndex = physics.NewQuadTree(
@@ -214,8 +215,6 @@ func (g *Game) Update() {
 
 	// Cleanup inactive entities
 	g.cleanupInactiveEntities()
-
-	g.EntityLock.Unlock()
 
 	// Increment tick counter
 	g.CurrentTick++
