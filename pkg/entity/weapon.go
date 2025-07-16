@@ -2,6 +2,7 @@
 package entity
 
 import (
+	"sync/atomic"
 	"time"
 
 	"github.com/opd-ai/go-netrek/pkg/physics"
@@ -155,11 +156,9 @@ func (p *Projectile) Update(deltaTime float64) {
 }
 
 // GenerateID generates a unique ID for entities
-// In a real implementation, this would use a more robust approach
-var nextID ID = 1
+// Thread-safe ID generation using atomic operations
+var nextID uint64
 
 func GenerateID() ID {
-	id := nextID
-	nextID++
-	return id
+	return ID(atomic.AddUint64(&nextID, 1))
 }
