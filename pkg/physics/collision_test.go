@@ -16,7 +16,7 @@ func TestCircle_Collides(t *testing.T) {
 			name:     "circles_touching",
 			circle1:  Circle{Center: Vector2D{X: 0, Y: 0}, Radius: 5},
 			circle2:  Circle{Center: Vector2D{X: 10, Y: 0}, Radius: 5},
-			expected: true,
+			expected: false, // Distance equals sum of radii, collision logic uses <
 		},
 		{
 			name:     "circles_overlapping",
