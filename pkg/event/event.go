@@ -22,6 +22,12 @@ const (
 	TeamScoreChanged Type = "team_score_changed"
 )
 
+// Subscription represents a subscription token
+type Subscription struct {
+	ID     uint64
+	Cancel func()
+}
+
 // Event is the base interface for all events
 type Event interface {
 	GetType() Type
@@ -47,29 +53,54 @@ func (e *BaseEvent) GetSource() interface{} {
 // Handler is a function that handles events
 type Handler func(Event)
 
+// handlerWrapper wraps a handler with an ID for unsubscription
+type handlerWrapper struct {
+	id      uint64
+	handler Handler
+}
+
 // Bus manages event subscriptions and dispatching
 type Bus struct {
-	handlers map[Type][]Handler
+	handlers map[Type][]handlerWrapper
+	nextID   uint64
 	mu       sync.RWMutex
 }
 
 // NewEventBus creates a new event bus
 func NewEventBus() *Bus {
 	return &Bus{
-		handlers: make(map[Type][]Handler),
+		handlers: make(map[Type][]handlerWrapper),
+		nextID:   1,
 	}
 }
 
-// Subscribe registers a handler for a specific event type
-func (b *Bus) Subscribe(eventType Type, handler Handler) {
+// Subscribe registers a handler for a specific event type and returns a subscription token
+func (b *Bus) Subscribe(eventType Type, handler Handler) *Subscription {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	b.handlers[eventType] = append(b.handlers[eventType], handler)
+	id := b.nextID
+	b.nextID++
+
+	wrapper := handlerWrapper{
+		id:      id,
+		handler: handler,
+	}
+
+	b.handlers[eventType] = append(b.handlers[eventType], wrapper)
+
+	sub := &Subscription{
+		ID: id,
+		Cancel: func() {
+			b.unsubscribeByID(eventType, id)
+		},
+	}
+
+	return sub
 }
 
-// Unsubscribe removes a handler for a specific event type
-func (b *Bus) Unsubscribe(eventType Type, handler Handler) {
+// unsubscribeByID removes a handler by its ID
+func (b *Bus) unsubscribeByID(eventType Type, id uint64) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
@@ -78,13 +109,19 @@ func (b *Bus) Unsubscribe(eventType Type, handler Handler) {
 		return
 	}
 
-	// Find and remove the handler
-	for i, h := range handlers {
-		if &h == &handler {
+	// Find and remove the handler with matching ID
+	for i, wrapper := range handlers {
+		if wrapper.id == id {
 			b.handlers[eventType] = append(handlers[:i], handlers[i+1:]...)
 			break
 		}
 	}
+}
+
+// Unsubscribe removes a handler for a specific event type (deprecated - use Subscription.Cancel instead)
+func (b *Bus) Unsubscribe(eventType Type, handler Handler) {
+	// This method is kept for backward compatibility but cannot work reliably
+	// Users should use the Subscription.Cancel() method returned from Subscribe
 }
 
 // Publish sends an event to all subscribed handlers
@@ -98,8 +135,8 @@ func (b *Bus) Publish(event Event) {
 	}
 
 	// Call each handler
-	for _, handler := range handlers {
-		handler(event)
+	for _, wrapper := range handlers {
+		wrapper.handler(event)
 	}
 }
 
