@@ -35,4 +35,5 @@ func (d *NullRenderer) RenderShip(ship *entity.Ship) {
 	log.Printf("RenderShip called for ship: %v", ship)
 }
 
-var nullRenderer entity.Renderer = &NullRenderer{}
+// NullRendererInstance is a global instance of NullRenderer for convenience.
+var NullRendererInstance entity.Renderer = &NullRenderer{}

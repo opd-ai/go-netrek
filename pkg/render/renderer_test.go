@@ -186,8 +186,8 @@ func TestNullRenderer_ImplementsRendererInterface(t *testing.T) {
 }
 
 func TestNullRenderer_GlobalVariable_IsCorrectType(t *testing.T) {
-	// Test that the global nullRenderer variable is of the correct type
-	var renderer entity.Renderer = nullRenderer
+	// Test that the global NullRendererInstance variable is of the correct type
+	var renderer entity.Renderer = NullRendererInstance
 
 	// Verify we can use it like any other renderer
 	output := captureLog(func() {
@@ -195,7 +195,7 @@ func TestNullRenderer_GlobalVariable_IsCorrectType(t *testing.T) {
 	})
 
 	if !strings.Contains(output, "Clear called") {
-		t.Errorf("Global nullRenderer should work like NullRenderer instance")
+		t.Errorf("Global NullRendererInstance should work like NullRenderer instance")
 	}
 }
 
