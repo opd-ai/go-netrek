@@ -460,10 +460,9 @@ func (g *Game) AddPlayer(name string, teamID int) (entity.ID, error) {
 
 	team, ok := g.Teams[teamID]
 	if !ok {
-		return 0, errors.New("invalid team ID")
+		return 0, errors.New("invalid team")
 	}
 
-	// Create player
 	playerID := entity.GenerateID()
 	player := &Player{
 		ID:        playerID,
@@ -478,10 +477,16 @@ func (g *Game) AddPlayer(name string, teamID int) (entity.ID, error) {
 	// Create a ship for the player
 	spawnPoint := g.findSpawnPoint(teamID)
 
+	// Determine ship class from team config
+	shipClass := entity.Scout
+	if teamID < len(g.Config.Teams) {
+		shipClass = entity.ShipClassFromString(g.Config.Teams[teamID].StartingShip)
+	}
+
 	shipID := entity.GenerateID()
 	ship := entity.NewShip(
 		shipID,
-		entity.Scout, // Default ship class
+		shipClass,
 		teamID,
 		spawnPoint,
 	)
@@ -577,12 +582,18 @@ func (g *Game) RespawnShip(playerID entity.ID) error {
 	// Find spawn point
 	spawnPoint := g.findSpawnPoint(player.TeamID)
 
+	// Determine ship class from team config
+	shipClass := entity.Scout
+	if player.TeamID < len(g.Config.Teams) {
+		shipClass = entity.ShipClassFromString(g.Config.Teams[player.TeamID].StartingShip)
+	}
+
 	// Create a new ship
 	oldShipID := player.ShipID
 	shipID := entity.GenerateID()
 	ship := entity.NewShip(
 		shipID,
-		entity.Scout, // Default ship class
+		shipClass,
 		player.TeamID,
 		spawnPoint,
 	)

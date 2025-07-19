@@ -242,3 +242,21 @@ func getShipStats(class ShipClass) ShipStats {
 		}
 	}
 }
+
+// ShipClassFromString converts a string to a ShipClass enum value.
+func ShipClassFromString(s string) ShipClass {
+	switch s {
+	case "Scout":
+		return Scout
+	case "Destroyer":
+		return Destroyer
+	case "Cruiser":
+		return Cruiser
+	case "Battleship":
+		return Battleship
+	case "Assault":
+		return Assault
+	default:
+		return Scout // fallback to Scout if unknown
+	}
+}

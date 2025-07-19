@@ -218,3 +218,38 @@ func TestGame_endGame_SetsStatusAndWinner(t *testing.T) {
 		t.Errorf("expected winning team 0, got %d", game.WinningTeam)
 	}
 }
+
+func TestGame_ShipClassSelectionFromConfig(t *testing.T) {
+	cfg := defaultConfig()
+	// Set team 0 to Destroyer, team 1 to Scout
+	cfg.Teams[0].StartingShip = "Destroyer"
+	cfg.Teams[1].StartingShip = "Scout"
+	game := NewGame(cfg)
+
+	id0, err := game.AddPlayer("DestroyerGuy", 0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	ship0 := game.Ships[game.Teams[0].Players[id0].ShipID]
+	if ship0.Class != entity.Destroyer {
+		t.Errorf("expected Destroyer, got %v", ship0.Class)
+	}
+
+	id1, err := game.AddPlayer("ScoutGuy", 1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	ship1 := game.Ships[game.Teams[1].Players[id1].ShipID]
+	if ship1.Class != entity.Scout {
+		t.Errorf("expected Scout, got %v", ship1.Class)
+	}
+
+	// Test respawn uses config
+	if err := game.RespawnShip(id0); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	ship0r := game.Ships[game.Teams[0].Players[id0].ShipID]
+	if ship0r.Class != entity.Destroyer {
+		t.Errorf("respawn: expected Destroyer, got %v", ship0r.Class)
+	}
+}
