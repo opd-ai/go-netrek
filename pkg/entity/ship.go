@@ -203,8 +203,21 @@ func (s *Ship) RepairTick(deltaTime float64) {
 	}
 }
 
-// getShipStats returns the base statistics for a ship class
+var shipTypeStats map[string]ShipStats
+
+// SetShipTypeStats allows the config loader to inject custom ship stats
+func SetShipTypeStats(stats map[string]ShipStats) {
+	shipTypeStats = stats
+}
+
+// getShipStats returns the base statistics for a ship class, using config if available
 func getShipStats(class ShipClass) ShipStats {
+	name := class.String()
+	if shipTypeStats != nil {
+		if s, ok := shipTypeStats[name]; ok {
+			return s
+		}
+	}
 	switch class {
 	case Scout:
 		return ShipStats{
@@ -240,6 +253,24 @@ func getShipStats(class ShipClass) ShipStats {
 			WeaponSlots:  2,
 			MaxArmies:    3,
 		}
+	}
+}
+
+// String returns the string name for a ShipClass
+func (c ShipClass) String() string {
+	switch c {
+	case Scout:
+		return "Scout"
+	case Destroyer:
+		return "Destroyer"
+	case Cruiser:
+		return "Cruiser"
+	case Battleship:
+		return "Battleship"
+	case Assault:
+		return "Assault"
+	default:
+		return "Unknown"
 	}
 }
 

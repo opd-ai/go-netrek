@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/opd-ai/go-netrek/pkg/entity"
+	"github.com/opd-ai/go-netrek/pkg/physics"
 )
 
 func TestDefaultConfig(t *testing.T) {
@@ -458,4 +459,34 @@ func findSubstring(s, substr string) bool {
 		}
 	}
 	return false
+}
+
+func TestLoadConfig_CustomShipTypes(t *testing.T) {
+	jsonData := `{
+		"worldSize": 1000,
+		"maxPlayers": 8,
+		"teams": [{"name": "Red", "color": "#f00", "maxShips": 4, "startingShip": "Scout"}],
+		"planets": [],
+		"shipTypes": {
+			"Scout": {"name": "Scout", "maxHull": 999, "maxShields": 1, "maxFuel": 1, "acceleration": 1, "turnRate": 1, "maxSpeed": 1, "weaponSlots": 1, "maxArmies": 1}
+		}
+	}`
+	f, err := os.CreateTemp("", "testconfig-*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+	if _, err := f.Write([]byte(jsonData)); err != nil {
+		t.Fatal(err)
+	}
+	f.Close()
+
+	_, err = LoadConfig(f.Name())
+	if err != nil {
+		t.Fatalf("failed to load config: %v", err)
+	}
+	ship := entity.NewShip(1, entity.ShipClassFromString("Scout"), 0, physics.Vector2D{})
+	if ship.Stats.MaxHull != 999 {
+		t.Errorf("expected MaxHull 999, got %d", ship.Stats.MaxHull)
+	}
 }

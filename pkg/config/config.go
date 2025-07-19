@@ -10,15 +10,30 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/entity"
 )
 
+// ShipTypeConfig allows defining custom ship types and stats in config
+// Keyed by name (e.g. "Scout", "Destroyer")
+type ShipTypeConfig struct {
+	Name         string  `json:"name"`
+	MaxHull      int     `json:"maxHull"`
+	MaxShields   int     `json:"maxShields"`
+	MaxFuel      int     `json:"maxFuel"`
+	Acceleration float64 `json:"acceleration"`
+	TurnRate     float64 `json:"turnRate"`
+	MaxSpeed     float64 `json:"maxSpeed"`
+	WeaponSlots  int     `json:"weaponSlots"`
+	MaxArmies    int     `json:"maxArmies"`
+}
+
 // GameConfig contains configuration for a Netrek game
 type GameConfig struct {
-	WorldSize     float64        `json:"worldSize"`
-	MaxPlayers    int            `json:"maxPlayers"`
-	Teams         []TeamConfig   `json:"teams"`
-	Planets       []PlanetConfig `json:"planets"`
-	PhysicsConfig PhysicsConfig  `json:"physics"`
-	NetworkConfig NetworkConfig  `json:"network"`
-	GameRules     GameRules      `json:"gameRules"`
+	WorldSize     float64                   `json:"worldSize"`
+	MaxPlayers    int                       `json:"maxPlayers"`
+	Teams         []TeamConfig              `json:"teams"`
+	Planets       []PlanetConfig            `json:"planets"`
+	PhysicsConfig PhysicsConfig             `json:"physics"`
+	NetworkConfig NetworkConfig             `json:"network"`
+	GameRules     GameRules                 `json:"gameRules"`
+	ShipTypes     map[string]ShipTypeConfig `json:"shipTypes"`
 }
 
 // TeamConfig contains configuration for a team
@@ -82,6 +97,24 @@ func LoadConfig(path string) (*GameConfig, error) {
 	var config GameConfig
 	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	}
+
+	// Convert ShipTypes to entity.ShipStats and inject
+	if len(config.ShipTypes) > 0 {
+		stats := make(map[string]entity.ShipStats)
+		for name, st := range config.ShipTypes {
+			stats[name] = entity.ShipStats{
+				MaxHull:      st.MaxHull,
+				MaxShields:   st.MaxShields,
+				MaxFuel:      st.MaxFuel,
+				Acceleration: st.Acceleration,
+				TurnRate:     st.TurnRate,
+				MaxSpeed:     st.MaxSpeed,
+				WeaponSlots:  st.WeaponSlots,
+				MaxArmies:    st.MaxArmies,
+			}
+		}
+		entity.SetShipTypeStats(stats)
 	}
 
 	return &config, nil
@@ -160,6 +193,30 @@ func DefaultConfig() *GameConfig {
 			RespawnDelay:   5,
 			FriendlyFire:   false,
 			StartingArmies: 0,
+		},
+		ShipTypes: map[string]ShipTypeConfig{
+			"Scout": {
+				Name:         "Scout",
+				MaxHull:      100,
+				MaxShields:   100,
+				MaxFuel:      1000,
+				Acceleration: 200,
+				TurnRate:     3.0,
+				MaxSpeed:     300,
+				WeaponSlots:  2,
+				MaxArmies:    2,
+			},
+			"Destroyer": {
+				Name:         "Destroyer",
+				MaxHull:      150,
+				MaxShields:   150,
+				MaxFuel:      1200,
+				Acceleration: 150,
+				TurnRate:     2.5,
+				MaxSpeed:     250,
+				WeaponSlots:  3,
+				MaxArmies:    5,
+			},
 		},
 	}
 }

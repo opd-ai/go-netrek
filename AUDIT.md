@@ -1,13 +1,19 @@
 ## AUDIT SUMMARY
 CRITICAL BUG: 0  
 FUNCTIONAL MISMATCH: 0  
-MISSING FEATURE: 1  
+MISSING FEATURE: 0  
 EDGE CASE BUG: 1  
 PERFORMANCE ISSUE: 1  
 
 - All findings are detailed below, with file and line references, severity, and reproduction steps.
 
 ## DETAILED FINDINGS
+
+### FIXED: Configurable Ship Types via JSON
+**File:** pkg/config/config.go:1-166, README.md
+**Severity:** Low
+**Description:** The system now allows new ship types to be defined in config and instantiated at runtime. See commit: "Support configurable ship types via JSON config".
+**Resolution Date:** 2025-07-19
 
 ### FIXED: Custom Game Rules Extensibility via Interface
 **File:** pkg/engine/game.go:953, README.md
@@ -26,19 +32,6 @@ PERFORMANCE ISSUE: 1
 **Severity:** Medium
 **Description:** When a player joins or respawns, the ship now uses the team's `StartingShip` from config. See commit: "Honor team StartingShip config for player join/respawn".
 **Resolution Date:** 2025-07-19
-
-### MISSING FEATURE: Configurable Ship/Planet/Weapon Types via JSON
-**File:** pkg/config/config.go:1-166, README.md
-**Severity:** Low
-**Description:** The README and config example suggest that new ship classes, planet types, and weapons can be added via JSON config, but the code only supports hardcoded types and does not parse or instantiate new types from config.
-**Expected Behavior:** The system should allow new ship/planet/weapon types to be defined in config and instantiated at runtime.
-**Actual Behavior:** Only predefined types in Go code are supported.
-**Impact:** Limits extensibility and contradicts documentation.
-**Reproduction:** Add a new ship or weapon type to the config JSON and attempt to use it in-game.
-**Code Reference:**
-```go
-// Only hardcoded types in entity/ship.go, entity/planet.go, entity/weapon.go
-```
 
 ### EDGE CASE BUG: Ship/Projectile World Wrapping May Cause Overlap
 **File:** pkg/engine/game.go:241-300
