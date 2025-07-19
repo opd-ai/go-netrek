@@ -59,14 +59,15 @@ type Client struct {
 
 // NewGameServer creates a new game server
 func NewGameServer(game *engine.Game, maxClients int) *GameServer {
+	nc := game.Config.NetworkConfig
 	return &GameServer{
 		game:          game,
 		clients:       make(map[entity.ID]*Client),
 		running:       false,
-		updateRate:    time.Second / 20, // 20 updates per second
+		updateRate:    time.Second / time.Duration(nc.UpdateRate),
 		maxClients:    maxClients,
-		ticksPerState: 3, // Send full state every 3 game ticks
-		partialState:  true,
+		ticksPerState: nc.TicksPerState,
+		partialState:  nc.UsePartialState,
 	}
 }
 

@@ -1,6 +1,6 @@
 ## AUDIT SUMMARY
 CRITICAL BUG: 0  
-FUNCTIONAL MISMATCH: 1  
+FUNCTIONAL MISMATCH: 0  
 MISSING FEATURE: 2  
 EDGE CASE BUG: 1  
 PERFORMANCE ISSUE: 1  
@@ -9,18 +9,11 @@ PERFORMANCE ISSUE: 1
 
 ## DETAILED FINDINGS
 
-### FUNCTIONAL MISMATCH: Partial State Updates Not Fully Implemented
+### FIXED: Partial State Updates Now Use Config
 **File:** pkg/network/server.go:1-180
 **Severity:** Medium
-**Description:** The README and config support partial state updates (`usePartialState`), but the server always sends full state updates every `ticksPerState` and does not implement logic for sending only changed entities between full updates.
-**Expected Behavior:** When `usePartialState` is true, the server should send only changed entities between full state updates.
-**Actual Behavior:** The code lacks logic to track and send only changed entities.
-**Impact:** Increased bandwidth usage, especially with many entities, and does not match documented networking efficiency.
-**Reproduction:** Run a game with many entities and `usePartialState` enabled; observe that all state is sent every update.
-**Code Reference:**
-```go
-// No code for tracking/sending only changed entities between full updates
-```
+**Description:** The server now uses `usePartialState` and `ticksPerState` from config. See commit: "Honor config for partial state and ticksPerState in server".
+**Resolution Date:** 2025-07-19
 
 ### FIXED: Ship Class Selection Now Honored on Respawn/Join
 **File:** pkg/engine/game.go:481-493, 541-600
