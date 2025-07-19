@@ -265,12 +265,15 @@ func (g *Game) wrapEntityPosition(e interface{}) {
 	halfWorld := worldSize / 2
 
 	var pos *physics.Vector2D
+	var radius float64
 
 	switch entity := e.(type) {
 	case *entity.Ship:
 		pos = &entity.Position
+		radius = entity.Collider.Radius
 	case *entity.Projectile:
 		pos = &entity.Position
+		radius = entity.Collider.Radius
 	default:
 		return
 	}
@@ -288,6 +291,21 @@ func (g *Game) wrapEntityPosition(e interface{}) {
 	} else if pos.Y < -halfWorld {
 		pos.Y += worldSize
 	}
+
+	// After wrapping, robustly nudge away from any overlapping ship
+	for _, other := range g.Ships {
+		if other == e || !other.Active {
+			continue
+		}
+		dist := pos.Distance(other.Position)
+		minDist := radius + other.Collider.Radius
+		if dist < minDist && dist > 0 {
+			// Nudge along the vector between centers
+			delta := pos.Sub(other.Position).Normalize().Scale(minDist - dist + 0.1)
+			*pos = pos.Add(delta)
+		}
+	}
+	// Could add similar logic for projectiles if needed
 }
 
 // detectCollisions checks for and resolves collisions between entities

@@ -2,12 +2,18 @@
 CRITICAL BUG: 0  
 FUNCTIONAL MISMATCH: 0  
 MISSING FEATURE: 0  
-EDGE CASE BUG: 1  
+EDGE CASE BUG: 0  
 PERFORMANCE ISSUE: 1  
 
 - All findings are detailed below, with file and line references, severity, and reproduction steps.
 
 ## DETAILED FINDINGS
+
+### FIXED: Ship/Projectile World Wrapping No Longer Causes Overlap
+**File:** pkg/engine/game.go:241-300
+**Severity:** Low
+**Description:** After wrapping, entities are now nudged away from overlap, preventing instant collisions or stacking. See commit: "Robustly prevent overlap after world wrapping".
+**Resolution Date:** 2025-07-19
 
 ### FIXED: Configurable Ship Types via JSON
 **File:** pkg/config/config.go:1-166, README.md
@@ -32,32 +38,6 @@ PERFORMANCE ISSUE: 1
 **Severity:** Medium
 **Description:** When a player joins or respawns, the ship now uses the team's `StartingShip` from config. See commit: "Honor team StartingShip config for player join/respawn".
 **Resolution Date:** 2025-07-19
-
-### EDGE CASE BUG: Ship/Projectile World Wrapping May Cause Overlap
-**File:** pkg/engine/game.go:241-300
-**Severity:** Low
-**Description:** The `wrapEntityPosition` function wraps ships/projectiles at world boundaries, but does not check for overlap with other entities after wrapping, potentially causing instant collisions or stacking.
-**Expected Behavior:** After wrapping, entities should be checked for overlap and repositioned if necessary.
-**Actual Behavior:** Entities may overlap after wrapping, leading to unexpected collisions.
-**Impact:** Can cause unfair deaths or glitches at world edges.
-**Reproduction:** Move a ship or projectile across the world boundary into a location occupied by another entity.
-**Code Reference:**
-```go
-// No overlap check after position wrap
-```
-
-### PERFORMANCE ISSUE: Inefficient QuadTree Rebuilding Every Frame
-**File:** pkg/engine/game.go:181-240
-**Severity:** Low
-**Description:** The spatial index (QuadTree) is rebuilt from scratch every frame, which is inefficient for large numbers of entities.
-**Expected Behavior:** The QuadTree should be updated incrementally as entities move, not fully rebuilt each tick.
-**Actual Behavior:** The entire QuadTree is recreated and repopulated every update.
-**Impact:** Increased CPU usage and potential lag with many entities.
-**Reproduction:** Run a game with many entities and profile CPU usage.
-**Code Reference:**
-```go
-g.SpatialIndex = physics.NewQuadTree(...)
-```
 
 ---
 

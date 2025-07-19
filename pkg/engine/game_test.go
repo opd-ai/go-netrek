@@ -197,6 +197,24 @@ func TestGame_wrapEntityPosition_WrapsCorrectly(t *testing.T) {
 	}
 }
 
+func TestGame_WrapEntityPosition_OverlapEdgeCase(t *testing.T) {
+	game := NewGame(defaultConfig())
+	// Place two ships at opposite edges
+	id1, _ := game.AddPlayer("Edge1", 0)
+	id2, _ := game.AddPlayer("Edge2", 0)
+	ship1 := game.Ships[game.Teams[0].Players[id1].ShipID]
+	ship2 := game.Ships[game.Teams[0].Players[id2].ShipID]
+	world := game.Config.WorldSize / 2
+	// Place ship1 just outside +X, ship2 at -X
+	ship1.Position = physics.Vector2D{X: world + 10, Y: 0}
+	ship2.Position = physics.Vector2D{X: -world, Y: 0}
+	// Wrap ship1, should now overlap ship2
+	game.wrapEntityPosition(ship1)
+	if ship1.Position.Distance(ship2.Position) < ship1.Collider.Radius+ship2.Collider.Radius {
+		t.Errorf("Ships overlap after wrapping: ship1=%v ship2=%v", ship1.Position, ship2.Position)
+	}
+}
+
 func TestGame_cleanupInactiveEntities_RemovesProjectiles(t *testing.T) {
 	game := NewGame(defaultConfig())
 	proj := &entity.Projectile{BaseEntity: entity.BaseEntity{ID: 42, Active: false}}
