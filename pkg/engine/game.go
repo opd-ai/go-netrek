@@ -23,6 +23,12 @@ const (
 	GameStatusEnded
 )
 
+// WinCondition defines an interface for custom win condition logic
+// Returns (winningTeamID, true) if a winner is found, else (-1, false)
+type WinCondition interface {
+	CheckWinner(game *Game) (int, bool)
+}
+
 // Game represents the core game state and logic
 type Game struct {
 	Config       *config.GameConfig
@@ -42,6 +48,8 @@ type Game struct {
 	EndTime      time.Time
 	StartTime    time.Time
 	ElapsedTime  float64 // seconds
+
+	CustomWinCondition WinCondition // Optional custom win condition
 }
 
 // Team represents a player team in the game
@@ -931,10 +939,28 @@ func (g *Game) endGame() {
 	g.EndTime = time.Now()
 	g.Running = false
 
-	// Determine winner based on score or planets
+	// Use custom win condition if set
+	if g.CustomWinCondition != nil {
+		if winnerID, ok := g.CustomWinCondition.CheckWinner(g); ok {
+			g.WinningTeam = winnerID
+			if winnerID >= 0 {
+				g.EventBus.Publish(&event.BaseEvent{
+					EventType: event.GameEnded,
+					Source:    g.Teams[winnerID],
+				})
+			} else {
+				g.EventBus.Publish(&event.BaseEvent{
+					EventType: event.GameEnded,
+					Source:    g,
+				})
+			}
+			return
+		}
+	}
+
+	// Default logic: score or conquest
 	var winnerID int = -1
 	maxScore := 0
-
 	for id, team := range g.Teams {
 		if team.Score > maxScore ||
 			(g.Config.GameRules.WinCondition == "conquest" && team.PlanetCount > maxScore) {
@@ -945,10 +971,7 @@ func (g *Game) endGame() {
 			winnerID = id
 		}
 	}
-
 	g.WinningTeam = winnerID
-
-	// Publish game ended event
 	if winnerID >= 0 {
 		g.EventBus.Publish(&event.BaseEvent{
 			EventType: event.GameEnded,

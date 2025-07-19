@@ -219,6 +219,25 @@ func TestGame_endGame_SetsStatusAndWinner(t *testing.T) {
 	}
 }
 
+type testWinCondition struct{}
+
+func (t testWinCondition) CheckWinner(game *Game) (int, bool) {
+	// Always declare team 1 as winner for test
+	return 1, true
+}
+
+func TestGame_endGame_CustomWinCondition(t *testing.T) {
+	game := NewGame(defaultConfig())
+	game.CustomWinCondition = testWinCondition{}
+	game.endGame()
+	if game.Status != GameStatusEnded {
+		t.Error("game status not set to ended")
+	}
+	if game.WinningTeam != 1 {
+		t.Errorf("expected winning team 1, got %d", game.WinningTeam)
+	}
+}
+
 func TestGame_ShipClassSelectionFromConfig(t *testing.T) {
 	cfg := defaultConfig()
 	// Set team 0 to Destroyer, team 1 to Scout

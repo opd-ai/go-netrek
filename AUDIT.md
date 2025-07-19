@@ -1,13 +1,19 @@
 ## AUDIT SUMMARY
 CRITICAL BUG: 0  
 FUNCTIONAL MISMATCH: 0  
-MISSING FEATURE: 2  
+MISSING FEATURE: 1  
 EDGE CASE BUG: 1  
 PERFORMANCE ISSUE: 1  
 
 - All findings are detailed below, with file and line references, severity, and reproduction steps.
 
 ## DETAILED FINDINGS
+
+### FIXED: Custom Game Rules Extensibility via Interface
+**File:** pkg/engine/game.go:953, README.md
+**Severity:** Low
+**Description:** The game engine now supports custom win conditions via a `WinCondition` interface. See commit: "Add WinCondition interface for custom game rules".
+**Resolution Date:** 2025-07-19
 
 ### FIXED: Partial State Updates Now Use Config
 **File:** pkg/network/server.go:1-180
@@ -20,19 +26,6 @@ PERFORMANCE ISSUE: 1
 **Severity:** Medium
 **Description:** When a player joins or respawns, the ship now uses the team's `StartingShip` from config. See commit: "Honor team StartingShip config for player join/respawn".
 **Resolution Date:** 2025-07-19
-
-### MISSING FEATURE: Custom Game Rules Extensibility
-**File:** pkg/engine/game.go:953, README.md
-**Severity:** Low
-**Description:** README claims custom game rules can be implemented in `pkg/engine/game.go`, but the code does not provide a plugin or interface mechanism for adding new rules without modifying core logic.
-**Expected Behavior:** There should be a documented interface or hook for adding new win conditions or rules.
-**Actual Behavior:** All rules are hardcoded; no extensibility points are provided.
-**Impact:** Developers must modify core files to add new rules, reducing modularity and maintainability.
-**Reproduction:** Attempt to add a new win condition or rule without editing `game.go` directly.
-**Code Reference:**
-```go
-// All win condition logic is hardcoded in endGame() and event handlers
-```
 
 ### MISSING FEATURE: Configurable Ship/Planet/Weapon Types via JSON
 **File:** pkg/config/config.go:1-166, README.md
