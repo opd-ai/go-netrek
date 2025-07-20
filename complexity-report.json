@@ -1,16 +1,16 @@
 {
   "metadata": {
     "repository": "/home/user/go/src/github.com/opd-ai/go-netrek",
-    "generated_at": "2025-07-20T17:44:49.235657233-04:00",
-    "analysis_time": 16163563,
+    "generated_at": "2025-07-20T17:53:20.567248801-04:00",
+    "analysis_time": 12396663,
     "files_processed": 43,
     "tool_version": "1.0.0",
     "go_version": ""
   },
   "overview": {
-    "total_lines_of_code": 1978,
-    "total_functions": 90,
-    "total_methods": 50,
+    "total_lines_of_code": 1476,
+    "total_functions": 75,
+    "total_methods": 64,
     "total_structs": 0,
     "total_interfaces": 0,
     "total_packages": 0,
@@ -18,176 +18,32 @@
   },
   "functions": [
     {
-      "name": "NewShip",
-      "package": "entity",
-      "file": "entity",
-      "line": 58,
-      "is_exported": true,
+      "name": "main",
+      "package": "main",
+      "file": "main",
+      "line": 16,
+      "is_exported": false,
       "is_method": false,
       "lines": {
-        "total": 28,
-        "code": 28,
+        "total": 51,
+        "code": 51,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 4,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 2.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "Update",
-      "package": "entity",
-      "file": "entity",
-      "line": 90,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 38,
-        "code": 38,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
+        "parameter_count": 0,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0
       },
       "complexity": {
         "cyclomatic": 7,
         "cognitive": 7,
-        "nesting_depth": 7,
-        "overall": 12.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 62,
-        "has_example": false,
-        "quality_score": 0.248
-      }
-    },
-    {
-      "name": "FireWeapon",
-      "package": "entity",
-      "file": "entity",
-      "line": 132,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 26,
-        "code": 26,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 49,
-        "has_example": false,
-        "quality_score": 0.196
-      }
-    },
-    {
-      "name": "TakeDamage",
-      "package": "entity",
-      "file": "entity",
-      "line": 162,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 18,
-        "code": 18,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 69,
-        "has_example": false,
-        "quality_score": 0.27599999999999997
-      }
-    },
-    {
-      "name": "RepairTick",
-      "package": "entity",
-      "file": "entity",
-      "line": 183,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 20,
-        "code": 20,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 5,
-        "cognitive": 5,
-        "nesting_depth": 5,
-        "overall": 9
+        "nesting_depth": 8,
+        "overall": 13.1
       },
       "documentation": {
         "has_comment": false,
@@ -197,86 +53,16 @@
       }
     },
     {
-      "name": "SetShipTypeStats",
-      "package": "entity",
-      "file": "entity",
-      "line": 209,
+      "name": "GetType",
+      "package": "event",
+      "file": "event",
+      "line": 44,
       "is_exported": true,
-      "is_method": false,
+      "is_method": true,
+      "receiver_type": "*BaseEvent",
       "lines": {
         "total": 1,
         "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 70,
-        "has_example": false,
-        "quality_score": 0.27999999999999997
-      }
-    },
-    {
-      "name": "getShipStats",
-      "package": "entity",
-      "file": "entity",
-      "line": 214,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 42,
-        "code": 42,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 85,
-        "has_example": false,
-        "quality_score": 0.44000000000000006
-      }
-    },
-    {
-      "name": "String",
-      "package": "entity",
-      "file": "entity",
-      "line": 260,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "ShipClass",
-      "lines": {
-        "total": 14,
-        "code": 14,
         "comments": 0,
         "blank": 0
       },
@@ -290,486 +76,205 @@
         "signature_complexity": 0.3
       },
       "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 47,
-        "has_example": false,
-        "quality_score": 0.28800000000000003
-      }
-    },
-    {
-      "name": "ShipClassFromString",
-      "package": "entity",
-      "file": "entity",
-      "line": 278,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "TestBaseEntity_GetID",
-      "package": "entity",
-      "file": "entity",
-      "line": 10,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 34,
-        "code": 34,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 4,
-        "overall": 5.9
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestBaseEntity_GetPosition",
-      "package": "entity",
-      "file": "entity",
-      "line": 47,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 39,
-        "code": 39,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 4,
-        "overall": 5.9
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestBaseEntity_GetCollider",
-      "package": "entity",
-      "file": "entity",
-      "line": 89,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 53,
-        "code": 53,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestBaseEntity_Update",
-      "package": "entity",
-      "file": "entity",
-      "line": 145,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 74,
-        "code": 74,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestBaseEntity_Render",
-      "package": "entity",
-      "file": "entity",
-      "line": 222,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 18,
-        "code": 18,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 3,
-        "overall": 4.1
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestBaseEntity_IntegrationTest",
-      "package": "entity",
-      "file": "entity",
-      "line": 243,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 42,
-        "code": 42,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "RenderShip",
-      "package": "entity",
-      "file": "entity",
-      "line": 297,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*MockRenderer",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
         "cyclomatic": 1,
         "cognitive": 1,
         "nesting_depth": 1,
         "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "RenderPlanet",
-      "package": "entity",
-      "file": "entity",
-      "line": 301,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*MockRenderer",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "RenderProjectile",
-      "package": "entity",
-      "file": "entity",
-      "line": 305,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*MockRenderer",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "Clear",
-      "package": "entity",
-      "file": "entity",
-      "line": 309,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*MockRenderer",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "Present",
-      "package": "entity",
-      "file": "entity",
-      "line": 313,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*MockRenderer",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "NewPlanet",
-      "package": "entity",
-      "file": "entity",
-      "line": 33,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 39,
-        "code": 39,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 4,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 2.3
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
       },
       "documentation": {
         "has_comment": true,
         "comment_length": 31,
         "has_example": false,
-        "quality_score": 0.124
+        "quality_score": 0.224
       }
     },
     {
-      "name": "Update",
-      "package": "entity",
-      "file": "entity",
-      "line": 76,
+      "name": "GetSource",
+      "package": "event",
+      "file": "event",
+      "line": 49,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Planet",
+      "receiver_type": "*BaseEvent",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 35,
+        "has_example": false,
+        "quality_score": 0.24
+      }
+    },
+    {
+      "name": "NewEventBus",
+      "package": "event",
+      "file": "event",
+      "line": 70,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 36,
+        "has_example": false,
+        "quality_score": 0.144
+      }
+    },
+    {
+      "name": "Subscribe",
+      "package": "event",
+      "file": "event",
+      "line": 78,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*Bus",
+      "lines": {
+        "total": 21,
+        "code": 21,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 2,
+        "overall": 2.3
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 89,
+        "has_example": false,
+        "quality_score": 0.45600000000000007
+      }
+    },
+    {
+      "name": "unsubscribeByID",
+      "package": "event",
+      "file": "event",
+      "line": 103,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*Bus",
+      "lines": {
+        "total": 15,
+        "code": 15,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 44,
+        "has_example": false,
+        "quality_score": 0.17600000000000002
+      }
+    },
+    {
+      "name": "Unsubscribe",
+      "package": "event",
+      "file": "event",
+      "line": 122,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*Bus",
+      "lines": {
+        "total": 2,
+        "code": 2,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 103,
+        "has_example": false,
+        "quality_score": 0.4
+      }
+    },
+    {
+      "name": "Publish",
+      "package": "event",
+      "file": "event",
+      "line": 128,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*Bus",
       "lines": {
         "total": 12,
         "code": 12,
@@ -786,46 +291,115 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 64,
+        "comment_length": 50,
         "has_example": false,
-        "quality_score": 0.256
+        "quality_score": 0.2
       }
     },
     {
-      "name": "Bomb",
-      "package": "entity",
-      "file": "entity",
-      "line": 92,
+      "name": "NewShipEvent",
+      "package": "event",
+      "file": "event",
+      "line": 153,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Planet",
+      "is_method": false,
       "lines": {
-        "total": 32,
-        "code": 32,
+        "total": 8,
+        "code": 8,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
+        "parameter_count": 4,
         "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
-        "interface_parameters": 0,
+        "interface_parameters": 1,
         "generic_parameters": null,
-        "signature_complexity": 0.8
+        "signature_complexity": 3.0999999999999996
       },
       "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 38,
+        "has_example": false,
+        "quality_score": 0.15200000000000002
+      }
+    },
+    {
+      "name": "NewPlanetEvent",
+      "package": "event",
+      "file": "event",
+      "line": 173,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 9,
+        "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 4,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 1,
+        "generic_parameters": null,
+        "signature_complexity": 3.0999999999999996
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 42,
+        "has_example": false,
+        "quality_score": 0.168
+      }
+    },
+    {
+      "name": "NewCollisionEvent",
+      "package": "event",
+      "file": "event",
+      "line": 193,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 8,
+        "code": 8,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 1,
+        "generic_parameters": null,
+        "signature_complexity": 2.1
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
       },
       "documentation": {
         "has_comment": true,
@@ -835,16 +409,51 @@
       }
     },
     {
-      "name": "BeamDownArmies",
-      "package": "entity",
-      "file": "entity",
-      "line": 128,
+      "name": "newMockConn",
+      "package": "network",
+      "file": "network",
+      "line": 26,
+      "is_exported": false,
+      "is_method": false,
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "Read",
+      "package": "network",
+      "file": "network",
+      "line": 33,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Planet",
+      "receiver_type": "*mockConn",
       "lines": {
-        "total": 25,
-        "code": 25,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
@@ -852,10 +461,297 @@
         "parameter_count": 1,
         "return_count": 2,
         "has_variadic": false,
-        "returns_error": false,
+        "returns_error": true,
         "interface_parameters": 0,
         "generic_parameters": null,
         "signature_complexity": 1.1
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "Write",
+      "package": "network",
+      "file": "network",
+      "line": 41,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 6,
+        "code": 6,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 2,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.1
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "Close",
+      "package": "network",
+      "file": "network",
+      "line": 49,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "LocalAddr",
+      "package": "network",
+      "file": "network",
+      "line": 55,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 0,
+        "code": 0,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "RemoteAddr",
+      "package": "network",
+      "file": "network",
+      "line": 56,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 0,
+        "code": 0,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "SetDeadline",
+      "package": "network",
+      "file": "network",
+      "line": 57,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 0,
+        "code": 0,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "SetReadDeadline",
+      "package": "network",
+      "file": "network",
+      "line": 58,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 0,
+        "code": 0,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "SetWriteDeadline",
+      "package": "network",
+      "file": "network",
+      "line": 59,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*mockConn",
+      "lines": {
+        "total": 0,
+        "code": 0,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestNewGameClient_BasicInitialization",
+      "package": "network",
+      "file": "network",
+      "line": 62,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 14,
+        "code": 14,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
       },
       "complexity": {
         "cyclomatic": 5,
@@ -865,33 +761,32 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 58,
+        "comment_length": 81,
         "has_example": false,
-        "quality_score": 0.23199999999999998
+        "quality_score": 0.42400000000000004
       }
     },
     {
-      "name": "BeamUpArmies",
-      "package": "entity",
-      "file": "entity",
-      "line": 157,
+      "name": "TestRequestShipClass_UpdatesDesiredShipClass",
+      "package": "network",
+      "file": "network",
+      "line": 80,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Planet",
+      "is_method": false,
       "lines": {
-        "total": 13,
-        "code": 13,
+        "total": 12,
+        "code": 12,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 1,
+        "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.8
+        "signature_complexity": 0.5
       },
       "complexity": {
         "cyclomatic": 3,
@@ -901,21 +796,21 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 56,
+        "comment_length": 45,
         "has_example": false,
-        "quality_score": 0.22400000000000003
+        "quality_score": 0.18000000000000002
       }
     },
     {
-      "name": "TestBaseWeapon_GetName",
-      "package": "entity",
-      "file": "entity",
-      "line": 13,
+      "name": "TestConnect_ErrorCases",
+      "package": "network",
+      "file": "network",
+      "line": 96,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 36,
-        "code": 36,
+        "total": 9,
+        "code": 9,
         "comments": 0,
         "blank": 0
       },
@@ -929,28 +824,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 4,
-        "overall": 5.9
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 96,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.484
       }
     },
     {
-      "name": "TestBaseWeapon_GetCooldown",
-      "package": "entity",
-      "file": "entity",
-      "line": 52,
+      "name": "TestSendInput_NotConnected",
+      "package": "network",
+      "file": "network",
+      "line": 109,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 36,
-        "code": 36,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
@@ -964,28 +859,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 4,
-        "overall": 5.9
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 41,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.364
       }
     },
     {
-      "name": "TestBaseWeapon_GetFuelCost",
-      "package": "entity",
-      "file": "entity",
-      "line": 91,
+      "name": "TestSendChatMessage_NotConnected",
+      "package": "network",
+      "file": "network",
+      "line": 119,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 36,
-        "code": 36,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
@@ -999,198 +894,23 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 4,
-        "overall": 5.9
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 47,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.388
       }
     },
     {
-      "name": "TestNewTorpedo",
-      "package": "entity",
-      "file": "entity",
-      "line": 130,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 35,
-        "code": 35,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 9,
-        "overall": 16.2
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNewPhaser",
-      "package": "entity",
-      "file": "entity",
-      "line": 168,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 35,
-        "code": 35,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 9,
-        "overall": 16.2
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestTorpedo_CreateProjectile",
-      "package": "entity",
-      "file": "entity",
-      "line": 206,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 60,
-        "code": 60,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 13,
-        "cognitive": 13,
-        "nesting_depth": 13,
-        "overall": 23.4
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestPhaser_CreateProjectile",
-      "package": "entity",
-      "file": "entity",
-      "line": 269,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 44,
-        "code": 44,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 9,
-        "overall": 16.2
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestProjectile_Update",
-      "package": "entity",
-      "file": "entity",
-      "line": 316,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 33,
-        "code": 33,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestProjectile_Update_ExceedsRange",
-      "package": "entity",
-      "file": "entity",
-      "line": 352,
+      "name": "TestSendInput_TableDriven",
+      "package": "network",
+      "file": "network",
+      "line": 129,
       "is_exported": true,
       "is_method": false,
       "lines": {
@@ -1211,61 +931,26 @@
       "complexity": {
         "cyclomatic": 3,
         "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestGenerateID_Uniqueness",
-      "package": "entity",
-      "file": "entity",
-      "line": 382,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 15,
-        "code": 15,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
         "nesting_depth": 4,
-        "overall": 7.2
+        "overall": 5.9
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 32,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.128
       }
     },
     {
-      "name": "TestGenerateID_ThreadSafety",
-      "package": "entity",
-      "file": "entity",
-      "line": 400,
+      "name": "TestGetLatency",
+      "package": "network",
+      "file": "network",
+      "line": 160,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 40,
-        "code": 40,
+        "total": 5,
+        "code": 5,
         "comments": 0,
         "blank": 0
       },
@@ -1279,10 +964,80 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 7,
-        "cognitive": 7,
-        "nesting_depth": 8,
-        "overall": 13.1
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 37,
+        "has_example": false,
+        "quality_score": 0.248
+      }
+    },
+    {
+      "name": "TestGetGameStateChannel",
+      "package": "network",
+      "file": "network",
+      "line": 169,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 5,
+        "code": 5,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 44,
+        "has_example": false,
+        "quality_score": 0.276
+      }
+    },
+    {
+      "name": "TestDefaultConfig",
+      "package": "config",
+      "file": "config",
+      "line": 13,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 73,
+        "code": 73,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 18,
+        "cognitive": 18,
+        "nesting_depth": 18,
+        "overall": 32.4
       },
       "documentation": {
         "has_comment": false,
@@ -1292,15 +1047,50 @@
       }
     },
     {
-      "name": "TestWeapon_Interface",
-      "package": "entity",
-      "file": "entity",
-      "line": 443,
+      "name": "TestLoadConfig_Success",
+      "package": "config",
+      "file": "config",
+      "line": 89,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 28,
-        "code": 28,
+        "total": 82,
+        "code": 82,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 9,
+        "cognitive": 9,
+        "nesting_depth": 9,
+        "overall": 16.2
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestLoadConfig_FileNotFound",
+      "package": "config",
+      "file": "config",
+      "line": 174,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 18,
+        "code": 18,
         "comments": 0,
         "blank": 0
       },
@@ -1327,32 +1117,32 @@
       }
     },
     {
-      "name": "UpdateMovement",
-      "package": "physics",
-      "file": "physics",
-      "line": 13,
+      "name": "TestLoadConfig_InvalidJSON",
+      "package": "config",
+      "file": "config",
+      "line": 195,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 16,
-        "code": 16,
+        "total": 26,
+        "code": 26,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 2,
+        "parameter_count": 1,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1
+        "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
+        "cyclomatic": 6,
+        "cognitive": 6,
+        "nesting_depth": 6,
+        "overall": 10.8
       },
       "documentation": {
         "has_comment": false,
@@ -1362,303 +1152,190 @@
       }
     },
     {
-      "name": "Add",
-      "package": "physics",
-      "file": "physics",
-      "line": 13,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 35,
-        "has_example": false,
-        "quality_score": 0.24
-      }
-    },
-    {
-      "name": "Sub",
-      "package": "physics",
-      "file": "physics",
-      "line": 21,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 47,
-        "has_example": false,
-        "quality_score": 0.28800000000000003
-      }
-    },
-    {
-      "name": "Scale",
-      "package": "physics",
-      "file": "physics",
-      "line": 29,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 46,
-        "has_example": false,
-        "quality_score": 0.18400000000000002
-      }
-    },
-    {
-      "name": "Length",
-      "package": "physics",
-      "file": "physics",
-      "line": 37,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 43,
-        "has_example": false,
-        "quality_score": 0.272
-      }
-    },
-    {
-      "name": "Normalize",
-      "package": "physics",
-      "file": "physics",
-      "line": 42,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 54,
-        "has_example": false,
-        "quality_score": 0.31600000000000006
-      }
-    },
-    {
-      "name": "Distance",
-      "package": "physics",
-      "file": "physics",
-      "line": 54,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 50,
-        "has_example": false,
-        "quality_score": 0.30000000000000004
-      }
-    },
-    {
-      "name": "Angle",
-      "package": "physics",
-      "file": "physics",
-      "line": 59,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 49,
-        "has_example": false,
-        "quality_score": 0.29600000000000004
-      }
-    },
-    {
-      "name": "FromAngle",
-      "package": "physics",
-      "file": "physics",
-      "line": 64,
+      "name": "TestSaveConfig_Success",
+      "package": "config",
+      "file": "config",
+      "line": 224,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 4,
-        "code": 4,
+        "total": 52,
+        "code": 52,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 1,
+        "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.8
+        "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 8,
+        "cognitive": 8,
+        "nesting_depth": 8,
+        "overall": 14.4
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 55,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.22000000000000003
+        "quality_score": 0
       }
     },
     {
-      "name": "Dot",
-      "package": "physics",
-      "file": "physics",
-      "line": 72,
+      "name": "TestSaveConfig_InvalidPath",
+      "package": "config",
+      "file": "config",
+      "line": 279,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
+      "is_method": false,
       "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 18,
+        "code": 18,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestSaveConfig_NilConfig",
+      "package": "config",
+      "file": "config",
+      "line": 300,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 19,
+        "code": 19,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestDefaultConfig_TeamConfigurations",
+      "package": "config",
+      "file": "config",
+      "line": 323,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 50,
+        "code": 50,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 7,
+        "cognitive": 7,
+        "nesting_depth": 8,
+        "overall": 13.1
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 51,
+        "has_example": false,
+        "quality_score": 0.20400000000000001
+      }
+    },
+    {
+      "name": "TestDefaultConfig_PlanetConfigurations",
+      "package": "config",
+      "file": "config",
+      "line": 377,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 68,
+        "code": 68,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 10,
+        "cognitive": 10,
+        "nesting_depth": 11,
+        "overall": 18.5
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 53,
+        "has_example": false,
+        "quality_score": 0.21200000000000002
+      }
+    },
+    {
+      "name": "contains",
+      "package": "config",
+      "file": "config",
+      "line": 449,
+      "is_exported": false,
+      "is_method": false,
+      "lines": {
+        "total": 3,
+        "code": 3,
         "comments": 0,
         "blank": 0
       },
@@ -1679,19 +1356,18 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 43,
+        "comment_length": 58,
         "has_example": false,
-        "quality_score": 0.272
+        "quality_score": 0.23199999999999998
       }
     },
     {
-      "name": "Rotate",
-      "package": "physics",
-      "file": "physics",
-      "line": 77,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
+      "name": "findSubstring",
+      "package": "config",
+      "file": "config",
+      "line": 455,
+      "is_exported": false,
+      "is_method": false,
       "lines": {
         "total": 6,
         "code": 6,
@@ -1708,52 +1384,471 @@
         "signature_complexity": 0.8
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 48,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.192
+        "quality_score": 0
       }
     },
     {
-      "name": "LengthSquared",
-      "package": "physics",
-      "file": "physics",
-      "line": 87,
+      "name": "TestLoadConfig_CustomShipTypes",
+      "package": "config",
+      "file": "config",
+      "line": 464,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "Vector2D",
+      "is_method": false,
       "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 27,
+        "code": 27,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
+        "parameter_count": 1,
+        "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.3
+        "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 71,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.384
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestNewPlanet_DefaultsAndTypes",
+      "package": "entity",
+      "file": "entity",
+      "line": 10,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 30,
+        "code": 30,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 6,
+        "cognitive": 6,
+        "nesting_depth": 7,
+        "overall": 11.3
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_Update_Production",
+      "package": "entity",
+      "file": "entity",
+      "line": 43,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 15,
+        "code": 15,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_Update_NoProductionWhenNeutral",
+      "package": "entity",
+      "file": "entity",
+      "line": 61,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 9,
+        "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_Update_MaxArmiesBoundary",
+      "package": "entity",
+      "file": "entity",
+      "line": 73,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_Bomb_Scenarios",
+      "package": "entity",
+      "file": "entity",
+      "line": 83,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 25,
+        "code": 25,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_Bomb_AtmosphereAndTemperature",
+      "package": "entity",
+      "file": "entity",
+      "line": 111,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 9,
+        "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_Bomb_DamageGreaterThanArmies",
+      "package": "entity",
+      "file": "entity",
+      "line": 123,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_BeamDownArmies_CaptureAndFriendly",
+      "package": "entity",
+      "file": "entity",
+      "line": 133,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 22,
+        "code": 22,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_BeamDownArmies_ZeroAmount",
+      "package": "entity",
+      "file": "entity",
+      "line": 158,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_BeamDownArmies_Overfill",
+      "package": "entity",
+      "file": "entity",
+      "line": 168,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_BeamUpArmies_FriendlyAndLimits",
+      "package": "entity",
+      "file": "entity",
+      "line": 178,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 27,
+        "code": 27,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestPlanet_BeamUpArmies_ZeroMaxAmount",
+      "package": "entity",
+      "file": "entity",
+      "line": 208,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
       }
     },
     {
@@ -2423,15 +2518,16 @@
       }
     },
     {
-      "name": "NewAdvancedMockRenderer",
+      "name": "GetName",
       "package": "entity",
       "file": "entity",
-      "line": 37,
+      "line": 30,
       "is_exported": true,
-      "is_method": false,
+      "is_method": true,
+      "receiver_type": "*BaseWeapon",
       "lines": {
-        "total": 5,
-        "code": 5,
+        "total": 1,
+        "code": 1,
         "comments": 0,
         "blank": 0
       },
@@ -2452,19 +2548,19 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 61,
+        "comment_length": 34,
         "has_example": false,
-        "quality_score": 0.244
+        "quality_score": 0.23600000000000002
       }
     },
     {
-      "name": "RenderShip",
+      "name": "GetCooldown",
       "package": "entity",
       "file": "entity",
-      "line": 46,
+      "line": 35,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*AdvancedMockRenderer",
+      "receiver_type": "*BaseWeapon",
       "lines": {
         "total": 1,
         "code": 1,
@@ -2472,49 +2568,13 @@
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
+        "parameter_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 45,
-        "has_example": false,
-        "quality_score": 0.18000000000000002
-      }
-    },
-    {
-      "name": "RenderPlanet",
-      "package": "entity",
-      "file": "entity",
-      "line": 51,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*AdvancedMockRenderer",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0.3
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2526,17 +2586,17 @@
         "has_comment": true,
         "comment_length": 47,
         "has_example": false,
-        "quality_score": 0.188
+        "quality_score": 0.28800000000000003
       }
     },
     {
-      "name": "RenderProjectile",
+      "name": "GetFuelCost",
       "package": "entity",
       "file": "entity",
-      "line": 56,
+      "line": 40,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*AdvancedMockRenderer",
+      "receiver_type": "*BaseWeapon",
       "lines": {
         "total": 1,
         "code": 1,
@@ -2544,13 +2604,13 @@
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
+        "parameter_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0.3
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2560,33 +2620,32 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 51,
+        "comment_length": 53,
         "has_example": false,
-        "quality_score": 0.20400000000000001
+        "quality_score": 0.31200000000000006
       }
     },
     {
-      "name": "Clear",
+      "name": "NewTorpedo",
       "package": "entity",
       "file": "entity",
-      "line": 61,
+      "line": 51,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*AdvancedMockRenderer",
+      "is_method": false,
       "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 11,
+        "code": 11,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
+        "parameter_count": 1,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0
+        "signature_complexity": 0.8
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2602,518 +2661,27 @@
       }
     },
     {
-      "name": "Present",
+      "name": "CreateProjectile",
       "package": "entity",
       "file": "entity",
       "line": 66,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*AdvancedMockRenderer",
+      "receiver_type": "*Torpedo",
       "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 19,
+        "code": 19,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 42,
-        "has_example": false,
-        "quality_score": 0.168
-      }
-    },
-    {
-      "name": "Reset",
-      "package": "entity",
-      "file": "entity",
-      "line": 71,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*AdvancedMockRenderer",
-      "lines": {
-        "total": 5,
-        "code": 5,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 32,
-        "has_example": false,
-        "quality_score": 0.128
-      }
-    },
-    {
-      "name": "TestRenderer_InterfaceCompliance",
-      "package": "entity",
-      "file": "entity",
-      "line": 80,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 3,
-        "overall": 2.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 86,
-        "has_example": false,
-        "quality_score": 0.34400000000000003
-      }
-    },
-    {
-      "name": "TestRenderer_RenderShip",
-      "package": "entity",
-      "file": "entity",
-      "line": 91,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 40,
-        "code": 40,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 8,
-        "overall": 11.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "TestRenderer_RenderPlanet",
-      "package": "entity",
-      "file": "entity",
-      "line": 135,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 40,
-        "code": 40,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 8,
-        "overall": 11.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "TestRenderer_RenderProjectile",
-      "package": "entity",
-      "file": "entity",
-      "line": 179,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 49,
-        "code": 49,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 8,
-        "overall": 11.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 73,
-        "has_example": false,
-        "quality_score": 0.292
-      }
-    },
-    {
-      "name": "TestRenderer_Clear",
-      "package": "entity",
-      "file": "entity",
-      "line": 232,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 46,
-        "code": 46,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 9,
-        "overall": 12.3
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 51,
-        "has_example": false,
-        "quality_score": 0.20400000000000001
-      }
-    },
-    {
-      "name": "TestRenderer_Present",
-      "package": "entity",
-      "file": "entity",
-      "line": 282,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 20,
-        "code": 20,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 5,
-        "overall": 6.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 55,
-        "has_example": false,
-        "quality_score": 0.22000000000000003
-      }
-    },
-    {
-      "name": "TestRenderer_CompleteRenderingSequence",
-      "package": "entity",
-      "file": "entity",
-      "line": 306,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 50,
-        "code": 50,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 9,
-        "overall": 16.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 80,
-        "has_example": false,
-        "quality_score": 0.32000000000000006
-      }
-    },
-    {
-      "name": "TestRenderer_MultipleEntitiesOfSameType",
-      "package": "entity",
-      "file": "entity",
-      "line": 360,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 24,
-        "code": 24,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 91,
-        "has_example": false,
-        "quality_score": 0.36400000000000005
-      }
-    },
-    {
-      "name": "TestRenderer_RenderingOrder",
-      "package": "entity",
-      "file": "entity",
-      "line": 388,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 47,
-        "code": 47,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 8,
-        "cognitive": 8,
-        "nesting_depth": 8,
-        "overall": 14.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 77,
-        "has_example": false,
-        "quality_score": 0.30800000000000005
-      }
-    },
-    {
-      "name": "TestAdvancedMockRenderer_Reset",
-      "package": "entity",
-      "file": "entity",
-      "line": 439,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 48,
-        "code": 48,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 11,
-        "cognitive": 11,
-        "nesting_depth": 11,
-        "overall": 19.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "TestRenderer_PolymorphicBehavior",
-      "package": "entity",
-      "file": "entity",
-      "line": 491,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 31,
-        "code": 31,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 3,
-        "overall": 4.1
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 86,
-        "has_example": false,
-        "quality_score": 0.34400000000000003
-      }
-    },
-    {
-      "name": "main",
-      "package": "main",
-      "file": "main",
-      "line": 48,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 42,
-        "code": 42,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "NewAIClient",
-      "package": "main",
-      "file": "main",
-      "line": 94,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 16,
-        "code": 16,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 3,
+        "parameter_count": 4,
         "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1.8
+        "signature_complexity": 2.3
       },
       "complexity": {
         "cyclomatic": 1,
@@ -3123,22 +2691,21 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 36,
+        "comment_length": 46,
         "has_example": false,
-        "quality_score": 0.144
+        "quality_score": 0.18400000000000002
       }
     },
     {
-      "name": "Connect",
-      "package": "main",
-      "file": "main",
-      "line": 114,
+      "name": "NewPhaser",
+      "package": "entity",
+      "file": "entity",
+      "line": 95,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*AIClient",
+      "is_method": false,
       "lines": {
-        "total": 8,
-        "code": 8,
+        "total": 11,
+        "code": 11,
         "comments": 0,
         "blank": 0
       },
@@ -3146,10 +2713,82 @@
         "parameter_count": 1,
         "return_count": 1,
         "has_variadic": false,
-        "returns_error": true,
+        "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
         "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 38,
+        "has_example": false,
+        "quality_score": 0.15200000000000002
+      }
+    },
+    {
+      "name": "CreateProjectile",
+      "package": "entity",
+      "file": "entity",
+      "line": 110,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*Phaser",
+      "lines": {
+        "total": 19,
+        "code": 19,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 4,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 2.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 45,
+        "has_example": false,
+        "quality_score": 0.18000000000000002
+      }
+    },
+    {
+      "name": "Update",
+      "package": "entity",
+      "file": "entity",
+      "line": 144,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*Projectile",
+      "lines": {
+        "total": 11,
+        "code": 11,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
       },
       "complexity": {
         "cyclomatic": 2,
@@ -3159,19 +2798,18 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 36,
+        "comment_length": 81,
         "has_example": false,
-        "quality_score": 0.144
+        "quality_score": 0.32400000000000007
       }
     },
     {
-      "name": "Disconnect",
-      "package": "main",
-      "file": "main",
-      "line": 126,
+      "name": "GenerateID",
+      "package": "entity",
+      "file": "entity",
+      "line": 162,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*AIClient",
+      "is_method": false,
       "lines": {
         "total": 1,
         "code": 1,
@@ -3180,12 +2818,83 @@
       },
       "signature": {
         "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "NewHUDSystem",
+      "package": "engo",
+      "file": "engo",
+      "line": 57,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 11,
+        "code": 11,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 38,
+        "has_example": false,
+        "quality_score": 0.15200000000000002
+      }
+    },
+    {
+      "name": "Add",
+      "package": "engo",
+      "file": "engo",
+      "line": 72,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 3,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0
+        "signature_complexity": 1.5
       },
       "complexity": {
         "cyclomatic": 1,
@@ -3201,16 +2910,124 @@
       }
     },
     {
-      "name": "setupEventHandlers",
-      "package": "main",
-      "file": "main",
-      "line": 131,
+      "name": "Remove",
+      "package": "engo",
+      "file": "engo",
+      "line": 77,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 42,
+        "has_example": false,
+        "quality_score": 0.168
+      }
+    },
+    {
+      "name": "Update",
+      "package": "engo",
+      "file": "engo",
+      "line": 82,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 12,
+        "code": 12,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 31,
+        "has_example": false,
+        "quality_score": 0.124
+      }
+    },
+    {
+      "name": "clearHUDEntities",
+      "package": "engo",
+      "file": "engo",
+      "line": 98,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 10,
-        "code": 10,
+        "total": 2,
+        "code": 2,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 47,
+        "has_example": false,
+        "quality_score": 0.188
+      }
+    },
+    {
+      "name": "renderShipStatus",
+      "package": "engo",
+      "file": "engo",
+      "line": 104,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 16,
+        "code": 16,
         "comments": 0,
         "blank": 0
       },
@@ -3226,27 +3043,27 @@
       "complexity": {
         "cyclomatic": 2,
         "cognitive": 2,
-        "nesting_depth": 4,
-        "overall": 4.6
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 42,
+        "comment_length": 56,
         "has_example": false,
-        "quality_score": 0.168
+        "quality_score": 0.22400000000000003
       }
     },
     {
-      "name": "behaviorLoop",
-      "package": "main",
-      "file": "main",
-      "line": 145,
+      "name": "renderChatWindow",
+      "package": "engo",
+      "file": "engo",
+      "line": 124,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 20,
-        "code": 20,
+        "total": 13,
+        "code": 13,
         "comments": 0,
         "blank": 0
       },
@@ -3260,46 +3077,154 @@
         "signature_complexity": 0
       },
       "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 44,
+        "comment_length": 49,
         "has_example": false,
-        "quality_score": 0.17600000000000002
+        "quality_score": 0.196
       }
     },
     {
-      "name": "updateMyShipID",
-      "package": "main",
-      "file": "main",
-      "line": 169,
+      "name": "renderTeamStatus",
+      "package": "engo",
+      "file": "engo",
+      "line": 141,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 9,
-        "code": 9,
+        "total": 15,
+        "code": 15,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
+        "parameter_count": 0,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 48,
+        "has_example": false,
+        "quality_score": 0.192
+      }
+    },
+    {
+      "name": "renderConnectionStatus",
+      "package": "engo",
+      "file": "engo",
+      "line": 160,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 11,
+        "code": 11,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 53,
+        "has_example": false,
+        "quality_score": 0.21200000000000002
+      }
+    },
+    {
+      "name": "renderMinimap",
+      "package": "engo",
+      "file": "engo",
+      "line": 175,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 11,
+        "code": 11,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 55,
+        "has_example": false,
+        "quality_score": 0.22000000000000003
+      }
+    },
+    {
+      "name": "renderText",
+      "package": "engo",
+      "file": "engo",
+      "line": 190,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 24,
+        "code": 24,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 3,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.5
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
       },
       "documentation": {
         "has_comment": true,
@@ -3309,124 +3234,88 @@
       }
     },
     {
-      "name": "executeBehavior",
-      "package": "main",
-      "file": "main",
-      "line": 182,
+      "name": "renderRect",
+      "package": "engo",
+      "file": "engo",
+      "line": 218,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 19,
-        "code": 19,
+        "total": 23,
+        "code": 23,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
+        "parameter_count": 2,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0
+        "signature_complexity": 1
       },
       "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 51,
+        "comment_length": 38,
         "has_example": false,
-        "quality_score": 0.20400000000000001
+        "quality_score": 0.15200000000000002
       }
     },
     {
-      "name": "executeExplorerBehavior",
-      "package": "main",
-      "file": "main",
-      "line": 205,
+      "name": "renderRectOutline",
+      "package": "engo",
+      "file": "engo",
+      "line": 245,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 28,
-        "code": 28,
+        "total": 23,
+        "code": 23,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
+        "parameter_count": 2,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 1
       },
       "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 56,
+        "comment_length": 46,
         "has_example": false,
-        "quality_score": 0.22400000000000003
+        "quality_score": 0.18400000000000002
       }
     },
     {
-      "name": "executeAggressorBehavior",
-      "package": "main",
-      "file": "main",
-      "line": 237,
-      "is_exported": false,
+      "name": "AddChatMessage",
+      "package": "engo",
+      "file": "engo",
+      "line": 272,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 46,
-        "code": 46,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 8,
-        "cognitive": 8,
-        "nesting_depth": 9,
-        "overall": 14.9
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 62,
-        "has_example": false,
-        "quality_score": 0.248
-      }
-    },
-    {
-      "name": "executeDefenderBehavior",
-      "package": "main",
-      "file": "main",
-      "line": 287,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 15,
-        "code": 15,
+        "total": 13,
+        "code": 13,
         "comments": 0,
         "blank": 0
       },
@@ -3440,26 +3329,26 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 4,
-        "overall": 5.9
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 57,
+        "comment_length": 54,
         "has_example": false,
-        "quality_score": 0.22799999999999998
+        "quality_score": 0.21600000000000003
       }
     },
     {
-      "name": "initializeDefenseInputs",
-      "package": "main",
-      "file": "main",
-      "line": 306,
-      "is_exported": false,
+      "name": "SetConnectionStatus",
+      "package": "engo",
+      "file": "engo",
+      "line": 289,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
         "total": 1,
         "code": 1,
@@ -3467,13 +3356,13 @@
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 3,
+        "parameter_count": 1,
+        "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.8999999999999999
+        "signature_complexity": 0.5
       },
       "complexity": {
         "cyclomatic": 1,
@@ -3483,202 +3372,22 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 80,
+        "comment_length": 55,
         "has_example": false,
-        "quality_score": 0.32000000000000006
+        "quality_score": 0.22000000000000003
       }
     },
     {
-      "name": "calculateDistanceToHome",
-      "package": "main",
-      "file": "main",
-      "line": 311,
-      "is_exported": false,
+      "name": "UpdateGameState",
+      "package": "engo",
+      "file": "engo",
+      "line": 294,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*AIClient",
+      "receiver_type": "*HUDSystem",
       "lines": {
-        "total": 2,
-        "code": 2,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 80,
-        "has_example": false,
-        "quality_score": 0.32000000000000006
-      }
-    },
-    {
-      "name": "calculateNavigationToHome",
-      "package": "main",
-      "file": "main",
-      "line": 317,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 5,
-        "code": 5,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.6
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 88,
-        "has_example": false,
-        "quality_score": 0.35200000000000004
-      }
-    },
-    {
-      "name": "normalizeAngleDifference",
-      "package": "main",
-      "file": "main",
-      "line": 326,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 77,
-        "has_example": false,
-        "quality_score": 0.30800000000000005
-      }
-    },
-    {
-      "name": "determineTurnDirection",
-      "package": "main",
-      "file": "main",
-      "line": 337,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.1
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 88,
-        "has_example": false,
-        "quality_score": 0.35200000000000004
-      }
-    },
-    {
-      "name": "executePatrolBehavior",
-      "package": "main",
-      "file": "main",
-      "line": 348,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.6
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 80,
-        "has_example": false,
-        "quality_score": 0.32000000000000006
-      }
-    },
-    {
-      "name": "executeBomberBehavior",
-      "package": "main",
-      "file": "main",
-      "line": 359,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 37,
-        "code": 37,
+        "total": 8,
+        "code": 8,
         "comments": 0,
         "blank": 0
       },
@@ -3692,10 +3401,10 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 7,
-        "cognitive": 7,
-        "nesting_depth": 8,
-        "overall": 13.1
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
         "has_comment": true,
@@ -3705,120 +3414,13 @@
       }
     },
     {
-      "name": "findNearestEnemyShip",
-      "package": "main",
-      "file": "main",
-      "line": 401,
+      "name": "getTeamColor",
+      "package": "engo",
+      "file": "engo",
+      "line": 306,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "findHomePlanet",
-      "package": "main",
-      "file": "main",
-      "line": 418,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 19,
-        "code": 19,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "findEnemyPlanet",
-      "package": "main",
-      "file": "main",
-      "line": 440,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*AIClient",
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "getBehaviorDescription",
-      "package": "main",
-      "file": "main",
-      "line": 457,
-      "is_exported": false,
-      "is_method": false,
+      "receiver_type": "*HUDSystem",
       "lines": {
         "total": 12,
         "code": 12,
@@ -3841,22 +3443,562 @@
         "overall": 3.6
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 51,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.30400000000000005
       }
     },
     {
-      "name": "captureLog",
-      "package": "render",
-      "file": "render",
-      "line": 16,
-      "is_exported": false,
+      "name": "SetMinimapEnabled",
+      "package": "engo",
+      "file": "engo",
+      "line": 322,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 50,
+        "has_example": false,
+        "quality_score": 0.2
+      }
+    },
+    {
+      "name": "IsMinimapEnabled",
+      "package": "engo",
+      "file": "engo",
+      "line": 327,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 56,
+        "has_example": false,
+        "quality_score": 0.32400000000000007
+      }
+    },
+    {
+      "name": "SetMinimapSize",
+      "package": "engo",
+      "file": "engo",
+      "line": 332,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 44,
+        "has_example": false,
+        "quality_score": 0.17600000000000002
+      }
+    },
+    {
+      "name": "GetMinimapSize",
+      "package": "engo",
+      "file": "engo",
+      "line": 337,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 48,
+        "has_example": false,
+        "quality_score": 0.29200000000000004
+      }
+    },
+    {
+      "name": "SetFont",
+      "package": "engo",
+      "file": "engo",
+      "line": 342,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 50,
+        "has_example": false,
+        "quality_score": 0.2
+      }
+    },
+    {
+      "name": "GetChatMessages",
+      "package": "engo",
+      "file": "engo",
+      "line": 347,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 50,
+        "has_example": false,
+        "quality_score": 0.30000000000000004
+      }
+    },
+    {
+      "name": "ClearChatMessages",
+      "package": "engo",
+      "file": "engo",
+      "line": 352,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*HUDSystem",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 43,
+        "has_example": false,
+        "quality_score": 0.17200000000000001
+      }
+    },
+    {
+      "name": "Add",
+      "package": "physics",
+      "file": "physics",
+      "line": 13,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 35,
+        "has_example": false,
+        "quality_score": 0.24
+      }
+    },
+    {
+      "name": "Sub",
+      "package": "physics",
+      "file": "physics",
+      "line": 21,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 47,
+        "has_example": false,
+        "quality_score": 0.28800000000000003
+      }
+    },
+    {
+      "name": "Scale",
+      "package": "physics",
+      "file": "physics",
+      "line": 29,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 46,
+        "has_example": false,
+        "quality_score": 0.18400000000000002
+      }
+    },
+    {
+      "name": "Length",
+      "package": "physics",
+      "file": "physics",
+      "line": 37,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 43,
+        "has_example": false,
+        "quality_score": 0.272
+      }
+    },
+    {
+      "name": "Normalize",
+      "package": "physics",
+      "file": "physics",
+      "line": 42,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 8,
+        "code": 8,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 54,
+        "has_example": false,
+        "quality_score": 0.31600000000000006
+      }
+    },
+    {
+      "name": "Distance",
+      "package": "physics",
+      "file": "physics",
+      "line": 54,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 50,
+        "has_example": false,
+        "quality_score": 0.30000000000000004
+      }
+    },
+    {
+      "name": "Angle",
+      "package": "physics",
+      "file": "physics",
+      "line": 59,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 49,
+        "has_example": false,
+        "quality_score": 0.29600000000000004
+      }
+    },
+    {
+      "name": "FromAngle",
+      "package": "physics",
+      "file": "physics",
+      "line": 64,
+      "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 5,
-        "code": 5,
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 55,
+        "has_example": false,
+        "quality_score": 0.22000000000000003
+      }
+    },
+    {
+      "name": "Dot",
+      "package": "physics",
+      "file": "physics",
+      "line": 72,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 1,
+        "code": 1,
         "comments": 0,
         "blank": 0
       },
@@ -3879,205 +4021,31 @@
         "has_comment": true,
         "comment_length": 43,
         "has_example": false,
-        "quality_score": 0.17200000000000001
+        "quality_score": 0.272
       }
     },
     {
-      "name": "TestNullRenderer_Clear_LogsExpectedMessage",
-      "package": "render",
-      "file": "render",
-      "line": 24,
+      "name": "Rotate",
+      "package": "physics",
+      "file": "physics",
+      "line": 77,
       "is_exported": true,
-      "is_method": false,
+      "is_method": true,
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 9,
-        "code": 9,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 3,
-        "overall": 4.1
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNullRenderer_Present_LogsExpectedMessage",
-      "package": "render",
-      "file": "render",
-      "line": 36,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 9,
-        "code": 9,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 3,
-        "overall": 4.1
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNullRenderer_RenderShip_LogsShipInformation",
-      "package": "render",
-      "file": "render",
-      "line": 48,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 40,
-        "code": 40,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 5,
-        "overall": 6.4
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNullRenderer_RenderPlanet_LogsPlanetInformation",
-      "package": "render",
-      "file": "render",
-      "line": 91,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 39,
-        "code": 39,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 5,
-        "overall": 6.4
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNullRenderer_RenderProjectile_LogsProjectileInformation",
-      "package": "render",
-      "file": "render",
-      "line": 133,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 39,
-        "code": 39,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 5,
-        "overall": 6.4
-      },
-      "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
-        "has_example": false,
-        "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNullRenderer_ImplementsRendererInterface",
-      "package": "render",
-      "file": "render",
-      "line": 175,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 10,
-        "code": 10,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0.8
       },
       "complexity": {
         "cyclomatic": 1,
@@ -4086,115 +4054,441 @@
         "overall": 1.8
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 48,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.192
       }
     },
     {
-      "name": "TestNullRenderer_GlobalVariable_IsCorrectType",
-      "package": "render",
-      "file": "render",
-      "line": 188,
+      "name": "LengthSquared",
+      "package": "physics",
+      "file": "physics",
+      "line": 87,
       "is_exported": true,
-      "is_method": false,
+      "is_method": true,
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 11,
-        "code": 11,
+        "total": 1,
+        "code": 1,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
+        "parameter_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0.3
       },
       "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 3,
-        "overall": 4.1
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 71,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.384
       }
     },
     {
-      "name": "TestNullRenderer_ConcurrentUsage_ThreadSafe",
-      "package": "render",
-      "file": "render",
-      "line": 202,
+      "name": "NewAssetManager",
+      "package": "engo",
+      "file": "engo",
+      "line": 30,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 31,
-        "code": 31,
+        "total": 5,
+        "code": 5,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
+        "parameter_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 44,
+        "has_example": false,
+        "quality_score": 0.17600000000000002
+      }
+    },
+    {
+      "name": "LoadAssets",
+      "package": "engo",
+      "file": "engo",
+      "line": 39,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 21,
+        "code": 21,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
       },
       "complexity": {
         "cyclomatic": 5,
         "cognitive": 5,
-        "nesting_depth": 8,
-        "overall": 10.5
+        "nesting_depth": 5,
+        "overall": 9
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 33,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.132
       }
     },
     {
-      "name": "TestNullRenderer_AllMethods_ProduceOutput",
-      "package": "render",
-      "file": "render",
-      "line": 236,
-      "is_exported": true,
-      "is_method": false,
+      "name": "loadShipSprites",
+      "package": "engo",
+      "file": "engo",
+      "line": 64,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
       "lines": {
-        "total": 38,
-        "code": 38,
+        "total": 52,
+        "code": 52,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 59,
+        "has_example": false,
+        "quality_score": 0.236
+      }
+    },
+    {
+      "name": "loadPlanetSprites",
+      "package": "engo",
+      "file": "engo",
+      "line": 120,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 22,
+        "code": 22,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 61,
+        "has_example": false,
+        "quality_score": 0.244
+      }
+    },
+    {
+      "name": "loadProjectileSprites",
+      "package": "engo",
+      "file": "engo",
+      "line": 146,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 18,
+        "code": 18,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 69,
+        "has_example": false,
+        "quality_score": 0.27599999999999997
+      }
+    },
+    {
+      "name": "loadUIAssets",
+      "package": "engo",
+      "file": "engo",
+      "line": 168,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 13,
+        "code": 13,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 37,
+        "has_example": false,
+        "quality_score": 0.148
+      }
+    },
+    {
+      "name": "createShipSprite",
+      "package": "engo",
+      "file": "engo",
+      "line": 185,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 33,
+        "code": 33,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 8,
+        "cognitive": 8,
+        "nesting_depth": 8,
+        "overall": 14.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 52,
+        "has_example": false,
+        "quality_score": 0.20800000000000002
+      }
+    },
+    {
+      "name": "GetShipSprite",
+      "package": "engo",
+      "file": "engo",
+      "line": 222,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 4,
+        "code": 4,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0.8
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 9,
-        "overall": 8.4
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
-        "has_comment": false,
-        "comment_length": 0,
+        "has_comment": true,
+        "comment_length": 50,
         "has_example": false,
-        "quality_score": 0
+        "quality_score": 0.30000000000000004
+      }
+    },
+    {
+      "name": "GetPlanetSprite",
+      "package": "engo",
+      "file": "engo",
+      "line": 230,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 53,
+        "has_example": false,
+        "quality_score": 0.31200000000000006
+      }
+    },
+    {
+      "name": "GetProjectileSprite",
+      "package": "engo",
+      "file": "engo",
+      "line": 238,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 4,
+        "code": 4,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 61,
+        "has_example": false,
+        "quality_score": 0.344
+      }
+    },
+    {
+      "name": "GetBackgroundTexture",
+      "package": "engo",
+      "file": "engo",
+      "line": 246,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*AssetManager",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 52,
+        "has_example": false,
+        "quality_score": 0.30800000000000005
       }
     },
     {
@@ -4650,321 +4944,6 @@
         "comment_length": 0,
         "has_example": false,
         "quality_score": 0
-      }
-    },
-    {
-      "name": "TestNewTerminalRenderer_CreatesValidRenderer_WithCorrectDimensions",
-      "package": "render",
-      "file": "render",
-      "line": 11,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 64,
-        "code": 64,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 10,
-        "cognitive": 10,
-        "nesting_depth": 11,
-        "overall": 18.5
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 70,
-        "has_example": false,
-        "quality_score": 0.27999999999999997
-      }
-    },
-    {
-      "name": "TestSetCenter_UpdatesCenterPosition_Correctly",
-      "package": "render",
-      "file": "render",
-      "line": 79,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 37,
-        "code": 37,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 48,
-        "has_example": false,
-        "quality_score": 0.192
-      }
-    },
-    {
-      "name": "TestWorldToScreen_ConvertsCoordinates_Correctly",
-      "package": "render",
-      "file": "render",
-      "line": 120,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 53,
-        "code": 53,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 73,
-        "has_example": false,
-        "quality_score": 0.292
-      }
-    },
-    {
-      "name": "TestClear_ClearsBuffer_WithSpaces",
-      "package": "render",
-      "file": "render",
-      "line": 177,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 20,
-        "code": 20,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 36,
-        "has_example": false,
-        "quality_score": 0.144
-      }
-    },
-    {
-      "name": "TestRenderShip_RendersShip_AtCorrectPosition",
-      "package": "render",
-      "file": "render",
-      "line": 201,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 63,
-        "code": 63,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 11,
-        "overall": 17.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 36,
-        "has_example": false,
-        "quality_score": 0.144
-      }
-    },
-    {
-      "name": "TestRenderPlanet_RendersPlanet_AtCorrectPosition",
-      "package": "render",
-      "file": "render",
-      "line": 268,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 58,
-        "code": 58,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 11,
-        "overall": 17.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 40,
-        "has_example": false,
-        "quality_score": 0.16000000000000003
-      }
-    },
-    {
-      "name": "TestRenderProjectile_RendersProjectile_AtCorrectPosition",
-      "package": "render",
-      "file": "render",
-      "line": 330,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 58,
-        "code": 58,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 11,
-        "overall": 17.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 48,
-        "has_example": false,
-        "quality_score": 0.192
-      }
-    },
-    {
-      "name": "TestPresent_ExecutesWithoutError_ForVariousSizes",
-      "package": "render",
-      "file": "render",
-      "line": 392,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 26,
-        "code": 26,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 5,
-        "overall": 6.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 51,
-        "has_example": false,
-        "quality_score": 0.20400000000000001
-      }
-    },
-    {
-      "name": "TestIntegration_RendersMultipleEntities_Correctly",
-      "package": "render",
-      "file": "render",
-      "line": 422,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 43,
-        "code": 43,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 59,
-        "has_example": false,
-        "quality_score": 0.236
       }
     }
   ],
