@@ -10,9 +10,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/EngoEngine/engo"
+
 	"github.com/opd-ai/go-netrek/pkg/config"
 	"github.com/opd-ai/go-netrek/pkg/event"
 	"github.com/opd-ai/go-netrek/pkg/network"
+	engorender "github.com/opd-ai/go-netrek/pkg/render/engo"
 )
 
 func main() {
@@ -20,6 +23,10 @@ func main() {
 	serverAddr := flag.String("server", "", "Server address (overrides config)")
 	playerName := flag.String("name", "Player", "Player name")
 	teamID := flag.Int("team", 0, "Team ID")
+	renderer := flag.String("renderer", "terminal", "Renderer type: 'terminal' or 'engo'")
+	fullscreen := flag.Bool("fullscreen", false, "Run in fullscreen mode (Engo only)")
+	width := flag.Int("width", 1024, "Window width (Engo only)")
+	height := flag.Int("height", 768, "Window height (Engo only)")
 	flag.Parse()
 
 	// Load configuration
@@ -73,6 +80,39 @@ func main() {
 		os.Exit(1)
 	})
 
+	// Choose renderer based on command line flag
+	switch *renderer {
+	case "engo":
+		// Start Engo GUI renderer
+		startEngoRenderer(client, eventBus, uint64(*teamID), *width, *height, *fullscreen)
+	case "terminal":
+		fallthrough
+	default:
+		// Start terminal renderer (existing implementation)
+		startTerminalRenderer(client, eventBus)
+	}
+}
+
+// startEngoRenderer starts the Engo GUI client
+func startEngoRenderer(client *network.GameClient, eventBus *event.Bus, playerID uint64, width, height int, fullscreen bool) {
+	// Create the game scene
+	scene := engorender.NewGameScene(client, eventBus, playerID)
+
+	// Configure Engo options
+	opts := engo.RunOptions{
+		Title:      "Go Netrek",
+		Width:      width,
+		Height:     height,
+		Fullscreen: fullscreen,
+		VSync:      true,
+	}
+
+	// Run Engo with the game scene
+	engo.Run(opts, scene)
+}
+
+// startTerminalRenderer starts the terminal-based client (existing implementation)
+func startTerminalRenderer(client *network.GameClient, eventBus *event.Bus) {
 	// Handle game state updates
 	go func() {
 		for gameState := range client.GetGameStateChannel() {
