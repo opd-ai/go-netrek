@@ -314,146 +314,142 @@ func (g *Game) wrapEntityPosition(e interface{}) {
 
 // detectCollisions checks for and resolves collisions between entities
 func (g *Game) detectCollisions() {
-	// Process ship-projectile collisions
+	g.processShipProjectileCollisions()
+	g.processShipPlanetCollisions()
+	g.processProjectilePlanetCollisions()
+}
+
+// processShipProjectileCollisions handles collisions between ships and projectiles.
+func (g *Game) processShipProjectileCollisions() {
 	for _, ship := range g.Ships {
 		if !ship.Active {
 			continue
 		}
-
-		// Find potential collisions
 		shipArea := physics.Rect{
 			Center: ship.Position,
 			Width:  ship.Collider.Radius * 2,
 			Height: ship.Collider.Radius * 2,
 		}
-
 		potentialCollisions := g.SpatialIndex.Query(shipArea)
-
 		for _, other := range potentialCollisions {
-			switch otherEntity := other.(type) {
-			case *entity.Projectile:
-				if !otherEntity.Active {
-					continue
-				}
-
-				// Skip projectiles from the same team
-				if otherEntity.TeamID == ship.TeamID {
-					continue
-				}
-
-				// Check for collision
-				if ship.GetCollider().Collides(otherEntity.GetCollider()) {
-					// Apply damage to ship
-					destroyed := ship.TakeDamage(otherEntity.Damage)
-
-					// Deactivate the projectile
-					otherEntity.Active = false
-
-					// Publish collision event
-					g.EventBus.Publish(event.NewCollisionEvent(
-						g,
-						uint64(ship.ID),
-						uint64(otherEntity.ID),
-					))
-
-					// If ship is destroyed
-					if destroyed {
-						ship.Active = false
-
-						// Find the player that fired the projectile
-						if player, ok := g.findPlayerByShipID(otherEntity.OwnerID); ok {
-							player.Kills++
-							player.Score += 10 // Points for kill
-						}
-
-						// Update the killed player's stats
-						if player, ok := g.findPlayerByShipID(ship.ID); ok {
-							player.Deaths++
-						}
-
-						// Publish ship destroyed event
-						g.EventBus.Publish(event.NewShipEvent(
-							event.ShipDestroyed,
-							g,
-							uint64(ship.ID),
-							ship.TeamID,
-						))
-					}
-				}
-
-			case *entity.Planet:
-				// Process ship-planet interactions only if very close
-				if ship.Position.Distance(otherEntity.Position) <
-					ship.Collider.Radius+otherEntity.Collider.Radius+10 {
-
-					// Prevent ships from flying through planets
-					if ship.Position.Distance(otherEntity.Position) <
-						ship.Collider.Radius+otherEntity.Collider.Radius {
-
-						// Simple collision response - push ship away
-						pushDir := ship.Position.Sub(otherEntity.Position).Normalize()
-						pushDistance := (ship.Collider.Radius + otherEntity.Collider.Radius) -
-							ship.Position.Distance(otherEntity.Position)
-
-						ship.Position = ship.Position.Add(pushDir.Scale(pushDistance + 1))
-
-						// Reduce velocity
-						ship.Velocity = ship.Velocity.Scale(0.5)
-					}
-				}
+			if projectile, ok := other.(*entity.Projectile); ok {
+				g.handleShipProjectileCollision(ship, projectile)
 			}
 		}
 	}
+}
 
-	// Process projectile-planet collisions
+// handleShipProjectileCollision checks and resolves a collision between a ship and a projectile.
+func (g *Game) handleShipProjectileCollision(ship *entity.Ship, projectile *entity.Projectile) {
+	if !projectile.Active || projectile.TeamID == ship.TeamID {
+		return
+	}
+	if ship.GetCollider().Collides(projectile.GetCollider()) {
+		destroyed := ship.TakeDamage(projectile.Damage)
+		projectile.Active = false
+		g.EventBus.Publish(event.NewCollisionEvent(
+			g,
+			uint64(ship.ID),
+			uint64(projectile.ID),
+		))
+		if destroyed {
+			ship.Active = false
+			g.updatePlayerStatsOnShipDestruction(ship, projectile)
+			g.EventBus.Publish(event.NewShipEvent(
+				event.ShipDestroyed,
+				g,
+				uint64(ship.ID),
+				ship.TeamID,
+			))
+		}
+	}
+}
+
+// updatePlayerStatsOnShipDestruction updates player stats when a ship is destroyed by a projectile.
+func (g *Game) updatePlayerStatsOnShipDestruction(ship *entity.Ship, projectile *entity.Projectile) {
+	if player, ok := g.findPlayerByShipID(projectile.OwnerID); ok {
+		player.Kills++
+		player.Score += 10 // Points for kill
+	}
+	if player, ok := g.findPlayerByShipID(ship.ID); ok {
+		player.Deaths++
+	}
+}
+
+// processShipPlanetCollisions handles ship-planet proximity and collision responses.
+func (g *Game) processShipPlanetCollisions() {
+	for _, ship := range g.Ships {
+		if !ship.Active {
+			continue
+		}
+		shipArea := physics.Rect{
+			Center: ship.Position,
+			Width:  ship.Collider.Radius * 2,
+			Height: ship.Collider.Radius * 2,
+		}
+		potentialCollisions := g.SpatialIndex.Query(shipArea)
+		for _, other := range potentialCollisions {
+			if planet, ok := other.(*entity.Planet); ok {
+				g.handleShipPlanetInteraction(ship, planet)
+			}
+		}
+	}
+}
+
+// handleShipPlanetInteraction manages ship-planet proximity and collision response.
+func (g *Game) handleShipPlanetInteraction(ship *entity.Ship, planet *entity.Planet) {
+	distance := ship.Position.Distance(planet.Position)
+	if distance < ship.Collider.Radius+planet.Collider.Radius+10 {
+		if distance < ship.Collider.Radius+planet.Collider.Radius {
+			pushDir := ship.Position.Sub(planet.Position).Normalize()
+			pushDistance := (ship.Collider.Radius + planet.Collider.Radius) - distance
+			ship.Position = ship.Position.Add(pushDir.Scale(pushDistance + 1))
+			ship.Velocity = ship.Velocity.Scale(0.5)
+		}
+	}
+}
+
+// processProjectilePlanetCollisions handles collisions between projectiles and planets.
+func (g *Game) processProjectilePlanetCollisions() {
 	for _, proj := range g.Projectiles {
 		if !proj.Active {
 			continue
 		}
-
 		projArea := physics.Rect{
 			Center: proj.Position,
 			Width:  proj.Collider.Radius * 2,
 			Height: proj.Collider.Radius * 2,
 		}
-
 		potentialCollisions := g.SpatialIndex.Query(projArea)
-
 		for _, other := range potentialCollisions {
 			if planet, ok := other.(*entity.Planet); ok {
-				if proj.Position.Distance(planet.Position) <
-					proj.Collider.Radius+planet.Collider.Radius {
+				g.handleProjectilePlanetCollision(proj, planet)
+			}
+		}
+	}
+}
 
-					// Deactivate the projectile
-					proj.Active = false
-
-					// If this is an enemy planet, apply bombing damage
-					if planet.TeamID >= 0 && planet.TeamID != proj.TeamID {
-						armiesKilled := planet.Bomb(proj.Damage / 2) // Reduced damage for bombing
-
-						// Update player stats
-						if player, ok := g.findPlayerByShipID(proj.OwnerID); ok {
-							player.Bombs += armiesKilled
-							player.Score += armiesKilled // Points for bombing
-						}
-
-						// If planet becomes neutral, update team stats
-						if planet.TeamID == -1 {
-							if team, ok := g.Teams[planet.TeamID]; ok {
-								team.PlanetCount--
-							}
-
-							// Publish planet captured event (now neutral)
-							g.EventBus.Publish(event.NewPlanetEvent(
-								event.PlanetCaptured,
-								g,
-								uint64(planet.ID),
-								-1,
-								planet.TeamID,
-							))
-						}
-					}
+// handleProjectilePlanetCollision checks and resolves a collision between a projectile and a planet.
+func (g *Game) handleProjectilePlanetCollision(proj *entity.Projectile, planet *entity.Planet) {
+	if proj.Position.Distance(planet.Position) < proj.Collider.Radius+planet.Collider.Radius {
+		proj.Active = false
+		if planet.TeamID >= 0 && planet.TeamID != proj.TeamID {
+			armiesKilled := planet.Bomb(proj.Damage / 2) // Reduced damage for bombing
+			if player, ok := g.findPlayerByShipID(proj.OwnerID); ok {
+				player.Bombs += armiesKilled
+				player.Score += armiesKilled // Points for bombing
+			}
+			if planet.TeamID == -1 {
+				if team, ok := g.Teams[planet.TeamID]; ok {
+					team.PlanetCount--
 				}
+				g.EventBus.Publish(event.NewPlanetEvent(
+					event.PlanetCaptured,
+					g,
+					uint64(planet.ID),
+					-1,
+					planet.TeamID,
+				))
 			}
 		}
 	}
