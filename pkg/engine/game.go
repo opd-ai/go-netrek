@@ -186,15 +186,19 @@ func (g *Game) Update() {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
-	// Clear spatial index for this frame
-	g.SpatialIndex = physics.NewQuadTree(
-		physics.Rect{
-			Center: physics.Vector2D{X: 0, Y: 0},
-			Width:  g.Config.WorldSize,
-			Height: g.Config.WorldSize,
-		},
-		10,
-	)
+	// Clear spatial index for this frame (reuse instead of recreate)
+	if g.SpatialIndex == nil {
+		g.SpatialIndex = physics.NewQuadTree(
+			physics.Rect{
+				Center: physics.Vector2D{X: 0, Y: 0},
+				Width:  g.Config.WorldSize,
+				Height: g.Config.WorldSize,
+			},
+			10,
+		)
+	} else {
+		g.SpatialIndex.Clear()
+	}
 
 	// Update all entities
 	g.updateShips(deltaTime)

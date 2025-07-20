@@ -161,3 +161,15 @@ func (qt *QuadTree) intersects(area Rect) bool {
 		area.Center.Y-area.Height/2 > qt.Boundary.Center.Y+qt.Boundary.Height/2 ||
 		area.Center.Y+area.Height/2 < qt.Boundary.Center.Y-qt.Boundary.Height/2)
 }
+
+// Clear removes all points and objects from the QuadTree, but keeps its structure for reuse
+func (qt *QuadTree) Clear() {
+	qt.Points = qt.Points[:0]
+	qt.Objects = qt.Objects[:0]
+	if qt.Divided {
+		qt.NorthWest.Clear()
+		qt.NorthEast.Clear()
+		qt.SouthWest.Clear()
+		qt.SouthEast.Clear()
+	}
+}

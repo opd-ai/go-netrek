@@ -3,11 +3,17 @@ CRITICAL BUG: 0
 FUNCTIONAL MISMATCH: 0  
 MISSING FEATURE: 0  
 EDGE CASE BUG: 0  
-PERFORMANCE ISSUE: 1  
+PERFORMANCE ISSUE: 0  
 
 - All findings are detailed below, with file and line references, severity, and reproduction steps.
 
 ## DETAILED FINDINGS
+
+### FIXED: QuadTree Spatial Index Now Reused Each Frame
+**File:** pkg/engine/game.go:181-240
+**Severity:** Low
+**Description:** The spatial index (QuadTree) is now cleared and reused each frame, rather than rebuilt from scratch. See commit: "Reuse QuadTree spatial index each frame for performance".
+**Resolution Date:** 2025-07-19
 
 ### FIXED: Ship/Projectile World Wrapping No Longer Causes Overlap
 **File:** pkg/engine/game.go:241-300
