@@ -58,24 +58,50 @@ func parseCommandLineArguments() *clientArgs {
 
 // loadGameConfiguration loads the game configuration from file or returns default configuration.
 func loadGameConfiguration(configPath string) *config.GameConfig {
+	var gameConfig *config.GameConfig
+
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Printf("Configuration file not found, using default configuration")
-		return config.DefaultConfig()
+		gameConfig = config.DefaultConfig()
+	} else {
+		var err error
+		gameConfig, err = config.LoadConfig(configPath)
+		if err != nil {
+			log.Fatalf("Failed to load configuration: %v", err)
+		}
 	}
 
-	gameConfig, err := config.LoadConfig(configPath)
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
+	// Apply environment variable overrides
+	if err := config.ApplyEnvironmentOverrides(gameConfig); err != nil {
+		log.Fatalf("Failed to apply environment configuration: %v", err)
 	}
+
 	return gameConfig
 }
 
 // resolveServerAddress determines the final server address to use for connection.
 func resolveServerAddress(cmdLineAddr string, gameConfig *config.GameConfig) string {
-	if cmdLineAddr == "" {
+	// Command line argument takes highest priority
+	if cmdLineAddr != "" {
+		return cmdLineAddr
+	}
+
+	// Check environment variable
+	if envAddr := os.Getenv("NETREK_SERVER_ADDR"); envAddr != "" {
+		port := os.Getenv("NETREK_SERVER_PORT")
+		if port == "" {
+			port = "4566" // Default port
+		}
+		return fmt.Sprintf("%s:%s", envAddr, port)
+	}
+
+	// Fall back to config file
+	if gameConfig.NetworkConfig.ServerAddress != "" {
 		return gameConfig.NetworkConfig.ServerAddress
 	}
-	return cmdLineAddr
+
+	// Final fallback to localhost
+	return "localhost:4566"
 }
 
 // initializeGameClient creates and connects a new game client to the server.

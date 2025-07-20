@@ -5,9 +5,203 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/opd-ai/go-netrek/pkg/entity"
 )
+
+// EnvironmentConfig contains configuration loaded from environment variables
+type EnvironmentConfig struct {
+	ServerAddr      string        `env:"NETREK_SERVER_ADDR"`
+	ServerPort      int           `env:"NETREK_SERVER_PORT"`
+	MaxClients      int           `env:"NETREK_MAX_CLIENTS"`
+	ReadTimeout     time.Duration `env:"NETREK_READ_TIMEOUT"`
+	WriteTimeout    time.Duration `env:"NETREK_WRITE_TIMEOUT"`
+	UpdateRate      int           `env:"NETREK_UPDATE_RATE"`
+	TicksPerState   int           `env:"NETREK_TICKS_PER_STATE"`
+	UsePartialState bool          `env:"NETREK_USE_PARTIAL_STATE"`
+	WorldSize       float64       `env:"NETREK_WORLD_SIZE"`
+}
+
+// ValidationError represents a configuration validation error
+type ValidationError struct {
+	Field   string
+	Value   interface{}
+	Message string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("validation failed for field '%s' with value '%v': %s", e.Field, e.Value, e.Message)
+}
+
+// LoadConfigFromEnv loads configuration from environment variables with validation
+func LoadConfigFromEnv() (*EnvironmentConfig, error) {
+	config := &EnvironmentConfig{
+		// Secure defaults
+		ServerAddr:      getEnvOrDefault("NETREK_SERVER_ADDR", "localhost"),
+		ServerPort:      getEnvAsIntOrDefault("NETREK_SERVER_PORT", 4566),
+		MaxClients:      getEnvAsIntOrDefault("NETREK_MAX_CLIENTS", 32),
+		ReadTimeout:     getEnvAsDurationOrDefault("NETREK_READ_TIMEOUT", 30*time.Second),
+		WriteTimeout:    getEnvAsDurationOrDefault("NETREK_WRITE_TIMEOUT", 30*time.Second),
+		UpdateRate:      getEnvAsIntOrDefault("NETREK_UPDATE_RATE", 20),
+		TicksPerState:   getEnvAsIntOrDefault("NETREK_TICKS_PER_STATE", 3),
+		UsePartialState: getEnvAsBoolOrDefault("NETREK_USE_PARTIAL_STATE", true),
+		WorldSize:       getEnvAsFloatOrDefault("NETREK_WORLD_SIZE", 10000.0),
+	}
+
+	if err := validateEnvironmentConfig(config); err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	return config, nil
+}
+
+// validateEnvironmentConfig validates the environment configuration
+func validateEnvironmentConfig(config *EnvironmentConfig) error {
+	// Validate server address
+	if strings.TrimSpace(config.ServerAddr) == "" {
+		return &ValidationError{
+			Field:   "ServerAddr",
+			Value:   config.ServerAddr,
+			Message: "server address cannot be empty",
+		}
+	}
+
+	// Validate server port
+	if config.ServerPort < 1024 || config.ServerPort > 65535 {
+		return &ValidationError{
+			Field:   "ServerPort",
+			Value:   config.ServerPort,
+			Message: "server port must be between 1024 and 65535",
+		}
+	}
+
+	// Validate max clients
+	if config.MaxClients < 1 || config.MaxClients > 1000 {
+		return &ValidationError{
+			Field:   "MaxClients",
+			Value:   config.MaxClients,
+			Message: "max clients must be between 1 and 1000",
+		}
+	}
+
+	// Validate timeouts
+	if config.ReadTimeout < time.Second || config.ReadTimeout > time.Minute {
+		return &ValidationError{
+			Field:   "ReadTimeout",
+			Value:   config.ReadTimeout,
+			Message: "read timeout must be between 1s and 1m",
+		}
+	}
+
+	if config.WriteTimeout < time.Second || config.WriteTimeout > time.Minute {
+		return &ValidationError{
+			Field:   "WriteTimeout",
+			Value:   config.WriteTimeout,
+			Message: "write timeout must be between 1s and 1m",
+		}
+	}
+
+	// Validate update rate
+	if config.UpdateRate < 1 || config.UpdateRate > 100 {
+		return &ValidationError{
+			Field:   "UpdateRate",
+			Value:   config.UpdateRate,
+			Message: "update rate must be between 1 and 100",
+		}
+	}
+
+	// Validate ticks per state
+	if config.TicksPerState < 1 || config.TicksPerState > 10 {
+		return &ValidationError{
+			Field:   "TicksPerState",
+			Value:   config.TicksPerState,
+			Message: "ticks per state must be between 1 and 10",
+		}
+	}
+
+	// Validate world size
+	if config.WorldSize < 1000.0 || config.WorldSize > 100000.0 {
+		return &ValidationError{
+			Field:   "WorldSize",
+			Value:   config.WorldSize,
+			Message: "world size must be between 1000.0 and 100000.0",
+		}
+	}
+
+	return nil
+}
+
+// getEnvOrDefault returns the environment variable value or default if not set
+func getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+// getEnvAsIntOrDefault returns the environment variable as int or default if not set or invalid
+func getEnvAsIntOrDefault(key string, defaultValue int) int {
+	if value := os.Getenv(key); value != "" {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
+	}
+	return defaultValue
+}
+
+// getEnvAsBoolOrDefault returns the environment variable as bool or default if not set or invalid
+func getEnvAsBoolOrDefault(key string, defaultValue bool) bool {
+	if value := os.Getenv(key); value != "" {
+		if boolValue, err := strconv.ParseBool(value); err == nil {
+			return boolValue
+		}
+	}
+	return defaultValue
+}
+
+// getEnvAsFloatOrDefault returns the environment variable as float64 or default if not set or invalid
+func getEnvAsFloatOrDefault(key string, defaultValue float64) float64 {
+	if value := os.Getenv(key); value != "" {
+		if floatValue, err := strconv.ParseFloat(value, 64); err == nil {
+			return floatValue
+		}
+	}
+	return defaultValue
+}
+
+// getEnvAsDurationOrDefault returns the environment variable as time.Duration or default if not set or invalid
+func getEnvAsDurationOrDefault(key string, defaultValue time.Duration) time.Duration {
+	if value := os.Getenv(key); value != "" {
+		if duration, err := time.ParseDuration(value); err == nil {
+			return duration
+		}
+	}
+	return defaultValue
+}
+
+// ApplyEnvironmentOverrides applies environment variable overrides to existing GameConfig
+func ApplyEnvironmentOverrides(gameConfig *GameConfig) error {
+	envConfig, err := LoadConfigFromEnv()
+	if err != nil {
+		return fmt.Errorf("failed to load environment configuration: %w", err)
+	}
+
+	// Apply environment overrides to NetworkConfig
+	gameConfig.NetworkConfig.ServerAddress = fmt.Sprintf("%s:%d", envConfig.ServerAddr, envConfig.ServerPort)
+	gameConfig.NetworkConfig.ServerPort = envConfig.ServerPort
+	gameConfig.NetworkConfig.UpdateRate = envConfig.UpdateRate
+	gameConfig.NetworkConfig.TicksPerState = envConfig.TicksPerState
+	gameConfig.NetworkConfig.UsePartialState = envConfig.UsePartialState
+
+	// Apply environment overrides to other configs
+	gameConfig.MaxPlayers = envConfig.MaxClients
+	gameConfig.WorldSize = envConfig.WorldSize
+
+	return nil
+}
 
 // ShipTypeConfig allows defining custom ship types and stats in config
 // Keyed by name (e.g. "Scout", "Destroyer")
@@ -194,13 +388,14 @@ func createDefaultPhysicsConfig() PhysicsConfig {
 }
 
 // createDefaultNetworkConfig creates the default network configuration for a new game.
+// Note: This function now provides base defaults that will be overridden by environment variables
 func createDefaultNetworkConfig() NetworkConfig {
 	return NetworkConfig{
 		UpdateRate:      20,
 		TicksPerState:   3,
 		UsePartialState: true,
 		ServerPort:      4566,
-		ServerAddress:   "localhost:4566",
+		ServerAddress:   "", // Will be set from environment or secure default
 	}
 }
 

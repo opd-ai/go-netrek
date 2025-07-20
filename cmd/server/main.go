@@ -41,6 +41,11 @@ func main() {
 		}
 	}
 
+	// Apply environment variable overrides
+	if err := config.ApplyEnvironmentOverrides(gameConfig); err != nil {
+		log.Fatalf("Failed to apply environment configuration: %v", err)
+	}
+
 	// Create game
 	game := engine.NewGame(gameConfig)
 
@@ -50,7 +55,7 @@ func main() {
 	// Start server
 	serverAddr := gameConfig.NetworkConfig.ServerAddress
 	if serverAddr == "" {
-		serverAddr = "localhost:4566"
+		log.Fatalf("Server address not configured. Set NETREK_SERVER_ADDR and NETREK_SERVER_PORT environment variables or provide in config file")
 	}
 
 	log.Printf("Starting server on %s", serverAddr)
