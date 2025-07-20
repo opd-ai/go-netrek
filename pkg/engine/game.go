@@ -91,9 +91,19 @@ func NewGame(config *config.GameConfig) *Game {
 		EventBus:    event.NewEventBus(),
 	}
 
-	// Create spatial index for collision detection
-	worldSize := config.WorldSize
-	game.SpatialIndex = physics.NewQuadTree(
+	// Initialize game components
+	game.initSpatialIndex()
+	game.initTeams()
+	game.initPlanets()
+	game.registerEventHandlers()
+
+	return game
+}
+
+// initSpatialIndex creates the spatial index for collision detection.
+func (g *Game) initSpatialIndex() {
+	worldSize := g.Config.WorldSize
+	g.SpatialIndex = physics.NewQuadTree(
 		physics.Rect{
 			Center: physics.Vector2D{X: 0, Y: 0},
 			Width:  worldSize,
@@ -101,20 +111,24 @@ func NewGame(config *config.GameConfig) *Game {
 		},
 		10, // Maximum entities per quad before subdivision
 	)
+}
 
-	// Initialize teams
-	for i, teamConfig := range config.Teams {
+// initTeams initializes the teams based on the game configuration.
+func (g *Game) initTeams() {
+	for i, teamConfig := range g.Config.Teams {
 		team := &Team{
 			ID:      i,
 			Name:    teamConfig.Name,
 			Color:   teamConfig.Color,
 			Players: make(map[entity.ID]*Player),
 		}
-		game.Teams[i] = team
+		g.Teams[i] = team
 	}
+}
 
-	// Initialize planets
-	for _, planetConfig := range config.Planets {
+// initPlanets initializes the planets based on the game configuration.
+func (g *Game) initPlanets() {
+	for _, planetConfig := range g.Config.Planets {
 		planet := entity.NewPlanet(
 			entity.GenerateID(),
 			planetConfig.Name,
@@ -127,18 +141,13 @@ func NewGame(config *config.GameConfig) *Game {
 			planet.Armies = planetConfig.InitialArmies
 
 			// Update team planet count
-			if team, ok := game.Teams[planetConfig.TeamID]; ok {
+			if team, ok := g.Teams[planetConfig.TeamID]; ok {
 				team.PlanetCount++
 			}
 		}
 
-		game.Planets[planet.GetID()] = planet
+		g.Planets[planet.GetID()] = planet
 	}
-
-	// Register event handlers
-	game.registerEventHandlers()
-
-	return game
 }
 
 // Start begins the game update loop
@@ -186,6 +195,17 @@ func (g *Game) Update() {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
+	// Update game state
+	g.updateEntities(deltaTime)
+	g.processCollisions()
+	g.cleanupInactiveEntities()
+
+	// Increment tick counter
+	g.CurrentTick++
+}
+
+// updateEntities updates all entities and the spatial index.
+func (g *Game) updateEntities(deltaTime float64) {
 	// Clear spatial index for this frame (reuse instead of recreate)
 	if g.SpatialIndex == nil {
 		g.SpatialIndex = physics.NewQuadTree(
@@ -221,15 +241,11 @@ func (g *Game) Update() {
 	for _, planet := range g.Planets {
 		g.SpatialIndex.Insert(planet.Position, planet)
 	}
+}
 
-	// Process collisions
+// processCollisions checks for and resolves collisions between entities.
+func (g *Game) processCollisions() {
 	g.detectCollisions()
-
-	// Cleanup inactive entities
-	g.cleanupInactiveEntities()
-
-	// Increment tick counter
-	g.CurrentTick++
 }
 
 // updateShips updates all ships
@@ -489,54 +505,57 @@ func (g *Game) AddPlayer(name string, teamID int) (entity.ID, error) {
 		return 0, errors.New("invalid team")
 	}
 
-	playerID := entity.GenerateID()
-	player := &Player{
-		ID:        playerID,
+	player := g.createPlayer(name, teamID)
+	team.Players[player.ID] = player
+
+	ship := g.createShipForPlayer(player)
+	g.Ships[ship.ID] = ship
+	player.ShipID = ship.ID
+
+	team.ShipCount++
+
+	g.publishPlayerAndShipCreationEvents(player, ship)
+
+	return player.ID, nil
+}
+
+// createPlayer creates a new player entity.
+func (g *Game) createPlayer(name string, teamID int) *Player {
+	return &Player{
+		ID:        entity.GenerateID(),
 		Name:      name,
 		TeamID:    teamID,
 		Connected: true,
 	}
+}
 
-	// Add to team
-	team.Players[playerID] = player
-
-	// Create a ship for the player
-	spawnPoint := g.findSpawnPoint(teamID)
-
-	// Determine ship class from team config
+// createShipForPlayer creates a new ship for a given player.
+func (g *Game) createShipForPlayer(player *Player) *entity.Ship {
+	spawnPoint := g.findSpawnPoint(player.TeamID)
 	shipClass := entity.Scout
-	if teamID < len(g.Config.Teams) {
-		shipClass = entity.ShipClassFromString(g.Config.Teams[teamID].StartingShip)
+	if player.TeamID < len(g.Config.Teams) {
+		shipClass = entity.ShipClassFromString(g.Config.Teams[player.TeamID].StartingShip)
 	}
-
-	shipID := entity.GenerateID()
-	ship := entity.NewShip(
-		shipID,
+	return entity.NewShip(
+		entity.GenerateID(),
 		shipClass,
-		teamID,
+		player.TeamID,
 		spawnPoint,
 	)
+}
 
-	g.Ships[shipID] = ship
-	player.ShipID = shipID
-
-	team.ShipCount++
-
-	// Publish player joined event
+// publishPlayerAndShipCreationEvents publishes events for player joining and ship creation.
+func (g *Game) publishPlayerAndShipCreationEvents(player *Player, ship *entity.Ship) {
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.PlayerJoined,
 		Source:    player,
 	})
-
-	// Publish ship created event
 	g.EventBus.Publish(event.NewShipEvent(
 		event.ShipCreated,
 		g,
-		uint64(shipID),
-		teamID,
+		uint64(ship.ID),
+		ship.TeamID,
 	))
-
-	return playerID, nil
 }
 
 // RemovePlayer removes a player from the game
@@ -591,57 +610,39 @@ func (g *Game) RespawnShip(playerID entity.ID) error {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
-	// Find the player
-	var player *Player
-
-	for _, team := range g.Teams {
-		if p, ok := team.Players[playerID]; ok {
-			player = p
-			break
-		}
-	}
-
-	if player == nil {
-		return errors.New("player not found")
-	}
-
-	// Find spawn point
-	spawnPoint := g.findSpawnPoint(player.TeamID)
-
-	// Determine ship class from team config
-	shipClass := entity.Scout
-	if player.TeamID < len(g.Config.Teams) {
-		shipClass = entity.ShipClassFromString(g.Config.Teams[player.TeamID].StartingShip)
+	player, err := g.findPlayerByID(playerID)
+	if err != nil {
+		return err
 	}
 
 	// Create a new ship
+	newShip := g.createShipForPlayer(player)
+
+	// Update player's ship ID and replace ship in game
 	oldShipID := player.ShipID
-	shipID := entity.GenerateID()
-	ship := entity.NewShip(
-		shipID,
-		shipClass,
-		player.TeamID,
-		spawnPoint,
-	)
-
-	// Update player's ship ID
-	player.ShipID = shipID
-
-	// Remove old ship if it exists
+	player.ShipID = newShip.ID
 	delete(g.Ships, oldShipID)
-
-	// Add new ship
-	g.Ships[shipID] = ship
+	g.Ships[newShip.ID] = newShip
 
 	// Publish ship created event
 	g.EventBus.Publish(event.NewShipEvent(
 		event.ShipCreated,
 		g,
-		uint64(shipID),
+		uint64(newShip.ID),
 		player.TeamID,
 	))
 
 	return nil
+}
+
+// findPlayerByID finds a player by their ID.
+func (g *Game) findPlayerByID(playerID entity.ID) (*Player, error) {
+	for _, team := range g.Teams {
+		if p, ok := team.Players[playerID]; ok {
+			return p, nil
+		}
+	}
+	return nil, errors.New("player not found")
 }
 
 // BeamArmies beams armies between a ship and a planet
