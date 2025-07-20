@@ -682,13 +682,12 @@ func (g *Game) BeamArmies(shipID, planetID entity.ID, direction string, amount i
 	if !ok {
 		return 0, errors.New("ship not found")
 	}
-
 	planet, ok := g.Planets[planetID]
 	if !ok {
 		return 0, errors.New("planet not found")
 	}
 
-	if err := g.validateBeamingDistance(ship, planet); err != nil {
+	if err := g.validateBeamingPreconditions(ship, planet, direction); err != nil {
 		return 0, err
 	}
 
@@ -698,8 +697,22 @@ func (g *Game) BeamArmies(shipID, planetID entity.ID, direction string, amount i
 	case "up":
 		return g.beamArmiesUp(ship, planet, amount)
 	default:
-		return 0, errors.New("invalid direction, must be 'up' or 'down'")
+		return 0, errors.New("invalid beam direction")
 	}
+}
+
+// validateBeamingPreconditions checks if the ship and planet are in a valid state for beaming.
+func (g *Game) validateBeamingPreconditions(ship *entity.Ship, planet *entity.Planet, direction string) error {
+	if !ship.Active {
+		return errors.New("ship is not active")
+	}
+	if err := g.validateBeamingDistance(ship, planet); err != nil {
+		return err
+	}
+	if direction == "up" && ship.TeamID != planet.TeamID {
+		return errors.New("cannot beam up from an enemy planet")
+	}
+	return nil
 }
 
 // validateBeamingDistance checks if a ship is close enough to a planet to beam armies.
@@ -732,27 +745,29 @@ func (g *Game) beamArmiesDown(ship *entity.Ship, planet *entity.Planet, amount i
 
 // handlePlanetCapture updates game state when a planet is captured.
 func (g *Game) handlePlanetCapture(ship *entity.Ship, planet *entity.Planet) {
-	// Update team planet counts
-	if oldTeam, ok := g.Teams[planet.TeamID]; ok {
-		oldTeam.PlanetCount--
-	}
-	if newTeam, ok := g.Teams[ship.TeamID]; ok {
-		newTeam.PlanetCount++
+	oldTeamID := planet.TeamID
+	if oldTeamID >= 0 {
+		if team, ok := g.Teams[oldTeamID]; ok {
+			team.PlanetCount--
+		}
 	}
 
-	// Update player stats
+	planet.TeamID = ship.TeamID
+	if team, ok := g.Teams[ship.TeamID]; ok {
+		team.PlanetCount++
+	}
+
 	if player, ok := g.findPlayerByShipID(ship.ID); ok {
 		player.Captures++
-		player.Score += 20 // Points for capture
+		player.Score += 50 // Points for capture
 	}
 
-	// Publish planet captured event
 	g.EventBus.Publish(event.NewPlanetEvent(
 		event.PlanetCaptured,
 		g,
 		uint64(planet.ID),
 		ship.TeamID,
-		-1, // Was neutral
+		oldTeamID,
 	))
 }
 
@@ -786,21 +801,21 @@ func (g *Game) FireWeapon(shipID entity.ID, weaponIndex int) error {
 	if !ok {
 		return errors.New("ship not found")
 	}
-
 	if !ship.Active {
 		return errors.New("ship is not active")
 	}
 
-	// Fire the weapon
 	projectile := ship.FireWeapon(weaponIndex)
+
 	if projectile == nil {
-		return errors.New("weapon could not be fired")
+		return nil // Weapon on cooldown or out of ammo
 	}
 
-	// Add projectile to game
+	// Set projectile owner for scoring
+	projectile.OwnerID = ship.ID
+
 	g.Projectiles[projectile.ID] = projectile
 
-	// Publish projectile fired event
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.ProjectileFired,
 		Source:    projectile,
