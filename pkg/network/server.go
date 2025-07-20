@@ -410,57 +410,76 @@ func (s *GameServer) sendFullStateUpdate() {
 func (s *GameServer) sendPartialStateUpdate() {
 	currentState := s.game.GetGameState()
 
-	// For each client, create a custom partial update
 	s.clientsLock.RLock()
+	defer s.clientsLock.RUnlock()
+
 	for _, client := range s.clients {
 		if !client.Connected {
 			continue
 		}
 
-		// Create partial state with only nearby entities
-		partialState := &engine.GameState{
-			Tick:        currentState.Tick,
-			Ships:       make(map[entity.ID]engine.ShipState),
-			Planets:     make(map[entity.ID]engine.PlanetState),
-			Projectiles: make(map[entity.ID]engine.ProjectileState),
-			Teams:       currentState.Teams, // Teams always included
-		}
-
-		// Get player's ship position for visibility check
-		var playerShipPos physics.Vector2D
-		var viewRadius float64 = 3000 // Default view radius
-
-		// Find player's ship
-		for _, player := range s.game.Teams[client.TeamID].Players {
-			if player.ID == client.PlayerID {
-				if ship, ok := currentState.Ships[player.ShipID]; ok {
-					playerShipPos = ship.Position
-					break
-				}
-			}
-		}
-
-		// Add nearby ships
-		for id, ship := range currentState.Ships {
-			if ship.Position.Distance(playerShipPos) <= viewRadius {
-				partialState.Ships[id] = ship
-			}
-		}
-
-		// Add nearby projectiles
-		for id, proj := range currentState.Projectiles {
-			if proj.Position.Distance(playerShipPos) <= viewRadius {
-				partialState.Projectiles[id] = proj
-			}
-		}
-
-		// Always include all planets
-		partialState.Planets = currentState.Planets
-
-		// Send the partial state
+		partialState := s.createPartialStateForClient(client, currentState)
 		s.sendMessage(client.Conn, GameStateUpdate, partialState)
 	}
-	s.clientsLock.RUnlock()
+}
+
+// createPartialStateForClient creates a partial game state containing only entities visible to the client.
+func (s *GameServer) createPartialStateForClient(client *Client, currentState *engine.GameState) *engine.GameState {
+	partialState := s.initializePartialState(currentState)
+	playerShipPos := s.findPlayerShipPosition(client, currentState)
+
+	s.addNearbyEntities(partialState, currentState, playerShipPos)
+	s.addAllPlanets(partialState, currentState)
+
+	return partialState
+}
+
+// initializePartialState creates an empty partial state with basic information.
+func (s *GameServer) initializePartialState(currentState *engine.GameState) *engine.GameState {
+	return &engine.GameState{
+		Tick:        currentState.Tick,
+		Ships:       make(map[entity.ID]engine.ShipState),
+		Planets:     make(map[entity.ID]engine.PlanetState),
+		Projectiles: make(map[entity.ID]engine.ProjectileState),
+		Teams:       currentState.Teams, // Teams always included
+	}
+}
+
+// findPlayerShipPosition locates the position of the client's ship for visibility calculations.
+func (s *GameServer) findPlayerShipPosition(client *Client, currentState *engine.GameState) physics.Vector2D {
+	for _, player := range s.game.Teams[client.TeamID].Players {
+		if player.ID == client.PlayerID {
+			if ship, ok := currentState.Ships[player.ShipID]; ok {
+				return ship.Position
+			}
+			break
+		}
+	}
+	return physics.Vector2D{} // Return zero vector if ship not found
+}
+
+// addNearbyEntities adds ships and projectiles within the view radius to the partial state.
+func (s *GameServer) addNearbyEntities(partialState *engine.GameState, currentState *engine.GameState, playerPos physics.Vector2D) {
+	viewRadius := 3000.0 // Default view radius
+
+	// Add nearby ships
+	for id, ship := range currentState.Ships {
+		if ship.Position.Distance(playerPos) <= viewRadius {
+			partialState.Ships[id] = ship
+		}
+	}
+
+	// Add nearby projectiles
+	for id, proj := range currentState.Projectiles {
+		if proj.Position.Distance(playerPos) <= viewRadius {
+			partialState.Projectiles[id] = proj
+		}
+	}
+}
+
+// addAllPlanets includes all planets in the partial state as they are always visible.
+func (s *GameServer) addAllPlanets(partialState *engine.GameState, currentState *engine.GameState) {
+	partialState.Planets = currentState.Planets
 }
 
 // readMessage reads a message from a connection
