@@ -285,51 +285,74 @@ func (ai *AIClient) executeAggressorBehavior(myShip engine.ShipState) {
 
 // executeDefenderBehavior makes the AI defend home planets
 func (ai *AIClient) executeDefenderBehavior(myShip engine.ShipState) {
-	// Find home planets that need defending
 	homePlanet := ai.findHomePlanet()
 
-	thrust := true
-	turnLeft := false
-	turnRight := false
+	thrust, turnLeft, turnRight := ai.initializeDefenseInputs()
 
 	if homePlanet != nil {
-		// Stay near home planet
-		homeVector := homePlanet.Position.Sub(myShip.Position)
-		distance := homeVector.Length()
+		distance := ai.calculateDistanceToHome(myShip.Position, homePlanet.Position)
 
 		if distance > 500 {
-			// Move towards home planet
-			targetAngle := homeVector.Angle()
-			angleDiff := targetAngle - myShip.Rotation
-
-			// Normalize angle difference
-			for angleDiff > math.Pi {
-				angleDiff -= 2 * math.Pi
-			}
-			for angleDiff < -math.Pi {
-				angleDiff += 2 * math.Pi
-			}
-
-			if math.Abs(angleDiff) > 0.1 {
-				if angleDiff > 0 {
-					turnLeft = true
-				} else {
-					turnRight = true
-				}
-			}
+			turnLeft, turnRight = ai.calculateNavigationToHome(myShip, homePlanet)
 		} else {
-			// Patrol around home planet
-			if ai.random.Float64() < 0.2 {
-				if ai.random.Float64() < 0.5 {
-					turnLeft = true
-				} else {
-					turnRight = true
-				}
-			}
+			turnLeft, turnRight = ai.executePatrolBehavior()
 		}
 	}
 
 	ai.client.SendInput(thrust, turnLeft, turnRight, -1, false, false, 0, 0)
+}
+
+// initializeDefenseInputs sets up the default input state for defensive behavior.
+func (ai *AIClient) initializeDefenseInputs() (thrust bool, turnLeft bool, turnRight bool) {
+	return true, false, false
+}
+
+// calculateDistanceToHome computes the distance between the ship and home planet.
+func (ai *AIClient) calculateDistanceToHome(shipPosition, homePosition physics.Vector2D) float64 {
+	homeVector := homePosition.Sub(shipPosition)
+	return homeVector.Length()
+}
+
+// calculateNavigationToHome determines turn direction to navigate toward the home planet.
+func (ai *AIClient) calculateNavigationToHome(myShip engine.ShipState, homePlanet *engine.PlanetState) (turnLeft bool, turnRight bool) {
+	homeVector := homePlanet.Position.Sub(myShip.Position)
+	targetAngle := homeVector.Angle()
+	angleDiff := ai.normalizeAngleDifference(targetAngle - myShip.Rotation)
+
+	return ai.determineTurnDirection(angleDiff)
+}
+
+// normalizeAngleDifference normalizes angle difference to the range [-π, π].
+func (ai *AIClient) normalizeAngleDifference(angleDiff float64) float64 {
+	for angleDiff > math.Pi {
+		angleDiff -= 2 * math.Pi
+	}
+	for angleDiff < -math.Pi {
+		angleDiff += 2 * math.Pi
+	}
+	return angleDiff
+}
+
+// determineTurnDirection decides whether to turn left or right based on angle difference.
+func (ai *AIClient) determineTurnDirection(angleDiff float64) (turnLeft bool, turnRight bool) {
+	if math.Abs(angleDiff) > 0.1 {
+		if angleDiff > 0 {
+			return true, false
+		}
+		return false, true
+	}
+	return false, false
+}
+
+// executePatrolBehavior implements random patrol movement around the home planet.
+func (ai *AIClient) executePatrolBehavior() (turnLeft bool, turnRight bool) {
+	if ai.random.Float64() < 0.2 {
+		if ai.random.Float64() < 0.5 {
+			return true, false
+		}
+		return false, true
+	}
+	return false, false
 }
 
 // executeBomberBehavior makes the AI attack enemy planets
