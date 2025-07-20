@@ -64,23 +64,55 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	// Close any existing connection before establishing a new one
+	c.prepareConnection(address)
+
+	if err := c.establishTCPConnection(address); err != nil {
+		return err
+	}
+
+	if err := c.performHandshake(playerName, teamID); err != nil {
+		return err
+	}
+
+	c.startBackgroundProcesses()
+	return nil
+}
+
+// prepareConnection closes any existing connection and prepares for a new one.
+func (c *GameClient) prepareConnection(address string) {
 	if c.conn != nil {
 		c.conn.Close()
 		c.conn = nil
 	}
 	c.connected = false
-
 	c.serverAddress = address
+}
 
-	// Connect to server
+// establishTCPConnection creates a TCP connection to the server.
+func (c *GameClient) establishTCPConnection(address string) error {
 	var err error
 	c.conn, err = net.Dial("tcp", address)
 	if err != nil {
 		return fmt.Errorf("failed to connect to server: %w", err)
 	}
+	return nil
+}
 
-	// Send connect request
+// performHandshake sends a connect request and processes the server's response.
+func (c *GameClient) performHandshake(playerName string, teamID int) error {
+	if err := c.sendConnectRequest(playerName, teamID); err != nil {
+		return err
+	}
+
+	if err := c.processConnectResponse(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// sendConnectRequest creates and sends the initial connection request to the server.
+func (c *GameClient) sendConnectRequest(playerName string, teamID int) error {
 	connectReq := struct {
 		PlayerName string `json:"playerName"`
 		TeamID     int    `json:"teamID"`
@@ -94,7 +126,11 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 		return fmt.Errorf("failed to send connect request: %w", err)
 	}
 
-	// Wait for connect response
+	return nil
+}
+
+// processConnectResponse reads and validates the server's connection response.
+func (c *GameClient) processConnectResponse() error {
 	msgType, data, err := c.readMessage()
 	if err != nil {
 		c.cleanupConnection()
@@ -106,7 +142,15 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 		return fmt.Errorf("unexpected response type: %d", msgType)
 	}
 
-	// Parse connect response
+	if err := c.parseAndValidateResponse(data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// parseAndValidateResponse parses the connection response and updates client state.
+func (c *GameClient) parseAndValidateResponse(data []byte) error {
 	var connectResp struct {
 		Success  bool      `json:"success"`
 		Error    string    `json:"error"`
@@ -128,13 +172,13 @@ func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	c.clientID = connectResp.ClientID
 	c.connected = true
 
-	// Start message handling
-	go c.messageLoop()
-
-	// Start ping loop
-	go c.pingLoop()
-
 	return nil
+}
+
+// startBackgroundProcesses initiates the message and ping handling goroutines.
+func (c *GameClient) startBackgroundProcesses() {
+	go c.messageLoop()
+	go c.pingLoop()
 }
 
 // cleanupConnection safely closes the connection and resets state (must be called with lock held)
