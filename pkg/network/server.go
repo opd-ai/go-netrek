@@ -260,68 +260,94 @@ func (s *GameServer) handleClientMessages(client *Client) {
 	s.removeClient(client)
 }
 
+// PlayerInputData represents the structure of player input messages
+type PlayerInputData struct {
+	Thrust     bool      `json:"thrust"`
+	TurnLeft   bool      `json:"turnLeft"`
+	TurnRight  bool      `json:"turnRight"`
+	FireWeapon int       `json:"fireWeapon"` // -1 if not firing, weapon index otherwise
+	BeamDown   bool      `json:"beamDown"`
+	BeamUp     bool      `json:"beamUp"`
+	BeamAmount int       `json:"beamAmount"`
+	TargetID   entity.ID `json:"targetID"` // Target planet ID for beaming
+}
+
 // handlePlayerInput processes player input messages
 func (s *GameServer) handlePlayerInput(client *Client, data []byte) {
-	var input struct {
-		Thrust     bool      `json:"thrust"`
-		TurnLeft   bool      `json:"turnLeft"`
-		TurnRight  bool      `json:"turnRight"`
-		FireWeapon int       `json:"fireWeapon"` // -1 if not firing, weapon index otherwise
-		BeamDown   bool      `json:"beamDown"`
-		BeamUp     bool      `json:"beamUp"`
-		BeamAmount int       `json:"beamAmount"`
-		TargetID   entity.ID `json:"targetID"` // Target planet ID for beaming
-	}
-
-	if err := json.Unmarshal(data, &input); err != nil {
+	input, err := s.parsePlayerInput(data)
+	if err != nil {
 		log.Printf("Error parsing player input: %v", err)
 		return
 	}
 
-	// Update last input time
 	client.LastInput = time.Now()
 
-	// Find player's ship
-	var ship *entity.Ship
-	s.game.EntityLock.RLock()
-	for _, player := range s.game.Teams[client.TeamID].Players {
-		if player.ID == client.PlayerID {
-			if shipObj, ok := s.game.Ships[player.ShipID]; ok {
-				ship = shipObj
-			}
-			break
-		}
-	}
-	s.game.EntityLock.RUnlock()
-
+	ship := s.findPlayerShip(client)
 	if ship == nil {
 		return
 	}
 
-	// Apply input
-	s.game.EntityLock.Lock()
+	s.applyPlayerInput(ship, input)
+}
 
-	// Update ship movement
+// parsePlayerInput deserializes the player input data from JSON bytes
+func (s *GameServer) parsePlayerInput(data []byte) (*PlayerInputData, error) {
+	var input PlayerInputData
+	if err := json.Unmarshal(data, &input); err != nil {
+		return nil, err
+	}
+	return &input, nil
+}
+
+// findPlayerShip locates the ship entity for a given client's player
+func (s *GameServer) findPlayerShip(client *Client) *entity.Ship {
+	s.game.EntityLock.RLock()
+	defer s.game.EntityLock.RUnlock()
+
+	for _, player := range s.game.Teams[client.TeamID].Players {
+		if player.ID == client.PlayerID {
+			if ship, ok := s.game.Ships[player.ShipID]; ok {
+				return ship
+			}
+			break
+		}
+	}
+	return nil
+}
+
+// applyPlayerInput applies all validated input commands to the player's ship
+func (s *GameServer) applyPlayerInput(ship *entity.Ship, input *PlayerInputData) {
+	s.game.EntityLock.Lock()
+	defer s.game.EntityLock.Unlock()
+
+	s.applyMovementInput(ship, input)
+	s.applyWeaponInput(ship, input)
+	s.applyBeamingInput(ship, input)
+}
+
+// applyMovementInput updates ship movement controls based on player input
+func (s *GameServer) applyMovementInput(ship *entity.Ship, input *PlayerInputData) {
 	ship.Thrusting = input.Thrust
 	ship.TurningCW = input.TurnRight
 	ship.TurningCCW = input.TurnLeft
+}
 
-	// Handle weapon firing
+// applyWeaponInput handles weapon firing commands from player input
+func (s *GameServer) applyWeaponInput(ship *entity.Ship, input *PlayerInputData) {
 	if input.FireWeapon >= 0 {
 		s.game.FireWeapon(ship.ID, input.FireWeapon)
 	}
+}
 
-	// Handle beaming
+// applyBeamingInput processes army beaming commands from player input
+func (s *GameServer) applyBeamingInput(ship *entity.Ship, input *PlayerInputData) {
 	if (input.BeamDown || input.BeamUp) && input.TargetID != 0 {
 		direction := "down"
 		if input.BeamUp {
 			direction = "up"
 		}
-
 		s.game.BeamArmies(ship.ID, input.TargetID, direction, input.BeamAmount)
 	}
-
-	s.game.EntityLock.Unlock()
 }
 
 // broadcastChatMessage sends a chat message to all connected clients
