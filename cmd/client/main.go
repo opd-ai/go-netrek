@@ -19,48 +19,80 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "config.json", "Path to configuration file")
-	serverAddr := flag.String("server", "", "Server address (overrides config)")
-	playerName := flag.String("name", "Player", "Player name")
-	teamID := flag.Int("team", 0, "Team ID")
-	renderer := flag.String("renderer", "terminal", "Renderer type: 'terminal' or 'engo'")
-	fullscreen := flag.Bool("fullscreen", false, "Run in fullscreen mode (Engo only)")
-	width := flag.Int("width", 1024, "Window width (Engo only)")
-	height := flag.Int("height", 768, "Window height (Engo only)")
-	flag.Parse()
+	args := parseCommandLineArguments()
+	gameConfig := loadGameConfiguration(args.configPath)
+	serverAddr := resolveServerAddress(args.serverAddr, gameConfig)
 
-	// Load configuration
-	var gameConfig *config.GameConfig
-
-	if _, err := os.Stat(*configPath); os.IsNotExist(err) {
-		log.Printf("Configuration file not found, using default configuration")
-		gameConfig = config.DefaultConfig()
-	} else {
-		gameConfig, err = config.LoadConfig(*configPath)
-		if err != nil {
-			log.Fatalf("Failed to load configuration: %v", err)
-		}
-	}
-
-	// Use server address from command line if provided
-	if *serverAddr == "" {
-		*serverAddr = gameConfig.NetworkConfig.ServerAddress
-	}
-
-	// Create event bus
 	eventBus := event.NewEventBus()
+	client := initializeGameClient(eventBus, serverAddr, args.playerName, args.teamID)
+	setupEventSubscriptions(eventBus)
+	startSelectedRenderer(args.renderer, client, eventBus, args.teamID, args.width, args.height, args.fullscreen)
+}
 
-	// Create client
+// clientArgs holds parsed command line arguments for the client application.
+type clientArgs struct {
+	configPath string
+	serverAddr string
+	playerName string
+	teamID     int
+	renderer   string
+	fullscreen bool
+	width      int
+	height     int
+}
+
+// parseCommandLineArguments parses and returns command line arguments for the client.
+func parseCommandLineArguments() *clientArgs {
+	args := &clientArgs{}
+	flag.StringVar(&args.configPath, "config", "config.json", "Path to configuration file")
+	flag.StringVar(&args.serverAddr, "server", "", "Server address (overrides config)")
+	flag.StringVar(&args.playerName, "name", "Player", "Player name")
+	flag.IntVar(&args.teamID, "team", 0, "Team ID")
+	flag.StringVar(&args.renderer, "renderer", "terminal", "Renderer type: 'terminal' or 'engo'")
+	flag.BoolVar(&args.fullscreen, "fullscreen", false, "Run in fullscreen mode (Engo only)")
+	flag.IntVar(&args.width, "width", 1024, "Window width (Engo only)")
+	flag.IntVar(&args.height, "height", 768, "Window height (Engo only)")
+	flag.Parse()
+	return args
+}
+
+// loadGameConfiguration loads the game configuration from file or returns default configuration.
+func loadGameConfiguration(configPath string) *config.GameConfig {
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		log.Printf("Configuration file not found, using default configuration")
+		return config.DefaultConfig()
+	}
+
+	gameConfig, err := config.LoadConfig(configPath)
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
+	return gameConfig
+}
+
+// resolveServerAddress determines the final server address to use for connection.
+func resolveServerAddress(cmdLineAddr string, gameConfig *config.GameConfig) string {
+	if cmdLineAddr == "" {
+		return gameConfig.NetworkConfig.ServerAddress
+	}
+	return cmdLineAddr
+}
+
+// initializeGameClient creates and connects a new game client to the server.
+func initializeGameClient(eventBus *event.Bus, serverAddr, playerName string, teamID int) *network.GameClient {
 	client := network.NewGameClient(eventBus)
 
-	// Connect to server
-	log.Printf("Connecting to server at %s", *serverAddr)
-	if err := client.Connect(*serverAddr, *playerName, *teamID); err != nil {
+	log.Printf("Connecting to server at %s", serverAddr)
+	if err := client.Connect(serverAddr, playerName, teamID); err != nil {
 		log.Fatalf("Failed to connect to server: %v", err)
 	}
 	log.Printf("Connected to server")
 
-	// Subscribe to events
+	return client
+}
+
+// setupEventSubscriptions configures all event handlers for client-server communication.
+func setupEventSubscriptions(eventBus *event.Bus) {
 	eventBus.Subscribe(network.ChatMessageReceived, func(e event.Event) {
 		if chatEvent, ok := e.(*network.ChatEvent); ok {
 			fmt.Printf("[%s]: %s\n", chatEvent.SenderName, chatEvent.Message)
@@ -79,16 +111,16 @@ func main() {
 		log.Printf("Failed to reconnect to server")
 		os.Exit(1)
 	})
+}
 
-	// Choose renderer based on command line flag
-	switch *renderer {
+// startSelectedRenderer launches the appropriate renderer based on user selection.
+func startSelectedRenderer(renderer string, client *network.GameClient, eventBus *event.Bus, teamID, width, height int, fullscreen bool) {
+	switch renderer {
 	case "engo":
-		// Start Engo GUI renderer
-		startEngoRenderer(client, eventBus, uint64(*teamID), *width, *height, *fullscreen)
+		startEngoRenderer(client, eventBus, uint64(teamID), width, height, fullscreen)
 	case "terminal":
 		fallthrough
 	default:
-		// Start terminal renderer (existing implementation)
 		startTerminalRenderer(client, eventBus)
 	}
 }

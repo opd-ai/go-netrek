@@ -1,16 +1,16 @@
 {
   "metadata": {
     "repository": "/home/user/go/src/github.com/opd-ai/go-netrek",
-    "generated_at": "2025-07-20T17:14:46.376220592-04:00",
-    "analysis_time": 19627189,
+    "generated_at": "2025-07-20T17:22:51.8409553-04:00",
+    "analysis_time": 13473155,
     "files_processed": 43,
     "tool_version": "1.0.0",
     "go_version": ""
   },
   "overview": {
-    "total_lines_of_code": 1304,
-    "total_functions": 24,
-    "total_methods": 105,
+    "total_lines_of_code": 1195,
+    "total_functions": 31,
+    "total_methods": 63,
     "total_structs": 0,
     "total_interfaces": 0,
     "total_packages": 0,
@@ -18,176 +18,32 @@
   },
   "functions": [
     {
-      "name": "NewShip",
-      "package": "entity",
-      "file": "entity",
-      "line": 58,
-      "is_exported": true,
+      "name": "main",
+      "package": "main",
+      "file": "main",
+      "line": 21,
+      "is_exported": false,
       "is_method": false,
       "lines": {
-        "total": 28,
-        "code": 28,
+        "total": 72,
+        "code": 72,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 4,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 2.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "Update",
-      "package": "entity",
-      "file": "entity",
-      "line": 90,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 38,
-        "code": 38,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
+        "parameter_count": 0,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 0
       },
       "complexity": {
         "cyclomatic": 7,
         "cognitive": 7,
-        "nesting_depth": 7,
-        "overall": 12.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 62,
-        "has_example": false,
-        "quality_score": 0.248
-      }
-    },
-    {
-      "name": "FireWeapon",
-      "package": "entity",
-      "file": "entity",
-      "line": 132,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 26,
-        "code": 26,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 49,
-        "has_example": false,
-        "quality_score": 0.196
-      }
-    },
-    {
-      "name": "TakeDamage",
-      "package": "entity",
-      "file": "entity",
-      "line": 162,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 18,
-        "code": 18,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 69,
-        "has_example": false,
-        "quality_score": 0.27599999999999997
-      }
-    },
-    {
-      "name": "RepairTick",
-      "package": "entity",
-      "file": "entity",
-      "line": 183,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Ship",
-      "lines": {
-        "total": 20,
-        "code": 20,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 5,
-        "cognitive": 5,
-        "nesting_depth": 5,
-        "overall": 9
+        "nesting_depth": 12,
+        "overall": 15.1
       },
       "documentation": {
         "has_comment": false,
@@ -197,173 +53,32 @@
       }
     },
     {
-      "name": "SetShipTypeStats",
-      "package": "entity",
-      "file": "entity",
-      "line": 209,
-      "is_exported": true,
+      "name": "startEngoRenderer",
+      "package": "main",
+      "file": "main",
+      "line": 97,
+      "is_exported": false,
       "is_method": false,
       "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 14,
+        "code": 14,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
+        "parameter_count": 5,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.5
+        "signature_complexity": 2.5
       },
       "complexity": {
         "cyclomatic": 1,
         "cognitive": 1,
         "nesting_depth": 1,
         "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 70,
-        "has_example": false,
-        "quality_score": 0.27999999999999997
-      }
-    },
-    {
-      "name": "getShipStats",
-      "package": "entity",
-      "file": "entity",
-      "line": 214,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 42,
-        "code": 42,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 85,
-        "has_example": false,
-        "quality_score": 0.44000000000000006
-      }
-    },
-    {
-      "name": "String",
-      "package": "entity",
-      "file": "entity",
-      "line": 260,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "ShipClass",
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 47,
-        "has_example": false,
-        "quality_score": 0.28800000000000003
-      }
-    },
-    {
-      "name": "ShipClassFromString",
-      "package": "entity",
-      "file": "entity",
-      "line": 278,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "LoadConfig",
-      "package": "config",
-      "file": "config",
-      "line": 84,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 29,
-        "code": 29,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.1
-      },
-      "complexity": {
-        "cyclomatic": 5,
-        "cognitive": 5,
-        "nesting_depth": 5,
-        "overall": 9
       },
       "documentation": {
         "has_comment": true,
@@ -373,102 +88,207 @@
       }
     },
     {
-      "name": "SaveConfig",
-      "package": "config",
-      "file": "config",
-      "line": 117,
-      "is_exported": true,
+      "name": "startTerminalRenderer",
+      "package": "main",
+      "file": "main",
+      "line": 115,
+      "is_exported": false,
       "is_method": false,
       "lines": {
-        "total": 10,
-        "code": 10,
+        "total": 35,
+        "code": 35,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 2,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.3
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 43,
-        "has_example": false,
-        "quality_score": 0.17200000000000001
-      }
-    },
-    {
-      "name": "DefaultConfig",
-      "package": "config",
-      "file": "config",
-      "line": 131,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 10,
-        "code": 10,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
+        "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.3
+        "signature_complexity": 1
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 6,
+        "overall": 6.9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 81,
+        "has_example": false,
+        "quality_score": 0.32400000000000007
+      }
+    },
+    {
+      "name": "TestNewGameServer_ConfiguresPartialStateFromConfig",
+      "package": "network",
+      "file": "network",
+      "line": 10,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 15,
+        "code": 15,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestShipClass_String",
+      "package": "entity",
+      "file": "entity",
+      "line": 11,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 21,
+        "code": 21,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 4,
+        "overall": 5.9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 58,
+        "has_example": false,
+        "quality_score": 0.23199999999999998
+      }
+    },
+    {
+      "name": "TestShipClassFromString",
+      "package": "entity",
+      "file": "entity",
+      "line": 36,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 23,
+        "code": 23,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 4,
+        "overall": 5.9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 63,
+        "has_example": false,
+        "quality_score": 0.252
+      }
+    },
+    {
+      "name": "TestNewShip",
+      "package": "entity",
+      "file": "entity",
+      "line": 63,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 46,
+        "code": 46,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 11,
+        "cognitive": 11,
+        "nesting_depth": 11,
+        "overall": 19.8
       },
       "documentation": {
         "has_comment": true,
         "comment_length": 51,
         "has_example": false,
-        "quality_score": 0.30400000000000005
+        "quality_score": 0.20400000000000001
       }
     },
     {
-      "name": "createDefaultTeams",
-      "package": "config",
-      "file": "config",
-      "line": 145,
-      "is_exported": false,
+      "name": "TestNewShip_DifferentShipClasses",
+      "package": "entity",
+      "file": "entity",
+      "line": 113,
+      "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 14,
-        "code": 14,
+        "total": 19,
+        "code": 19,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
+        "parameter_count": 1,
+        "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.3
+        "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 5,
+        "overall": 7.7
       },
       "documentation": {
         "has_comment": true,
@@ -478,262 +298,15 @@
       }
     },
     {
-      "name": "createDefaultPlanets",
-      "package": "config",
-      "file": "config",
-      "line": 163,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 21,
-        "code": 21,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 79,
-        "has_example": false,
-        "quality_score": 0.31600000000000006
-      }
-    },
-    {
-      "name": "createDefaultPhysicsConfig",
-      "package": "config",
-      "file": "config",
-      "line": 188,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 5,
-        "code": 5,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 85,
-        "has_example": false,
-        "quality_score": 0.34
-      }
-    },
-    {
-      "name": "createDefaultNetworkConfig",
-      "package": "config",
-      "file": "config",
-      "line": 197,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 85,
-        "has_example": false,
-        "quality_score": 0.34
-      }
-    },
-    {
-      "name": "createDefaultGameRules",
-      "package": "config",
-      "file": "config",
-      "line": 208,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 84,
-        "has_example": false,
-        "quality_score": 0.336
-      }
-    },
-    {
-      "name": "createDefaultShipTypes",
-      "package": "config",
-      "file": "config",
-      "line": 220,
-      "is_exported": false,
-      "is_method": false,
-      "lines": {
-        "total": 24,
-        "code": 24,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 84,
-        "has_example": false,
-        "quality_score": 0.336
-      }
-    },
-    {
-      "name": "NewHUDSystem",
-      "package": "engo",
-      "file": "engo",
-      "line": 57,
+      "name": "TestShip_TakeDamage",
+      "package": "entity",
+      "file": "entity",
+      "line": 136,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 38,
-        "has_example": false,
-        "quality_score": 0.15200000000000002
-      }
-    },
-    {
-      "name": "Add",
-      "package": "engo",
-      "file": "engo",
-      "line": 72,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 3,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 39,
-        "has_example": false,
-        "quality_score": 0.15600000000000003
-      }
-    },
-    {
-      "name": "Remove",
-      "package": "engo",
-      "file": "engo",
-      "line": 77,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 66,
+        "code": 66,
         "comments": 0,
         "blank": 0
       },
@@ -747,190 +320,10 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 42,
-        "has_example": false,
-        "quality_score": 0.168
-      }
-    },
-    {
-      "name": "Update",
-      "package": "engo",
-      "file": "engo",
-      "line": 82,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 12,
-        "code": 12,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 31,
-        "has_example": false,
-        "quality_score": 0.124
-      }
-    },
-    {
-      "name": "clearHUDEntities",
-      "package": "engo",
-      "file": "engo",
-      "line": 98,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 2,
-        "code": 2,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 47,
-        "has_example": false,
-        "quality_score": 0.188
-      }
-    },
-    {
-      "name": "renderShipStatus",
-      "package": "engo",
-      "file": "engo",
-      "line": 104,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 16,
-        "code": 16,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 56,
-        "has_example": false,
-        "quality_score": 0.22400000000000003
-      }
-    },
-    {
-      "name": "renderChatWindow",
-      "package": "engo",
-      "file": "engo",
-      "line": 124,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 13,
-        "code": 13,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 49,
-        "has_example": false,
-        "quality_score": 0.196
-      }
-    },
-    {
-      "name": "renderTeamStatus",
-      "package": "engo",
-      "file": "engo",
-      "line": 141,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 15,
-        "code": 15,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 10,
+        "overall": 11.5
       },
       "documentation": {
         "has_comment": true,
@@ -940,196 +333,15 @@
       }
     },
     {
-      "name": "renderConnectionStatus",
-      "package": "engo",
-      "file": "engo",
-      "line": 160,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 53,
-        "has_example": false,
-        "quality_score": 0.21200000000000002
-      }
-    },
-    {
-      "name": "renderMinimap",
-      "package": "engo",
-      "file": "engo",
-      "line": 175,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 55,
-        "has_example": false,
-        "quality_score": 0.22000000000000003
-      }
-    },
-    {
-      "name": "renderText",
-      "package": "engo",
-      "file": "engo",
-      "line": 190,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 24,
-        "code": 24,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 3,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 50,
-        "has_example": false,
-        "quality_score": 0.2
-      }
-    },
-    {
-      "name": "renderRect",
-      "package": "engo",
-      "file": "engo",
-      "line": 218,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 23,
-        "code": 23,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 38,
-        "has_example": false,
-        "quality_score": 0.15200000000000002
-      }
-    },
-    {
-      "name": "renderRectOutline",
-      "package": "engo",
-      "file": "engo",
-      "line": 245,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 23,
-        "code": 23,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 46,
-        "has_example": false,
-        "quality_score": 0.18400000000000002
-      }
-    },
-    {
-      "name": "AddChatMessage",
-      "package": "engo",
-      "file": "engo",
-      "line": 272,
+      "name": "TestShip_Update",
+      "package": "entity",
+      "file": "entity",
+      "line": 206,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
+      "is_method": false,
       "lines": {
-        "total": 13,
-        "code": 13,
+        "total": 83,
+        "code": 83,
         "comments": 0,
         "blank": 0
       },
@@ -1143,29 +355,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
+        "cyclomatic": 8,
+        "cognitive": 8,
+        "nesting_depth": 13,
+        "overall": 16.9
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 54,
+        "comment_length": 40,
         "has_example": false,
-        "quality_score": 0.21600000000000003
+        "quality_score": 0.16000000000000003
       }
     },
     {
-      "name": "SetConnectionStatus",
-      "package": "engo",
-      "file": "engo",
-      "line": 289,
+      "name": "TestShip_FireWeapon",
+      "package": "entity",
+      "file": "entity",
+      "line": 293,
       "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
+      "is_method": false,
       "lines": {
-        "total": 1,
-        "code": 1,
+        "total": 82,
+        "code": 82,
         "comments": 0,
         "blank": 0
       },
@@ -1179,352 +390,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 55,
-        "has_example": false,
-        "quality_score": 0.22000000000000003
-      }
-    },
-    {
-      "name": "UpdateGameState",
-      "package": "engo",
-      "file": "engo",
-      "line": 294,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 56,
-        "has_example": false,
-        "quality_score": 0.22400000000000003
-      }
-    },
-    {
-      "name": "getTeamColor",
-      "package": "engo",
-      "file": "engo",
-      "line": 306,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 12,
-        "code": 12,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 51,
-        "has_example": false,
-        "quality_score": 0.30400000000000005
-      }
-    },
-    {
-      "name": "SetMinimapEnabled",
-      "package": "engo",
-      "file": "engo",
-      "line": 322,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 50,
-        "has_example": false,
-        "quality_score": 0.2
-      }
-    },
-    {
-      "name": "IsMinimapEnabled",
-      "package": "engo",
-      "file": "engo",
-      "line": 327,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 56,
-        "has_example": false,
-        "quality_score": 0.32400000000000007
-      }
-    },
-    {
-      "name": "SetMinimapSize",
-      "package": "engo",
-      "file": "engo",
-      "line": 332,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 44,
-        "has_example": false,
-        "quality_score": 0.17600000000000002
-      }
-    },
-    {
-      "name": "GetMinimapSize",
-      "package": "engo",
-      "file": "engo",
-      "line": 337,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 13,
+        "cognitive": 13,
+        "nesting_depth": 17,
+        "overall": 25.4
       },
       "documentation": {
         "has_comment": true,
         "comment_length": 48,
         "has_example": false,
-        "quality_score": 0.29200000000000004
+        "quality_score": 0.192
       }
     },
     {
-      "name": "SetFont",
-      "package": "engo",
-      "file": "engo",
-      "line": 342,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 50,
-        "has_example": false,
-        "quality_score": 0.2
-      }
-    },
-    {
-      "name": "GetChatMessages",
-      "package": "engo",
-      "file": "engo",
-      "line": 347,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 50,
-        "has_example": false,
-        "quality_score": 0.30000000000000004
-      }
-    },
-    {
-      "name": "ClearChatMessages",
-      "package": "engo",
-      "file": "engo",
-      "line": 352,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*HUDSystem",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 43,
-        "has_example": false,
-        "quality_score": 0.17200000000000001
-      }
-    },
-    {
-      "name": "TestNewTerminalRenderer_CreatesValidRenderer_WithCorrectDimensions",
-      "package": "render",
-      "file": "render",
-      "line": 11,
+      "name": "TestShip_RepairTick",
+      "package": "entity",
+      "file": "entity",
+      "line": 379,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 64,
-        "code": 64,
+        "total": 67,
+        "code": 67,
         "comments": 0,
         "blank": 0
       },
@@ -1538,23 +425,58 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 10,
-        "cognitive": 10,
-        "nesting_depth": 11,
-        "overall": 18.5
+        "cyclomatic": 8,
+        "cognitive": 8,
+        "nesting_depth": 12,
+        "overall": 16.4
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 70,
+        "comment_length": 48,
         "has_example": false,
-        "quality_score": 0.27999999999999997
+        "quality_score": 0.192
       }
     },
     {
-      "name": "TestSetCenter_UpdatesCenterPosition_Correctly",
-      "package": "render",
-      "file": "render",
-      "line": 79,
+      "name": "TestSetShipTypeStats",
+      "package": "entity",
+      "file": "entity",
+      "line": 450,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 27,
+        "code": 27,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 57,
+        "has_example": false,
+        "quality_score": 0.22799999999999998
+      }
+    },
+    {
+      "name": "TestGetShipStats",
+      "package": "entity",
+      "file": "entity",
+      "line": 481,
       "is_exported": true,
       "is_method": false,
       "lines": {
@@ -1573,133 +495,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 48,
-        "has_example": false,
-        "quality_score": 0.192
-      }
-    },
-    {
-      "name": "TestWorldToScreen_ConvertsCoordinates_Correctly",
-      "package": "render",
-      "file": "render",
-      "line": 120,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 53,
-        "code": 53,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 5,
-        "overall": 7.7
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 73,
-        "has_example": false,
-        "quality_score": 0.292
-      }
-    },
-    {
-      "name": "TestClear_ClearsBuffer_WithSpaces",
-      "package": "render",
-      "file": "render",
-      "line": 177,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 20,
-        "code": 20,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 36,
-        "has_example": false,
-        "quality_score": 0.144
-      }
-    },
-    {
-      "name": "TestRenderShip_RendersShip_AtCorrectPosition",
-      "package": "render",
-      "file": "render",
-      "line": 201,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 63,
-        "code": 63,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
         "cyclomatic": 9,
         "cognitive": 9,
-        "nesting_depth": 11,
-        "overall": 17.2
+        "nesting_depth": 10,
+        "overall": 16.7
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 36,
+        "comment_length": 49,
         "has_example": false,
-        "quality_score": 0.144
+        "quality_score": 0.196
       }
     },
     {
-      "name": "TestRenderPlanet_RendersPlanet_AtCorrectPosition",
-      "package": "render",
-      "file": "render",
-      "line": 268,
+      "name": "BenchmarkNewShip",
+      "package": "entity",
+      "file": "entity",
+      "line": 522,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 58,
-        "code": 58,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
@@ -1713,28 +530,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 11,
-        "overall": 17.2
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 40,
+        "comment_length": 45,
         "has_example": false,
-        "quality_score": 0.16000000000000003
+        "quality_score": 0.18000000000000002
       }
     },
     {
-      "name": "TestRenderProjectile_RendersProjectile_AtCorrectPosition",
-      "package": "render",
-      "file": "render",
-      "line": 330,
+      "name": "BenchmarkShip_Update",
+      "package": "entity",
+      "file": "entity",
+      "line": 531,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 58,
-        "code": 58,
+        "total": 7,
+        "code": 7,
         "comments": 0,
         "blank": 0
       },
@@ -1748,28 +565,28 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 11,
-        "overall": 17.2
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 48,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.192
+        "quality_score": 0
       }
     },
     {
-      "name": "TestPresent_ExecutesWithoutError_ForVariousSizes",
-      "package": "render",
-      "file": "render",
-      "line": 392,
+      "name": "BenchmarkShip_TakeDamage",
+      "package": "entity",
+      "file": "entity",
+      "line": 541,
       "is_exported": true,
       "is_method": false,
       "lines": {
-        "total": 26,
-        "code": 26,
+        "total": 11,
+        "code": 11,
         "comments": 0,
         "blank": 0
       },
@@ -1785,61 +602,27 @@
       "complexity": {
         "cyclomatic": 3,
         "cognitive": 3,
-        "nesting_depth": 5,
-        "overall": 6.4
+        "nesting_depth": 3,
+        "overall": 5.4
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 51,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.20400000000000001
+        "quality_score": 0
       }
     },
     {
-      "name": "TestIntegration_RendersMultipleEntities_Correctly",
-      "package": "render",
-      "file": "render",
-      "line": 422,
+      "name": "Add",
+      "package": "physics",
+      "file": "physics",
+      "line": 13,
       "is_exported": true,
-      "is_method": false,
+      "is_method": true,
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 43,
-        "code": 43,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 59,
-        "has_example": false,
-        "quality_score": 0.236
-      }
-    },
-    {
-      "name": "NewGame",
-      "package": "engine",
-      "file": "engine",
-      "line": 81,
-      "is_exported": true,
-      "is_method": false,
-      "lines": {
-        "total": 19,
-        "code": 19,
+        "total": 4,
+        "code": 4,
         "comments": 0,
         "blank": 0
       },
@@ -1860,33 +643,33 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 60,
+        "comment_length": 35,
         "has_example": false,
         "quality_score": 0.24
       }
     },
     {
-      "name": "initSpatialIndex",
-      "package": "engine",
-      "file": "engine",
-      "line": 104,
-      "is_exported": false,
+      "name": "Sub",
+      "package": "physics",
+      "file": "physics",
+      "line": 21,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 9,
-        "code": 9,
+        "total": 4,
+        "code": 4,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
+        "parameter_count": 1,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0
+        "signature_complexity": 0.8
       },
       "complexity": {
         "cyclomatic": 1,
@@ -1896,105 +679,33 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 68,
+        "comment_length": 47,
         "has_example": false,
-        "quality_score": 0.272
+        "quality_score": 0.28800000000000003
       }
     },
     {
-      "name": "initTeams",
-      "package": "engine",
-      "file": "engine",
-      "line": 117,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 9,
-        "code": 9,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "initPlanets",
-      "package": "engine",
-      "file": "engine",
-      "line": 130,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 20,
-        "code": 20,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 69,
-        "has_example": false,
-        "quality_score": 0.27599999999999997
-      }
-    },
-    {
-      "name": "Start",
-      "package": "engine",
-      "file": "engine",
-      "line": 154,
+      "name": "Scale",
+      "package": "physics",
+      "file": "physics",
+      "line": 29,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 8,
-        "code": 8,
+        "total": 4,
+        "code": 4,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
+        "parameter_count": 1,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0
+        "signature_complexity": 0.8
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2004,69 +715,33 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 34,
+        "comment_length": 46,
         "has_example": false,
-        "quality_score": 0.136
+        "quality_score": 0.18400000000000002
       }
     },
     {
-      "name": "Stop",
-      "package": "engine",
-      "file": "engine",
-      "line": 166,
+      "name": "Length",
+      "package": "physics",
+      "file": "physics",
+      "line": 37,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 5,
-        "code": 5,
+        "total": 1,
+        "code": 1,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 0,
-        "return_count": 0,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 32,
-        "has_example": false,
-        "quality_score": 0.128
-      }
-    },
-    {
-      "name": "Update",
-      "package": "engine",
-      "file": "engine",
-      "line": 175,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
+        "signature_complexity": 0.3
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2078,56 +753,20 @@
         "has_comment": true,
         "comment_length": 43,
         "has_example": false,
-        "quality_score": 0.17200000000000001
+        "quality_score": 0.272
       }
     },
     {
-      "name": "checkTimeLimit",
-      "package": "engine",
-      "file": "engine",
-      "line": 186,
-      "is_exported": false,
+      "name": "Normalize",
+      "package": "physics",
+      "file": "physics",
+      "line": 42,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 67,
-        "has_example": false,
-        "quality_score": 0.268
-      }
-    },
-    {
-      "name": "calculateDeltaTime",
-      "package": "engine",
-      "file": "engine",
-      "line": 197,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 9,
-        "code": 9,
+        "total": 8,
+        "code": 8,
         "comments": 0,
         "blank": 0
       },
@@ -2148,19 +787,90 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 74,
+        "comment_length": 54,
         "has_example": false,
-        "quality_score": 0.296
+        "quality_score": 0.31600000000000006
       }
     },
     {
-      "name": "updateGameState",
-      "package": "engine",
-      "file": "engine",
-      "line": 210,
-      "is_exported": false,
+      "name": "Distance",
+      "package": "physics",
+      "file": "physics",
+      "line": 54,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 50,
+        "has_example": false,
+        "quality_score": 0.30000000000000004
+      }
+    },
+    {
+      "name": "Angle",
+      "package": "physics",
+      "file": "physics",
+      "line": 59,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "Vector2D",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 49,
+        "has_example": false,
+        "quality_score": 0.29600000000000004
+      }
+    },
+    {
+      "name": "FromAngle",
+      "package": "physics",
+      "file": "physics",
+      "line": 64,
+      "is_exported": true,
+      "is_method": false,
       "lines": {
         "total": 4,
         "code": 4,
@@ -2169,480 +879,12 @@
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 75,
-        "has_example": false,
-        "quality_score": 0.30000000000000004
-      }
-    },
-    {
-      "name": "updateEntities",
-      "package": "engine",
-      "file": "engine",
-      "line": 218,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 59,
-        "has_example": false,
-        "quality_score": 0.236
-      }
-    },
-    {
-      "name": "prepareSpatialIndex",
-      "package": "engine",
-      "file": "engine",
-      "line": 230,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 12,
-        "code": 12,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 3,
-        "overall": 4.1
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 82,
-        "has_example": false,
-        "quality_score": 0.328
-      }
-    },
-    {
-      "name": "populateSpatialIndex",
-      "package": "engine",
-      "file": "engine",
-      "line": 246,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 15,
-        "code": 15,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 6,
-        "cognitive": 6,
-        "nesting_depth": 6,
-        "overall": 10.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 68,
-        "has_example": false,
-        "quality_score": 0.272
-      }
-    },
-    {
-      "name": "processCollisions",
-      "package": "engine",
-      "file": "engine",
-      "line": 265,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 71,
-        "has_example": false,
-        "quality_score": 0.284
-      }
-    },
-    {
-      "name": "updateShips",
-      "package": "engine",
-      "file": "engine",
-      "line": 270,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 30,
-        "has_example": false,
-        "quality_score": 0.12
-      }
-    },
-    {
-      "name": "updateProjectiles",
-      "package": "engine",
-      "file": "engine",
-      "line": 282,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 42,
-        "has_example": false,
-        "quality_score": 0.168
-      }
-    },
-    {
-      "name": "updatePlanets",
-      "package": "engine",
-      "file": "engine",
-      "line": 294,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 3,
-        "code": 3,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 34,
-        "has_example": false,
-        "quality_score": 0.136
-      }
-    },
-    {
-      "name": "wrapEntityPosition",
-      "package": "engine",
-      "file": "engine",
-      "line": 301,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 45,
-        "code": 45,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 1,
-        "generic_parameters": null,
-        "signature_complexity": 1.3
-      },
-      "complexity": {
-        "cyclomatic": 9,
-        "cognitive": 9,
-        "nesting_depth": 9,
-        "overall": 16.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 74,
-        "has_example": false,
-        "quality_score": 0.296
-      }
-    },
-    {
-      "name": "detectCollisions",
-      "package": "engine",
-      "file": "engine",
-      "line": 350,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 3,
-        "code": 3,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 69,
-        "has_example": false,
-        "quality_score": 0.27599999999999997
-      }
-    },
-    {
-      "name": "processShipProjectileCollisions",
-      "package": "engine",
-      "file": "engine",
-      "line": 357,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 3,
-        "code": 3,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 82,
-        "has_example": false,
-        "quality_score": 0.328
-      }
-    },
-    {
-      "name": "checkCollisionsForShip",
-      "package": "engine",
-      "file": "engine",
-      "line": 364,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 71,
-        "has_example": false,
-        "quality_score": 0.284
-      }
-    },
-    {
-      "name": "handleShipProjectileCollision",
-      "package": "engine",
-      "file": "engine",
-      "line": 382,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 95,
-        "has_example": false,
-        "quality_score": 0.38
-      }
-    },
-    {
-      "name": "canShipAndProjectileCollide",
-      "package": "engine",
-      "file": "engine",
-      "line": 393,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
         "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1.3
+        "signature_complexity": 0.8
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2652,69 +894,33 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 74,
+        "comment_length": 55,
         "has_example": false,
-        "quality_score": 0.296
+        "quality_score": 0.22000000000000003
       }
     },
     {
-      "name": "processShipDamage",
-      "package": "engine",
-      "file": "engine",
-      "line": 398,
-      "is_exported": false,
+      "name": "Dot",
+      "package": "physics",
+      "file": "physics",
+      "line": 72,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 12,
-        "code": 12,
+        "total": 1,
+        "code": 1,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
+        "parameter_count": 1,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 86,
-        "has_example": false,
-        "quality_score": 0.34400000000000003
-      }
-    },
-    {
-      "name": "handleShipDestruction",
-      "package": "engine",
-      "file": "engine",
-      "line": 414,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 8,
-        "code": 8,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
+        "signature_complexity": 0.8
       },
       "complexity": {
         "cyclomatic": 1,
@@ -2724,235 +930,19 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 79,
+        "comment_length": 43,
         "has_example": false,
-        "quality_score": 0.31600000000000006
+        "quality_score": 0.272
       }
     },
     {
-      "name": "updatePlayerStatsOnShipDestruction",
-      "package": "engine",
-      "file": "engine",
-      "line": 426,
-      "is_exported": false,
+      "name": "Rotate",
+      "package": "physics",
+      "file": "physics",
+      "line": 77,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 98,
-        "has_example": false,
-        "quality_score": 0.392
-      }
-    },
-    {
-      "name": "processShipPlanetCollisions",
-      "package": "engine",
-      "file": "engine",
-      "line": 437,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 3,
-        "code": 3,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 83,
-        "has_example": false,
-        "quality_score": 0.332
-      }
-    },
-    {
-      "name": "checkInteractionsForShip",
-      "package": "engine",
-      "file": "engine",
-      "line": 444,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 75,
-        "has_example": false,
-        "quality_score": 0.30000000000000004
-      }
-    },
-    {
-      "name": "handleShipPlanetInteraction",
-      "package": "engine",
-      "file": "engine",
-      "line": 462,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 9,
-        "code": 9,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 82,
-        "has_example": false,
-        "quality_score": 0.328
-      }
-    },
-    {
-      "name": "processProjectilePlanetCollisions",
-      "package": "engine",
-      "file": "engine",
-      "line": 475,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 3,
-        "code": 3,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 86,
-        "has_example": false,
-        "quality_score": 0.34400000000000003
-      }
-    },
-    {
-      "name": "checkCollisionsForProjectile",
-      "package": "engine",
-      "file": "engine",
-      "line": 482,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 14,
-        "code": 14,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 83,
-        "has_example": false,
-        "quality_score": 0.332
-      }
-    },
-    {
-      "name": "handleProjectilePlanetCollision",
-      "package": "engine",
-      "file": "engine",
-      "line": 500,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
         "total": 6,
         "code": 6,
@@ -2960,49 +950,156 @@
         "blank": 0
       },
       "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
+        "parameter_count": 1,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1
+        "signature_complexity": 0.8
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 99,
+        "comment_length": 48,
         "has_example": false,
-        "quality_score": 0.396
+        "quality_score": 0.192
       }
     },
     {
-      "name": "processPlanetBombing",
-      "package": "engine",
-      "file": "engine",
-      "line": 510,
-      "is_exported": false,
+      "name": "LengthSquared",
+      "package": "physics",
+      "file": "physics",
+      "line": 87,
+      "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "Vector2D",
       "lines": {
-        "total": 8,
-        "code": 8,
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 71,
+        "has_example": false,
+        "quality_score": 0.384
+      }
+    },
+    {
+      "name": "NewGameClient",
+      "package": "network",
+      "file": "network",
+      "line": 39,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 40,
+        "has_example": false,
+        "quality_score": 0.16000000000000003
+      }
+    },
+    {
+      "name": "RequestShipClass",
+      "package": "network",
+      "file": "network",
+      "line": 49,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 10,
+        "code": 10,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "Connect",
+      "package": "network",
+      "file": "network",
+      "line": 63,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 15,
+        "code": 15,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 2,
-        "return_count": 0,
+        "return_count": 1,
         "has_variadic": false,
-        "returns_error": false,
+        "returns_error": true,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1
+        "signature_complexity": 1.3
       },
       "complexity": {
         "cyclomatic": 3,
@@ -3012,22 +1109,22 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 73,
+        "comment_length": 36,
         "has_example": false,
-        "quality_score": 0.292
+        "quality_score": 0.144
       }
     },
     {
-      "name": "handlePlanetNeutralization",
-      "package": "engine",
-      "file": "engine",
-      "line": 522,
+      "name": "prepareConnection",
+      "package": "network",
+      "file": "network",
+      "line": 82,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameClient",
       "lines": {
-        "total": 10,
-        "code": 10,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
@@ -3054,27 +1151,135 @@
       }
     },
     {
-      "name": "findPlayerByShipID",
-      "package": "engine",
-      "file": "engine",
-      "line": 536,
+      "name": "establishTCPConnection",
+      "package": "network",
+      "file": "network",
+      "line": 92,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameClient",
       "lines": {
-        "total": 8,
-        "code": 8,
+        "total": 6,
+        "code": 6,
         "comments": 0,
         "blank": 0
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 2,
+        "return_count": 1,
         "has_variadic": false,
-        "returns_error": false,
+        "returns_error": true,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1.1
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 63,
+        "has_example": false,
+        "quality_score": 0.252
+      }
+    },
+    {
+      "name": "performHandshake",
+      "package": "network",
+      "file": "network",
+      "line": 102,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 9,
+        "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 78,
+        "has_example": false,
+        "quality_score": 0.31200000000000006
+      }
+    },
+    {
+      "name": "sendConnectRequest",
+      "package": "network",
+      "file": "network",
+      "line": 115,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 14,
+        "code": 14,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 83,
+        "has_example": false,
+        "quality_score": 0.332
+      }
+    },
+    {
+      "name": "processConnectResponse",
+      "package": "network",
+      "file": "network",
+      "line": 133,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 16,
+        "code": 16,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
       },
       "complexity": {
         "cyclomatic": 4,
@@ -3084,22 +1289,526 @@
       },
       "documentation": {
         "has_comment": true,
+        "comment_length": 77,
+        "has_example": false,
+        "quality_score": 0.30800000000000005
+      }
+    },
+    {
+      "name": "parseAndValidateResponse",
+      "package": "network",
+      "file": "network",
+      "line": 153,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 22,
+        "code": 22,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 82,
+        "has_example": false,
+        "quality_score": 0.328
+      }
+    },
+    {
+      "name": "startBackgroundProcesses",
+      "package": "network",
+      "file": "network",
+      "line": 179,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 2,
+        "code": 2,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 77,
+        "has_example": false,
+        "quality_score": 0.30800000000000005
+      }
+    },
+    {
+      "name": "cleanupConnection",
+      "package": "network",
+      "file": "network",
+      "line": 185,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 5,
+        "code": 5,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 96,
+        "has_example": false,
+        "quality_score": 0.384
+      }
+    },
+    {
+      "name": "Disconnect",
+      "package": "network",
+      "file": "network",
+      "line": 194,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 13,
+        "code": 13,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 44,
+        "has_example": false,
+        "quality_score": 0.17600000000000002
+      }
+    },
+    {
+      "name": "SendInput",
+      "package": "network",
+      "file": "network",
+      "line": 211,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 25,
+        "code": 25,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 5,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 2.8
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 43,
+        "has_example": false,
+        "quality_score": 0.17200000000000001
+      }
+    },
+    {
+      "name": "SendChatMessage",
+      "package": "network",
+      "file": "network",
+      "line": 242,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 11,
+        "code": 11,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
         "comment_length": 51,
         "has_example": false,
         "quality_score": 0.20400000000000001
       }
     },
     {
-      "name": "cleanupInactiveEntities",
-      "package": "engine",
-      "file": "engine",
-      "line": 548,
+      "name": "GetLatency",
+      "package": "network",
+      "file": "network",
+      "line": 257,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 3,
+        "code": 3,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 53,
+        "has_example": false,
+        "quality_score": 0.31200000000000006
+      }
+    },
+    {
+      "name": "GetGameStateChannel",
+      "package": "network",
+      "file": "network",
+      "line": 264,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 66,
+        "has_example": false,
+        "quality_score": 0.364
+      }
+    },
+    {
+      "name": "messageLoop",
+      "package": "network",
+      "file": "network",
+      "line": 269,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameClient",
       "lines": {
-        "total": 8,
-        "code": 8,
+        "total": 24,
+        "code": 24,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 54,
+        "has_example": false,
+        "quality_score": 0.21600000000000003
+      }
+    },
+    {
+      "name": "handleGameStateUpdate",
+      "package": "network",
+      "file": "network",
+      "line": 297,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 12,
+        "code": 12,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 3,
+        "overall": 8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 52,
+        "has_example": false,
+        "quality_score": 0.20800000000000002
+      }
+    },
+    {
+      "name": "handleChatMessage",
+      "package": "network",
+      "file": "network",
+      "line": 313,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 24,
+        "code": 24,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 43,
+        "has_example": false,
+        "quality_score": 0.17200000000000001
+      }
+    },
+    {
+      "name": "handlePingResponse",
+      "package": "network",
+      "file": "network",
+      "line": 341,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 9,
+        "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 45,
+        "has_example": false,
+        "quality_score": 0.18000000000000002
+      }
+    },
+    {
+      "name": "pingLoop",
+      "package": "network",
+      "file": "network",
+      "line": 354,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 13,
+        "code": 13,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 56,
+        "has_example": false,
+        "quality_score": 0.22400000000000003
+      }
+    },
+    {
+      "name": "handleDisconnect",
+      "package": "network",
+      "file": "network",
+      "line": 371,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 18,
+        "code": 18,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 53,
+        "has_example": false,
+        "quality_score": 0.21200000000000002
+      }
+    },
+    {
+      "name": "attemptReconnect",
+      "package": "network",
+      "file": "network",
+      "line": 393,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 27,
+        "code": 27,
         "comments": 0,
         "blank": 0
       },
@@ -3126,16 +1835,303 @@
       }
     },
     {
-      "name": "AddPlayer",
-      "package": "engine",
-      "file": "engine",
-      "line": 560,
+      "name": "readMessage",
+      "package": "network",
+      "file": "network",
+      "line": 424,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 19,
+        "code": 19,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 3,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8999999999999999
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 44,
+        "has_example": false,
+        "quality_score": 0.17600000000000002
+      }
+    },
+    {
+      "name": "sendMessage",
+      "package": "network",
+      "file": "network",
+      "line": 447,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameClient",
+      "lines": {
+        "total": 42,
+        "code": 42,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 1,
+        "generic_parameters": null,
+        "signature_complexity": 2.1
+      },
+      "complexity": {
+        "cyclomatic": 8,
+        "cognitive": 8,
+        "nesting_depth": 9,
+        "overall": 14.9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 42,
+        "has_example": false,
+        "quality_score": 0.168
+      }
+    },
+    {
+      "name": "NewGameServer",
+      "package": "network",
+      "file": "network",
+      "line": 61,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 10,
+        "code": 10,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 40,
+        "has_example": false,
+        "quality_score": 0.16000000000000003
+      }
+    },
+    {
+      "name": "Start",
+      "package": "network",
+      "file": "network",
+      "line": 75,
       "is_exported": true,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 19,
+        "code": 19,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 29,
+        "has_example": false,
+        "quality_score": 0.11599999999999999
+      }
+    },
+    {
+      "name": "Stop",
+      "package": "network",
+      "file": "network",
+      "line": 98,
+      "is_exported": true,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 18,
+        "code": 18,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 27,
+        "has_example": false,
+        "quality_score": 0.10800000000000001
+      }
+    },
+    {
+      "name": "acceptConnections",
+      "package": "network",
+      "file": "network",
+      "line": 120,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 23,
+        "code": 23,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 49,
+        "has_example": false,
+        "quality_score": 0.196
+      }
+    },
+    {
+      "name": "handleConnection",
+      "package": "network",
+      "file": "network",
+      "line": 147,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
       "lines": {
         "total": 15,
         "code": 15,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 49,
+        "has_example": false,
+        "quality_score": 0.196
+      }
+    },
+    {
+      "name": "readAndValidateConnectRequest",
+      "package": "network",
+      "file": "network",
+      "line": 166,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 18,
+        "code": 18,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 2,
+        "has_variadic": false,
+        "returns_error": true,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.1
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 82,
+        "has_example": false,
+        "quality_score": 0.328
+      }
+    },
+    {
+      "name": "addPlayerToGame",
+      "package": "network",
+      "file": "network",
+      "line": 188,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 7,
+        "code": 7,
         "comments": 0,
         "blank": 0
       },
@@ -3156,19 +2152,199 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 40,
+        "comment_length": 66,
         "has_example": false,
-        "quality_score": 0.16000000000000003
+        "quality_score": 0.364
       }
     },
     {
-      "name": "validateTeam",
-      "package": "engine",
-      "file": "engine",
-      "line": 579,
+      "name": "createAndRegisterClient",
+      "package": "network",
+      "file": "network",
+      "line": 199,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 16,
+        "code": 16,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 3,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 79,
+        "has_example": false,
+        "quality_score": 0.31600000000000006
+      }
+    },
+    {
+      "name": "sendConnectionErrorResponse",
+      "package": "network",
+      "file": "network",
+      "line": 219,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 8,
+        "code": 8,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 76,
+        "has_example": false,
+        "quality_score": 0.404
+      }
+    },
+    {
+      "name": "sendConnectionSuccessResponse",
+      "package": "network",
+      "file": "network",
+      "line": 231,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 10,
+        "code": 10,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 84,
+        "has_example": false,
+        "quality_score": 0.336
+      }
+    },
+    {
+      "name": "handleClientMessages",
+      "package": "network",
+      "file": "network",
+      "line": 251,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 34,
+        "code": 34,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 64,
+        "has_example": false,
+        "quality_score": 0.256
+      }
+    },
+    {
+      "name": "handlePlayerInput",
+      "package": "network",
+      "file": "network",
+      "line": 301,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 14,
+        "code": 14,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 50,
+        "has_example": false,
+        "quality_score": 0.2
+      }
+    },
+    {
+      "name": "parsePlayerInput",
+      "package": "network",
+      "file": "network",
+      "line": 319,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
       "lines": {
         "total": 5,
         "code": 5,
@@ -3192,58 +2368,22 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 65,
+        "comment_length": 68,
         "has_example": false,
-        "quality_score": 0.36
+        "quality_score": 0.272
       }
     },
     {
-      "name": "createAndAddPlayer",
-      "package": "engine",
-      "file": "engine",
-      "line": 588,
+      "name": "findPlayerShip",
+      "package": "network",
+      "file": "network",
+      "line": 328,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
       "lines": {
-        "total": 3,
-        "code": 3,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "createAndAddShip",
-      "package": "engine",
-      "file": "engine",
-      "line": 595,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 3,
-        "code": 3,
+        "total": 12,
+        "code": 12,
         "comments": 0,
         "blank": 0
       },
@@ -3257,137 +2397,29 @@
         "signature_complexity": 0.8
       },
       "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 61,
+        "comment_length": 67,
         "has_example": false,
-        "quality_score": 0.244
+        "quality_score": 0.268
       }
     },
     {
-      "name": "assignShipToPlayer",
-      "package": "engine",
-      "file": "engine",
-      "line": 602,
+      "name": "applyPlayerInput",
+      "package": "network",
+      "file": "network",
+      "line": 344,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 2,
-        "code": 2,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 3,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.5
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 70,
-        "has_example": false,
-        "quality_score": 0.27999999999999997
-      }
-    },
-    {
-      "name": "createPlayer",
-      "package": "engine",
-      "file": "engine",
-      "line": 608,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
       "lines": {
         "total": 6,
         "code": 6,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 42,
-        "has_example": false,
-        "quality_score": 0.168
-      }
-    },
-    {
-      "name": "createShipForPlayer",
-      "package": "engine",
-      "file": "engine",
-      "line": 618,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 59,
-        "has_example": false,
-        "quality_score": 0.236
-      }
-    },
-    {
-      "name": "publishPlayerAndShipCreationEvents",
-      "package": "engine",
-      "file": "engine",
-      "line": 633,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 10,
-        "code": 10,
         "comments": 0,
         "blank": 0
       },
@@ -3408,130 +2440,22 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 90,
+        "comment_length": 75,
         "has_example": false,
-        "quality_score": 0.36000000000000004
+        "quality_score": 0.30000000000000004
       }
     },
     {
-      "name": "RemovePlayer",
-      "package": "engine",
-      "file": "engine",
-      "line": 647,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 13,
-        "code": 13,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 44,
-        "has_example": false,
-        "quality_score": 0.17600000000000002
-      }
-    },
-    {
-      "name": "findPlayerAndTeam",
-      "package": "engine",
-      "file": "engine",
-      "line": 664,
+      "name": "applyMovementInput",
+      "package": "network",
+      "file": "network",
+      "line": 354,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
       "lines": {
-        "total": 6,
-        "code": 6,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 3,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.4
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 62,
-        "has_example": false,
-        "quality_score": 0.248
-      }
-    },
-    {
-      "name": "deactivatePlayerShip",
-      "package": "engine",
-      "file": "engine",
-      "line": 674,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 81,
-        "has_example": false,
-        "quality_score": 0.32400000000000007
-      }
-    },
-    {
-      "name": "removePlayerFromTeam",
-      "package": "engine",
-      "file": "engine",
-      "line": 689,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 2,
-        "code": 2,
+        "total": 3,
+        "code": 3,
         "comments": 0,
         "blank": 0
       },
@@ -3543,42 +2467,6 @@
         "interface_parameters": 0,
         "generic_parameters": null,
         "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "publishPlayerLeftEvent",
-      "package": "engine",
-      "file": "engine",
-      "line": 695,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
       },
       "complexity": {
         "cyclomatic": 1,
@@ -3594,27 +2482,27 @@
       }
     },
     {
-      "name": "RespawnShip",
-      "package": "engine",
-      "file": "engine",
-      "line": 703,
-      "is_exported": true,
+      "name": "applyWeaponInput",
+      "package": "network",
+      "file": "network",
+      "line": 361,
+      "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
       "lines": {
-        "total": 26,
-        "code": 26,
+        "total": 3,
+        "code": 3,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
+        "parameter_count": 2,
+        "return_count": 0,
         "has_variadic": false,
-        "returns_error": true,
+        "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 0.8
+        "signature_complexity": 1
       },
       "complexity": {
         "cyclomatic": 2,
@@ -3624,33 +2512,33 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 37,
+        "comment_length": 66,
         "has_example": false,
-        "quality_score": 0.148
+        "quality_score": 0.264
       }
     },
     {
-      "name": "findPlayerByID",
-      "package": "engine",
-      "file": "engine",
-      "line": 733,
+      "name": "applyBeamingInput",
+      "package": "network",
+      "file": "network",
+      "line": 368,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
       "lines": {
-        "total": 6,
-        "code": 6,
+        "total": 7,
+        "code": 7,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 1,
-        "return_count": 2,
+        "parameter_count": 2,
+        "return_count": 0,
         "has_variadic": false,
-        "returns_error": true,
+        "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1.1
+        "signature_complexity": 1
       },
       "complexity": {
         "cyclomatic": 3,
@@ -3660,19 +2548,163 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 43,
+        "comment_length": 68,
         "has_example": false,
-        "quality_score": 0.17200000000000001
+        "quality_score": 0.272
       }
     },
     {
-      "name": "BeamArmies",
-      "package": "engine",
-      "file": "engine",
-      "line": 743,
-      "is_exported": true,
+      "name": "broadcastChatMessage",
+      "package": "network",
+      "file": "network",
+      "line": 379,
+      "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 31,
+        "code": 31,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 67,
+        "has_example": false,
+        "quality_score": 0.268
+      }
+    },
+    {
+      "name": "removeClient",
+      "package": "network",
+      "file": "network",
+      "line": 414,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 8,
+        "code": 8,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 46,
+        "has_example": false,
+        "quality_score": 0.18400000000000002
+      }
+    },
+    {
+      "name": "gameLoop",
+      "package": "network",
+      "file": "network",
+      "line": 426,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 18,
+        "code": 18,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 33,
+        "has_example": false,
+        "quality_score": 0.132
+      }
+    },
+    {
+      "name": "sendFullStateUpdate",
+      "package": "network",
+      "file": "network",
+      "line": 448,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 9,
+        "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 0,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 3,
+        "overall": 5.4
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 63,
+        "has_example": false,
+        "quality_score": 0.252
+      }
+    },
+    {
+      "name": "sendPartialStateUpdate",
+      "package": "network",
+      "file": "network",
+      "line": 461,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
       "lines": {
         "total": 13,
         "code": 13,
@@ -3680,13 +2712,13 @@
         "blank": 0
       },
       "signature": {
-        "parameter_count": 3,
-        "return_count": 2,
+        "parameter_count": 0,
+        "return_count": 0,
         "has_variadic": false,
-        "returns_error": true,
+        "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 2.1
+        "signature_complexity": 0
       },
       "complexity": {
         "cyclomatic": 3,
@@ -3696,22 +2728,202 @@
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 52,
+        "comment_length": 64,
         "has_example": false,
-        "quality_score": 0.20800000000000002
+        "quality_score": 0.256
       }
     },
     {
-      "name": "findShipAndPlanet",
-      "package": "engine",
-      "file": "engine",
-      "line": 760,
+      "name": "createPartialStateForClient",
+      "package": "network",
+      "file": "network",
+      "line": 478,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 105,
+        "has_example": false,
+        "quality_score": 0.4
+      }
+    },
+    {
+      "name": "initializePartialState",
+      "package": "network",
+      "file": "network",
+      "line": 489,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.8
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 78,
+        "has_example": false,
+        "quality_score": 0.31200000000000006
+      }
+    },
+    {
+      "name": "findPlayerShipPosition",
+      "package": "network",
+      "file": "network",
+      "line": 500,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
       "lines": {
         "total": 9,
         "code": 9,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 1,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.3
+      },
+      "complexity": {
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 94,
+        "has_example": false,
+        "quality_score": 0.376
+      }
+    },
+    {
+      "name": "addNearbyEntities",
+      "package": "network",
+      "file": "network",
+      "line": 513,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 15,
+        "code": 15,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 3,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1.5
+      },
+      "complexity": {
+        "cyclomatic": 5,
+        "cognitive": 5,
+        "nesting_depth": 5,
+        "overall": 9
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 90,
+        "has_example": false,
+        "quality_score": 0.36000000000000004
+      }
+    },
+    {
+      "name": "addAllPlanets",
+      "package": "network",
+      "file": "network",
+      "line": 532,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 1,
+        "code": 1,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 2,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 1
+      },
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting_depth": 1,
+        "overall": 1.8
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 84,
+        "has_example": false,
+        "quality_score": 0.336
+      }
+    },
+    {
+      "name": "readMessage",
+      "package": "network",
+      "file": "network",
+      "line": 537,
+      "is_exported": false,
+      "is_method": true,
+      "receiver_type": "*GameServer",
+      "lines": {
+        "total": 19,
+        "code": 19,
         "comments": 0,
         "blank": 0
       },
@@ -3725,278 +2937,411 @@
         "signature_complexity": 1.4
       },
       "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
+        "cyclomatic": 4,
+        "cognitive": 4,
+        "nesting_depth": 4,
+        "overall": 7.2
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 61,
+        "comment_length": 46,
         "has_example": false,
-        "quality_score": 0.244
+        "quality_score": 0.18400000000000002
       }
     },
     {
-      "name": "executeBeaming",
-      "package": "engine",
-      "file": "engine",
-      "line": 773,
+      "name": "sendMessage",
+      "package": "network",
+      "file": "network",
+      "line": 560,
       "is_exported": false,
       "is_method": true,
-      "receiver_type": "*Game",
+      "receiver_type": "*GameServer",
       "lines": {
-        "total": 8,
-        "code": 8,
+        "total": 28,
+        "code": 28,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 4,
-        "return_count": 2,
+        "parameter_count": 3,
+        "return_count": 1,
         "has_variadic": false,
         "returns_error": true,
-        "interface_parameters": 0,
+        "interface_parameters": 1,
         "generic_parameters": null,
         "signature_complexity": 2.6
       },
       "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
+        "cyclomatic": 6,
+        "cognitive": 6,
+        "nesting_depth": 6,
+        "overall": 10.8
       },
       "documentation": {
         "has_comment": true,
-        "comment_length": 67,
+        "comment_length": 44,
         "has_example": false,
-        "quality_score": 0.268
+        "quality_score": 0.17600000000000002
       }
     },
     {
-      "name": "validateBeamingPreconditions",
-      "package": "engine",
-      "file": "engine",
-      "line": 785,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
+      "name": "TestCircle_Collides",
+      "package": "physics",
+      "file": "physics",
+      "line": 8,
+      "is_exported": true,
+      "is_method": false,
       "lines": {
-        "total": 10,
-        "code": 10,
+        "total": 46,
+        "code": 46,
         "comments": 0,
         "blank": 0
       },
       "signature": {
-        "parameter_count": 3,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.8
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 93,
-        "has_example": false,
-        "quality_score": 0.37200000000000005
-      }
-    },
-    {
-      "name": "validateBeamingDistance",
-      "package": "engine",
-      "file": "engine",
-      "line": 799,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.3
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 85,
-        "has_example": false,
-        "quality_score": 0.34
-      }
-    },
-    {
-      "name": "beamArmiesDown",
-      "package": "engine",
-      "file": "engine",
-      "line": 807,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 16,
-        "code": 16,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 3,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 2.1
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 63,
-        "has_example": false,
-        "quality_score": 0.252
-      }
-    },
-    {
-      "name": "handlePlanetCapture",
-      "package": "engine",
-      "file": "engine",
-      "line": 827,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 24,
-        "code": 24,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
+        "parameter_count": 1,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
         "interface_parameters": 0,
         "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 5,
-        "cognitive": 5,
-        "nesting_depth": 5,
-        "overall": 9
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 66,
-        "has_example": false,
-        "quality_score": 0.264
-      }
-    },
-    {
-      "name": "beamArmiesUp",
-      "package": "engine",
-      "file": "engine",
-      "line": 855,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 17,
-        "code": 17,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 3,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 2.1
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "FireWeapon",
-      "package": "engine",
-      "file": "engine",
-      "line": 876,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 15,
-        "code": 15,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.3
+        "signature_complexity": 0.5
       },
       "complexity": {
         "cyclomatic": 3,
         "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
+        "nesting_depth": 4,
+        "overall": 5.9
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 38,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.15200000000000002
+        "quality_score": 0
       }
     },
     {
-      "name": "findActiveShip",
-      "package": "engine",
-      "file": "engine",
-      "line": 895,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
+      "name": "TestCheckCollision",
+      "package": "physics",
+      "file": "physics",
+      "line": 57,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 55,
+        "code": 55,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 8,
+        "cognitive": 8,
+        "nesting_depth": 11,
+        "overall": 15.9
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestRect_Contains",
+      "package": "physics",
+      "file": "physics",
+      "line": 115,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 51,
+        "code": 51,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 4,
+        "overall": 5.9
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestNewQuadTree",
+      "package": "physics",
+      "file": "physics",
+      "line": 169,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 20,
+        "code": 20,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 6,
+        "cognitive": 6,
+        "nesting_depth": 6,
+        "overall": 10.8
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestQuadTree_Insert",
+      "package": "physics",
+      "file": "physics",
+      "line": 192,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 52,
+        "code": 52,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 9,
+        "cognitive": 9,
+        "nesting_depth": 12,
+        "overall": 17.7
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestQuadTree_Subdivide",
+      "package": "physics",
+      "file": "physics",
+      "line": 247,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 43,
+        "code": 43,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 10,
+        "cognitive": 10,
+        "nesting_depth": 10,
+        "overall": 18
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestQuadTree_Query",
+      "package": "physics",
+      "file": "physics",
+      "line": 293,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 46,
+        "code": 46,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 6,
+        "cognitive": 6,
+        "nesting_depth": 9,
+        "overall": 12.3
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "TestQuadTree_intersects",
+      "package": "physics",
+      "file": "physics",
+      "line": 342,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 38,
+        "code": 38,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 3,
+        "cognitive": 3,
+        "nesting_depth": 4,
+        "overall": 5.9
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "BenchmarkCircle_Collides",
+      "package": "physics",
+      "file": "physics",
+      "line": 384,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": true,
+        "comment_length": 43,
+        "has_example": false,
+        "quality_score": 0.17200000000000001
+      }
+    },
+    {
+      "name": "BenchmarkCheckCollision",
+      "package": "physics",
+      "file": "physics",
+      "line": 394,
+      "is_exported": true,
+      "is_method": false,
+      "lines": {
+        "total": 7,
+        "code": 7,
+        "comments": 0,
+        "blank": 0
+      },
+      "signature": {
+        "parameter_count": 1,
+        "return_count": 0,
+        "has_variadic": false,
+        "returns_error": false,
+        "interface_parameters": 0,
+        "generic_parameters": null,
+        "signature_complexity": 0.5
+      },
+      "complexity": {
+        "cyclomatic": 2,
+        "cognitive": 2,
+        "nesting_depth": 2,
+        "overall": 3.6
+      },
+      "documentation": {
+        "has_comment": false,
+        "comment_length": 0,
+        "has_example": false,
+        "quality_score": 0
+      }
+    },
+    {
+      "name": "BenchmarkQuadTree_Insert",
+      "package": "physics",
+      "file": "physics",
+      "line": 404,
+      "is_exported": true,
+      "is_method": false,
       "lines": {
         "total": 8,
         "code": 8,
@@ -4005,438 +3350,6 @@
       },
       "signature": {
         "parameter_count": 1,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": true,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.1
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "registerAndPublishProjectile",
-      "package": "engine",
-      "file": "engine",
-      "line": 907,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 2,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 85,
-        "has_example": false,
-        "quality_score": 0.34
-      }
-    },
-    {
-      "name": "findSpawnPoint",
-      "package": "engine",
-      "file": "engine",
-      "line": 918,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.8
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 55,
-        "has_example": false,
-        "quality_score": 0.22000000000000003
-      }
-    },
-    {
-      "name": "findSpawnPointNearHomeworld",
-      "package": "engine",
-      "file": "engine",
-      "line": 926,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 2,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 1.1
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 78,
-        "has_example": false,
-        "quality_score": 0.31200000000000006
-      }
-    },
-    {
-      "name": "findRandomSpawnPoint",
-      "package": "engine",
-      "file": "engine",
-      "line": 941,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.344
-      }
-    },
-    {
-      "name": "GetGameState",
-      "package": "engine",
-      "file": "engine",
-      "line": 952,
-      "is_exported": true,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 4,
-        "code": 4,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 58,
-        "has_example": false,
-        "quality_score": 0.33199999999999996
-      }
-    },
-    {
-      "name": "createGameStateSnapshot",
-      "package": "engine",
-      "file": "engine",
-      "line": 960,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 7,
-        "code": 7,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 68,
-        "has_example": false,
-        "quality_score": 0.372
-      }
-    },
-    {
-      "name": "getShipStates",
-      "package": "engine",
-      "file": "engine",
-      "line": 971,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 18,
-        "code": 18,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "getPlanetStates",
-      "package": "engine",
-      "file": "engine",
-      "line": 993,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 65,
-        "has_example": false,
-        "quality_score": 0.26
-      }
-    },
-    {
-      "name": "getProjectileStates",
-      "package": "engine",
-      "file": "engine",
-      "line": 1008,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 13,
-        "code": 13,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 73,
-        "has_example": false,
-        "quality_score": 0.292
-      }
-    },
-    {
-      "name": "getTeamStates",
-      "package": "engine",
-      "file": "engine",
-      "line": 1025,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 12,
-        "code": 12,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 2,
-        "cognitive": 2,
-        "nesting_depth": 2,
-        "overall": 3.6
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 61,
-        "has_example": false,
-        "quality_score": 0.244
-      }
-    },
-    {
-      "name": "registerEventHandlers",
-      "package": "engine",
-      "file": "engine",
-      "line": 1092,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 1,
-        "code": 1,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 1,
-        "cognitive": 1,
-        "nesting_depth": 1,
-        "overall": 1.8
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 57,
-        "has_example": false,
-        "quality_score": 0.22799999999999998
-      }
-    },
-    {
-      "name": "handleShipDestroyedEvent",
-      "package": "engine",
-      "file": "engine",
-      "line": 1097,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 10,
-        "code": 10,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
         "return_count": 0,
         "has_variadic": false,
         "returns_error": false,
@@ -4445,196 +3358,16 @@
         "signature_complexity": 0.5
       },
       "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 69,
-        "has_example": false,
-        "quality_score": 0.27599999999999997
-      }
-    },
-    {
-      "name": "endGameWithWinner",
-      "package": "engine",
-      "file": "engine",
-      "line": 1111,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 26,
-        "code": 26,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
-        "cyclomatic": 4,
-        "cognitive": 4,
-        "nesting_depth": 4,
-        "overall": 7.2
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 59,
-        "has_example": false,
-        "quality_score": 0.236
-      }
-    },
-    {
-      "name": "endGame",
-      "package": "engine",
-      "file": "engine",
-      "line": 1141,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 11,
-        "code": 11,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0
-      },
-      "complexity": {
         "cyclomatic": 2,
         "cognitive": 2,
         "nesting_depth": 2,
         "overall": 3.6
       },
       "documentation": {
-        "has_comment": true,
-        "comment_length": 38,
+        "has_comment": false,
+        "comment_length": 0,
         "has_example": false,
-        "quality_score": 0.15200000000000002
-      }
-    },
-    {
-      "name": "determineWinner",
-      "package": "engine",
-      "file": "engine",
-      "line": 1157,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 9,
-        "code": 9,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 126,
-        "has_example": false,
-        "quality_score": 0.5
-      }
-    },
-    {
-      "name": "calculateWinnerByDefaultRules",
-      "package": "engine",
-      "file": "engine",
-      "line": 1170,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 19,
-        "code": 19,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 0,
-        "return_count": 1,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.3
-      },
-      "complexity": {
-        "cyclomatic": 5,
-        "cognitive": 5,
-        "nesting_depth": 6,
-        "overall": 9.5
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 80,
-        "has_example": false,
-        "quality_score": 0.32000000000000006
-      }
-    },
-    {
-      "name": "publishGameEndedEvent",
-      "package": "engine",
-      "file": "engine",
-      "line": 1193,
-      "is_exported": false,
-      "is_method": true,
-      "receiver_type": "*Game",
-      "lines": {
-        "total": 10,
-        "code": 10,
-        "comments": 0,
-        "blank": 0
-      },
-      "signature": {
-        "parameter_count": 1,
-        "return_count": 0,
-        "has_variadic": false,
-        "returns_error": false,
-        "interface_parameters": 0,
-        "generic_parameters": null,
-        "signature_complexity": 0.5
-      },
-      "complexity": {
-        "cyclomatic": 3,
-        "cognitive": 3,
-        "nesting_depth": 3,
-        "overall": 5.4
-      },
-      "documentation": {
-        "has_comment": true,
-        "comment_length": 50,
-        "has_example": false,
-        "quality_score": 0.2
+        "quality_score": 0
       }
     }
   ],
