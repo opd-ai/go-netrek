@@ -173,17 +173,29 @@ func (g *Game) Stop() {
 
 // Update advances the game state by one tick
 func (g *Game) Update() {
-	now := time.Now()
-	if g.Status == GameStatusActive {
-		g.ElapsedTime = now.Sub(g.StartTime).Seconds()
+	g.checkTimeLimit()
+	deltaTime := g.calculateDeltaTime()
 
-		// Check for time limit
+	g.EntityLock.Lock()
+	defer g.EntityLock.Unlock()
+
+	g.updateGameState(deltaTime)
+}
+
+// checkTimeLimit checks if the game has ended due to the time limit.
+func (g *Game) checkTimeLimit() {
+	if g.Status == GameStatusActive {
+		g.ElapsedTime = time.Since(g.StartTime).Seconds()
 		if g.Config.GameRules.TimeLimit > 0 &&
 			g.ElapsedTime >= float64(g.Config.GameRules.TimeLimit) {
-			// Game ended due to time limit
 			g.endGame()
 		}
 	}
+}
+
+// calculateDeltaTime calculates the time since the last update and caps it.
+func (g *Game) calculateDeltaTime() float64 {
+	now := time.Now()
 	deltaTime := now.Sub(g.LastUpdate).Seconds()
 	g.LastUpdate = now
 
@@ -191,22 +203,31 @@ func (g *Game) Update() {
 	if deltaTime > 0.1 {
 		deltaTime = 0.1
 	}
+	return deltaTime
+}
 
-	g.EntityLock.Lock()
-	defer g.EntityLock.Unlock()
-
-	// Update game state
+// updateGameState updates all entities, processes collisions, and cleans up.
+func (g *Game) updateGameState(deltaTime float64) {
 	g.updateEntities(deltaTime)
 	g.processCollisions()
 	g.cleanupInactiveEntities()
-
-	// Increment tick counter
 	g.CurrentTick++
 }
 
 // updateEntities updates all entities and the spatial index.
 func (g *Game) updateEntities(deltaTime float64) {
-	// Clear spatial index for this frame (reuse instead of recreate)
+	g.prepareSpatialIndex()
+
+	// Update all entities
+	g.updateShips(deltaTime)
+	g.updateProjectiles(deltaTime)
+	g.updatePlanets(deltaTime)
+
+	g.populateSpatialIndex()
+}
+
+// prepareSpatialIndex clears the spatial index for the new frame or initializes it.
+func (g *Game) prepareSpatialIndex() {
 	if g.SpatialIndex == nil {
 		g.SpatialIndex = physics.NewQuadTree(
 			physics.Rect{
@@ -214,18 +235,15 @@ func (g *Game) updateEntities(deltaTime float64) {
 				Width:  g.Config.WorldSize,
 				Height: g.Config.WorldSize,
 			},
-			10,
+			10, // Maximum entities per quad before subdivision
 		)
 	} else {
 		g.SpatialIndex.Clear()
 	}
+}
 
-	// Update all entities
-	g.updateShips(deltaTime)
-	g.updateProjectiles(deltaTime)
-	g.updatePlanets(deltaTime)
-
-	// Add active entities to spatial index
+// populateSpatialIndex adds all active entities to the spatial index.
+func (g *Game) populateSpatialIndex() {
 	for _, ship := range g.Ships {
 		if ship.Active {
 			g.SpatialIndex.Insert(ship.Position, ship)
@@ -338,19 +356,24 @@ func (g *Game) detectCollisions() {
 // processShipProjectileCollisions handles collisions between ships and projectiles.
 func (g *Game) processShipProjectileCollisions() {
 	for _, ship := range g.Ships {
-		if !ship.Active {
-			continue
-		}
-		shipArea := physics.Rect{
-			Center: ship.Position,
-			Width:  ship.Collider.Radius * 2,
-			Height: ship.Collider.Radius * 2,
-		}
-		potentialCollisions := g.SpatialIndex.Query(shipArea)
-		for _, other := range potentialCollisions {
-			if projectile, ok := other.(*entity.Projectile); ok {
-				g.handleShipProjectileCollision(ship, projectile)
-			}
+		g.checkCollisionsForShip(ship)
+	}
+}
+
+// checkCollisionsForShip finds and handles collisions for a single ship.
+func (g *Game) checkCollisionsForShip(ship *entity.Ship) {
+	if !ship.Active {
+		return
+	}
+	shipArea := physics.Rect{
+		Center: ship.Position,
+		Width:  ship.Collider.Radius * 2,
+		Height: ship.Collider.Radius * 2,
+	}
+	potentialCollisions := g.SpatialIndex.Query(shipArea)
+	for _, other := range potentialCollisions {
+		if projectile, ok := other.(*entity.Projectile); ok {
+			g.handleShipProjectileCollision(ship, projectile)
 		}
 	}
 }
@@ -413,19 +436,24 @@ func (g *Game) updatePlayerStatsOnShipDestruction(ship *entity.Ship, projectile 
 // processShipPlanetCollisions handles ship-planet proximity and collision responses.
 func (g *Game) processShipPlanetCollisions() {
 	for _, ship := range g.Ships {
-		if !ship.Active {
-			continue
-		}
-		shipArea := physics.Rect{
-			Center: ship.Position,
-			Width:  ship.Collider.Radius * 2,
-			Height: ship.Collider.Radius * 2,
-		}
-		potentialCollisions := g.SpatialIndex.Query(shipArea)
-		for _, other := range potentialCollisions {
-			if planet, ok := other.(*entity.Planet); ok {
-				g.handleShipPlanetInteraction(ship, planet)
-			}
+		g.checkInteractionsForShip(ship)
+	}
+}
+
+// checkInteractionsForShip finds and handles interactions for a single ship.
+func (g *Game) checkInteractionsForShip(ship *entity.Ship) {
+	if !ship.Active {
+		return
+	}
+	shipArea := physics.Rect{
+		Center: ship.Position,
+		Width:  ship.Collider.Radius * 2,
+		Height: ship.Collider.Radius * 2,
+	}
+	potentialCollisions := g.SpatialIndex.Query(shipArea)
+	for _, other := range potentialCollisions {
+		if planet, ok := other.(*entity.Planet); ok {
+			g.handleShipPlanetInteraction(ship, planet)
 		}
 	}
 }
@@ -446,19 +474,24 @@ func (g *Game) handleShipPlanetInteraction(ship *entity.Ship, planet *entity.Pla
 // processProjectilePlanetCollisions handles collisions between projectiles and planets.
 func (g *Game) processProjectilePlanetCollisions() {
 	for _, proj := range g.Projectiles {
-		if !proj.Active {
-			continue
-		}
-		projArea := physics.Rect{
-			Center: proj.Position,
-			Width:  proj.Collider.Radius * 2,
-			Height: proj.Collider.Radius * 2,
-		}
-		potentialCollisions := g.SpatialIndex.Query(projArea)
-		for _, other := range potentialCollisions {
-			if planet, ok := other.(*entity.Planet); ok {
-				g.handleProjectilePlanetCollision(proj, planet)
-			}
+		g.checkCollisionsForProjectile(proj)
+	}
+}
+
+// checkCollisionsForProjectile finds and handles collisions for a single projectile.
+func (g *Game) checkCollisionsForProjectile(proj *entity.Projectile) {
+	if !proj.Active {
+		return
+	}
+	projArea := physics.Rect{
+		Center: proj.Position,
+		Width:  proj.Collider.Radius * 2,
+		Height: proj.Collider.Radius * 2,
+	}
+	potentialCollisions := g.SpatialIndex.Query(projArea)
+	for _, other := range potentialCollisions {
+		if planet, ok := other.(*entity.Planet); ok {
+			g.handleProjectilePlanetCollision(proj, planet)
 		}
 	}
 }
@@ -528,23 +561,47 @@ func (g *Game) AddPlayer(name string, teamID int) (entity.ID, error) {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
-	team, ok := g.Teams[teamID]
-	if !ok {
-		return 0, errors.New("invalid team")
+	team, err := g.validateTeam(teamID)
+	if err != nil {
+		return 0, err
 	}
 
-	player := g.createPlayer(name, teamID)
-	team.Players[player.ID] = player
-
-	ship := g.createShipForPlayer(player)
-	g.Ships[ship.ID] = ship
-	player.ShipID = ship.ID
-
-	team.ShipCount++
+	player := g.createAndAddPlayer(name, team)
+	ship := g.createAndAddShip(player)
+	g.assignShipToPlayer(player, ship, team)
 
 	g.publishPlayerAndShipCreationEvents(player, ship)
 
 	return player.ID, nil
+}
+
+// validateTeam checks if the teamID is valid and returns the team.
+func (g *Game) validateTeam(teamID int) (*Team, error) {
+	team, ok := g.Teams[teamID]
+	if !ok {
+		return nil, errors.New("invalid team")
+	}
+	return team, nil
+}
+
+// createAndAddPlayer creates a new player and adds it to the team.
+func (g *Game) createAndAddPlayer(name string, team *Team) *Player {
+	player := g.createPlayer(name, team.ID)
+	team.Players[player.ID] = player
+	return player
+}
+
+// createAndAddShip creates a new ship and adds it to the game.
+func (g *Game) createAndAddShip(player *Player) *entity.Ship {
+	ship := g.createShipForPlayer(player)
+	g.Ships[ship.ID] = ship
+	return ship
+}
+
+// assignShipToPlayer assigns a ship to a player and updates team stats.
+func (g *Game) assignShipToPlayer(player *Player, ship *entity.Ship, team *Team) {
+	player.ShipID = ship.ID
+	team.ShipCount++
 }
 
 // createPlayer creates a new player entity.
@@ -591,23 +648,30 @@ func (g *Game) RemovePlayer(playerID entity.ID) error {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
-	// Find the player
-	var player *Player
-	var team *Team
+	player, team, err := g.findPlayerAndTeam(playerID)
+	if err != nil {
+		return err
+	}
 
+	g.deactivatePlayerShip(player)
+	g.removePlayerFromTeam(player, team)
+	g.publishPlayerLeftEvent(player)
+
+	return nil
+}
+
+// findPlayerAndTeam finds a player and their team by player ID.
+func (g *Game) findPlayerAndTeam(playerID entity.ID) (*Player, *Team, error) {
 	for _, t := range g.Teams {
 		if p, ok := t.Players[playerID]; ok {
-			player = p
-			team = t
-			break
+			return p, t, nil
 		}
 	}
+	return nil, nil, errors.New("player not found")
+}
 
-	if player == nil {
-		return errors.New("player not found")
-	}
-
-	// Mark the player's ship as inactive
+// deactivatePlayerShip marks the player's ship as inactive and publishes an event.
+func (g *Game) deactivatePlayerShip(player *Player) {
 	if ship, ok := g.Ships[player.ShipID]; ok {
 		ship.Active = false
 
@@ -619,18 +683,20 @@ func (g *Game) RemovePlayer(playerID entity.ID) error {
 			ship.TeamID,
 		))
 	}
+}
 
-	// Remove player from team
-	delete(team.Players, playerID)
+// removePlayerFromTeam removes a player from their team's records.
+func (g *Game) removePlayerFromTeam(player *Player, team *Team) {
+	delete(team.Players, player.ID)
 	team.ShipCount--
+}
 
-	// Publish player left event
+// publishPlayerLeftEvent publishes an event indicating a player has left.
+func (g *Game) publishPlayerLeftEvent(player *Player) {
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.PlayerLeft,
 		Source:    player,
 	})
-
-	return nil
 }
 
 // RespawnShip respawns a player's ship
@@ -678,19 +744,33 @@ func (g *Game) BeamArmies(shipID, planetID entity.ID, direction string, amount i
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
-	ship, ok := g.Ships[shipID]
-	if !ok {
-		return 0, errors.New("ship not found")
-	}
-	planet, ok := g.Planets[planetID]
-	if !ok {
-		return 0, errors.New("planet not found")
+	ship, planet, err := g.findShipAndPlanet(shipID, planetID)
+	if err != nil {
+		return 0, err
 	}
 
 	if err := g.validateBeamingPreconditions(ship, planet, direction); err != nil {
 		return 0, err
 	}
 
+	return g.executeBeaming(ship, planet, direction, amount)
+}
+
+// findShipAndPlanet retrieves the ship and planet for beaming.
+func (g *Game) findShipAndPlanet(shipID, planetID entity.ID) (*entity.Ship, *entity.Planet, error) {
+	ship, ok := g.Ships[shipID]
+	if !ok {
+		return nil, nil, errors.New("ship not found")
+	}
+	planet, ok := g.Planets[planetID]
+	if !ok {
+		return nil, nil, errors.New("planet not found")
+	}
+	return ship, planet, nil
+}
+
+// executeBeaming performs the beaming action based on the direction.
+func (g *Game) executeBeaming(ship *entity.Ship, planet *entity.Planet, direction string, amount int) (int, error) {
 	switch direction {
 	case "down":
 		return g.beamArmiesDown(ship, planet, amount)
@@ -797,50 +877,68 @@ func (g *Game) FireWeapon(shipID entity.ID, weaponIndex int) error {
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
-	ship, ok := g.Ships[shipID]
-	if !ok {
-		return errors.New("ship not found")
-	}
-	if !ship.Active {
-		return errors.New("ship is not active")
+	ship, err := g.findActiveShip(shipID)
+	if err != nil {
+		return err
 	}
 
 	projectile := ship.FireWeapon(weaponIndex)
-
 	if projectile == nil {
 		return nil // Weapon on cooldown or out of ammo
 	}
 
-	// Set projectile owner for scoring
-	projectile.OwnerID = ship.ID
+	g.registerAndPublishProjectile(projectile, ship.ID)
+	return nil
+}
 
+// findActiveShip finds a ship by ID and checks if it's active.
+func (g *Game) findActiveShip(shipID entity.ID) (*entity.Ship, error) {
+	ship, ok := g.Ships[shipID]
+	if !ok {
+		return nil, errors.New("ship not found")
+	}
+	if !ship.Active {
+		return nil, errors.New("ship is not active")
+	}
+	return ship, nil
+}
+
+// registerAndPublishProjectile adds the projectile to the game and publishes an event.
+func (g *Game) registerAndPublishProjectile(projectile *entity.Projectile, ownerID entity.ID) {
+	projectile.OwnerID = ownerID
 	g.Projectiles[projectile.ID] = projectile
 
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.ProjectileFired,
 		Source:    projectile,
 	})
-
-	return nil
 }
 
 // findSpawnPoint finds a suitable spawn point for a ship
 func (g *Game) findSpawnPoint(teamID int) physics.Vector2D {
-	// First try to spawn near a team's homeworld
+	if pos, ok := g.findSpawnPointNearHomeworld(teamID); ok {
+		return pos
+	}
+	return g.findRandomSpawnPoint()
+}
+
+// findSpawnPointNearHomeworld tries to find a spawn point near a team's planet.
+func (g *Game) findSpawnPointNearHomeworld(teamID int) (physics.Vector2D, bool) {
 	for _, planet := range g.Planets {
 		if planet.TeamID == teamID {
-			// Random position around the planet
 			angle := rand.Float64() * 2 * math.Pi
 			distance := planet.Collider.Radius + 100 + rand.Float64()*100
-
 			return physics.Vector2D{
 				X: planet.Position.X + math.Cos(angle)*distance,
 				Y: planet.Position.Y + math.Sin(angle)*distance,
-			}
+			}, true
 		}
 	}
+	return physics.Vector2D{}, false
+}
 
-	// Fallback to random position
+// findRandomSpawnPoint returns a random position in the world.
+func (g *Game) findRandomSpawnPoint() physics.Vector2D {
 	worldSize := g.Config.WorldSize
 	halfWorld := worldSize / 2
 
@@ -855,6 +953,11 @@ func (g *Game) GetGameState() *GameState {
 	g.EntityLock.RLock()
 	defer g.EntityLock.RUnlock()
 
+	return g.createGameStateSnapshot()
+}
+
+// createGameStateSnapshot builds and returns the complete game state.
+func (g *Game) createGameStateSnapshot() *GameState {
 	return &GameState{
 		Tick:        g.CurrentTick,
 		Ships:       g.getShipStates(),
@@ -987,44 +1090,51 @@ type TeamState struct {
 
 // registerEventHandlers registers handlers for game events
 func (g *Game) registerEventHandlers() {
-	// Handle ship destruction
-	g.EventBus.Subscribe(event.ShipDestroyed, func(e event.Event) {
-		if shipEvent, ok := e.(*event.ShipEvent); ok {
-			// shipID
-			_ = entity.ID(shipEvent.ShipID)
+	g.EventBus.Subscribe(event.ShipDestroyed, g.handleShipDestroyedEvent)
+}
 
-			// Check if any teams have no ships left
-			for _, team := range g.Teams {
-				if team.ShipCount == 0 {
-					// Set game status to ended with winning team
-					g.Status = GameStatusEnded
+// handleShipDestroyedEvent handles the logic when a ship is destroyed.
+func (g *Game) handleShipDestroyedEvent(e event.Event) {
+	if _, ok := e.(*event.ShipEvent); !ok {
+		return
+	}
 
-					// Find the winning team (team with most planets or ships)
-					var winnerID int = -1
-					maxPlanets := 0
-
-					for id, t := range g.Teams {
-						if t.PlanetCount > maxPlanets {
-							maxPlanets = t.PlanetCount
-							winnerID = id
-						}
-					}
-
-					g.WinningTeam = winnerID
-					g.EndTime = time.Now()
-
-					// Publish game ended event
-					g.EventBus.Publish(&event.BaseEvent{
-						EventType: event.GameEnded,
-						Source:    g.Teams[winnerID],
-					})
-
-					// Stop the game
-					g.Running = false
-				}
-			}
+	for _, team := range g.Teams {
+		if team.ShipCount == 0 {
+			g.endGameWithWinner()
+			return
 		}
+	}
+}
+
+// endGameWithWinner determines the winner and ends the game.
+func (g *Game) endGameWithWinner() {
+	g.Status = GameStatusEnded
+	g.EndTime = time.Now()
+
+	var winnerID = -1
+	maxPlanets := 0
+
+	for id, t := range g.Teams {
+		if t.PlanetCount > maxPlanets {
+			maxPlanets = t.PlanetCount
+			winnerID = id
+		}
+	}
+
+	g.WinningTeam = winnerID
+
+	var winnerSource interface{} = g
+	if winner, ok := g.Teams[winnerID]; ok {
+		winnerSource = winner
+	}
+
+	g.EventBus.Publish(&event.BaseEvent{
+		EventType: event.GameEnded,
+		Source:    winnerSource,
 	})
+
+	g.Running = false
 }
 
 // Add helper method for ending the game
