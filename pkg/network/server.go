@@ -147,48 +147,56 @@ func (s *GameServer) acceptConnections() {
 func (s *GameServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
-	// Wait for connect request
+	connectReq, err := s.readAndValidateConnectRequest(conn)
+	if err != nil {
+		return
+	}
+
+	playerID, err := s.addPlayerToGame(conn, connectReq)
+	if err != nil {
+		return
+	}
+
+	client := s.createAndRegisterClient(conn, playerID, connectReq)
+	s.sendConnectionSuccessResponse(conn, playerID, client.ID)
+	s.handleClientMessages(client)
+}
+
+// readAndValidateConnectRequest reads and validates the initial connection request.
+func (s *GameServer) readAndValidateConnectRequest(conn net.Conn) (*connectRequest, error) {
 	msgType, data, err := s.readMessage(conn)
 	if err != nil {
 		log.Printf("Error reading connect request: %v", err)
-		return
+		return nil, err
 	}
 
 	if msgType != ConnectRequest {
 		log.Printf("Expected connect request, got %d", msgType)
-		return
+		return nil, errors.New("invalid message type")
 	}
 
-	// Parse connect request
-	var connectReq struct {
-		PlayerName string `json:"playerName"`
-		TeamID     int    `json:"teamID"`
-	}
-
+	var connectReq connectRequest
 	if err := json.Unmarshal(data, &connectReq); err != nil {
 		log.Printf("Error parsing connect request: %v", err)
-		return
+		return nil, err
 	}
 
-	// Add player to game
+	return &connectReq, nil
+}
+
+// addPlayerToGame adds a new player to the game and handles errors.
+func (s *GameServer) addPlayerToGame(conn net.Conn, connectReq *connectRequest) (entity.ID, error) {
 	playerID, err := s.game.AddPlayer(connectReq.PlayerName, connectReq.TeamID)
 	if err != nil {
 		log.Printf("Error adding player: %v", err)
-
-		// Send error response
-		errorResp := struct {
-			Success bool   `json:"success"`
-			Error   string `json:"error"`
-		}{
-			Success: false,
-			Error:   err.Error(),
-		}
-
-		s.sendMessage(conn, ConnectResponse, errorResp)
-		return
+		s.sendConnectionErrorResponse(conn, err)
+		return 0, err
 	}
+	return playerID, nil
+}
 
-	// Create client
+// createAndRegisterClient creates a new client and registers it with the server.
+func (s *GameServer) createAndRegisterClient(conn net.Conn, playerID entity.ID, connectReq *connectRequest) *Client {
 	clientID := entity.GenerateID()
 	client := &Client{
 		ID:         clientID,
@@ -200,12 +208,27 @@ func (s *GameServer) handleConnection(conn net.Conn) {
 		LastInput:  time.Now(),
 	}
 
-	// Add client to server
 	s.clientsLock.Lock()
 	s.clients[clientID] = client
 	s.clientsLock.Unlock()
 
-	// Send success response
+	return client
+}
+
+// sendConnectionErrorResponse sends an error response for failed connections.
+func (s *GameServer) sendConnectionErrorResponse(conn net.Conn, err error) {
+	errorResp := struct {
+		Success bool   `json:"success"`
+		Error   string `json:"error"`
+	}{
+		Success: false,
+		Error:   err.Error(),
+	}
+	s.sendMessage(conn, ConnectResponse, errorResp)
+}
+
+// sendConnectionSuccessResponse sends a success response for established connections.
+func (s *GameServer) sendConnectionSuccessResponse(conn net.Conn, playerID, clientID entity.ID) {
 	successResp := struct {
 		Success  bool      `json:"success"`
 		PlayerID entity.ID `json:"playerID"`
@@ -215,11 +238,13 @@ func (s *GameServer) handleConnection(conn net.Conn) {
 		PlayerID: playerID,
 		ClientID: clientID,
 	}
-
 	s.sendMessage(conn, ConnectResponse, successResp)
+}
 
-	// Handle client messages
-	s.handleClientMessages(client)
+// connectRequest represents the structure of connection request data.
+type connectRequest struct {
+	PlayerName string `json:"playerName"`
+	TeamID     int    `json:"teamID"`
 }
 
 // handleClientMessages processes messages from a connected client
