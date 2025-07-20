@@ -357,28 +357,46 @@ func (g *Game) processShipProjectileCollisions() {
 
 // handleShipProjectileCollision checks and resolves a collision between a ship and a projectile.
 func (g *Game) handleShipProjectileCollision(ship *entity.Ship, projectile *entity.Projectile) {
-	if !projectile.Active || projectile.TeamID == ship.TeamID {
+	if !g.canShipAndProjectileCollide(ship, projectile) {
 		return
 	}
+
 	if ship.GetCollider().Collides(projectile.GetCollider()) {
-		destroyed := ship.TakeDamage(projectile.Damage)
-		projectile.Active = false
-		g.EventBus.Publish(event.NewCollisionEvent(
-			g,
-			uint64(ship.ID),
-			uint64(projectile.ID),
-		))
-		if destroyed {
-			ship.Active = false
-			g.updatePlayerStatsOnShipDestruction(ship, projectile)
-			g.EventBus.Publish(event.NewShipEvent(
-				event.ShipDestroyed,
-				g,
-				uint64(ship.ID),
-				ship.TeamID,
-			))
-		}
+		g.processShipDamage(ship, projectile)
 	}
+}
+
+// canShipAndProjectileCollide determines if a collision check is necessary.
+func (g *Game) canShipAndProjectileCollide(ship *entity.Ship, projectile *entity.Projectile) bool {
+	return projectile.Active && projectile.TeamID != ship.TeamID
+}
+
+// processShipDamage handles the consequences of a ship taking damage from a projectile.
+func (g *Game) processShipDamage(ship *entity.Ship, projectile *entity.Projectile) {
+	destroyed := ship.TakeDamage(projectile.Damage)
+	projectile.Active = false
+
+	g.EventBus.Publish(event.NewCollisionEvent(
+		g,
+		uint64(ship.ID),
+		uint64(projectile.ID),
+	))
+
+	if destroyed {
+		g.handleShipDestruction(ship, projectile)
+	}
+}
+
+// handleShipDestruction manages the game state changes when a ship is destroyed.
+func (g *Game) handleShipDestruction(ship *entity.Ship, projectile *entity.Projectile) {
+	ship.Active = false
+	g.updatePlayerStatsOnShipDestruction(ship, projectile)
+	g.EventBus.Publish(event.NewShipEvent(
+		event.ShipDestroyed,
+		g,
+		uint64(ship.ID),
+		ship.TeamID,
+	))
 }
 
 // updatePlayerStatsOnShipDestruction updates player stats when a ship is destroyed by a projectile.
@@ -450,25 +468,35 @@ func (g *Game) handleProjectilePlanetCollision(proj *entity.Projectile, planet *
 	if proj.Position.Distance(planet.Position) < proj.Collider.Radius+planet.Collider.Radius {
 		proj.Active = false
 		if planet.TeamID >= 0 && planet.TeamID != proj.TeamID {
-			armiesKilled := planet.Bomb(proj.Damage / 2) // Reduced damage for bombing
-			if player, ok := g.findPlayerByShipID(proj.OwnerID); ok {
-				player.Bombs += armiesKilled
-				player.Score += armiesKilled // Points for bombing
-			}
-			if planet.TeamID == -1 {
-				if team, ok := g.Teams[planet.TeamID]; ok {
-					team.PlanetCount--
-				}
-				g.EventBus.Publish(event.NewPlanetEvent(
-					event.PlanetCaptured,
-					g,
-					uint64(planet.ID),
-					-1,
-					planet.TeamID,
-				))
-			}
+			g.processPlanetBombing(proj, planet)
 		}
 	}
+}
+
+// processPlanetBombing handles the logic when a projectile bombs a planet.
+func (g *Game) processPlanetBombing(proj *entity.Projectile, planet *entity.Planet) {
+	armiesKilled := planet.Bomb(proj.Damage / 2) // Reduced damage for bombing
+	if player, ok := g.findPlayerByShipID(proj.OwnerID); ok {
+		player.Bombs += armiesKilled
+		player.Score += armiesKilled // Points for bombing
+	}
+	if planet.TeamID == -1 { // Planet was just neutralized
+		g.handlePlanetNeutralization(planet)
+	}
+}
+
+// handlePlanetNeutralization updates game state when a planet becomes neutral.
+func (g *Game) handlePlanetNeutralization(planet *entity.Planet) {
+	if team, ok := g.Teams[planet.TeamID]; ok {
+		team.PlanetCount--
+	}
+	g.EventBus.Publish(event.NewPlanetEvent(
+		event.PlanetCaptured, // Or a new "PlanetNeutralized" event type
+		g,
+		uint64(planet.ID),
+		-1,            // New team is neutral
+		planet.TeamID, // Old team ID
+	))
 }
 
 // findPlayerByShipID finds a player by their ship ID
@@ -986,52 +1014,66 @@ func (g *Game) registerEventHandlers() {
 
 // Add helper method for ending the game
 func (g *Game) endGame() {
+	if g.Status == GameStatusEnded {
+		return
+	}
 	g.Status = GameStatusEnded
 	g.EndTime = time.Now()
 	g.Running = false
 
+	winnerID := g.determineWinner()
+	g.WinningTeam = winnerID
+
+	g.publishGameEndedEvent(winnerID)
+}
+
+// determineWinner calculates the winning team based on game rules.
+// It returns the winner's team ID, or -1 for a draw/no winner.
+func (g *Game) determineWinner() int {
 	// Use custom win condition if set
 	if g.CustomWinCondition != nil {
 		if winnerID, ok := g.CustomWinCondition.CheckWinner(g); ok {
-			g.WinningTeam = winnerID
-			if winnerID >= 0 {
-				g.EventBus.Publish(&event.BaseEvent{
-					EventType: event.GameEnded,
-					Source:    g.Teams[winnerID],
-				})
-			} else {
-				g.EventBus.Publish(&event.BaseEvent{
-					EventType: event.GameEnded,
-					Source:    g,
-				})
-			}
-			return
+			return winnerID
 		}
 	}
 
 	// Default logic: score or conquest
+	return g.calculateWinnerByDefaultRules()
+}
+
+// calculateWinnerByDefaultRules determines the winner based on score or conquest.
+func (g *Game) calculateWinnerByDefaultRules() int {
 	var winnerID int = -1
-	maxScore := 0
+	maxScore := -1 // Use -1 to handle zero scores correctly
+
 	for id, team := range g.Teams {
-		if team.Score > maxScore ||
-			(g.Config.GameRules.WinCondition == "conquest" && team.PlanetCount > maxScore) {
-			maxScore = team.Score
-			if g.Config.GameRules.WinCondition == "conquest" {
-				maxScore = team.PlanetCount
-			}
+		currentScore := 0
+		if g.Config.GameRules.WinCondition == "conquest" {
+			currentScore = team.PlanetCount
+		} else {
+			currentScore = team.Score
+		}
+
+		if currentScore > maxScore {
+			maxScore = currentScore
 			winnerID = id
+		} else if currentScore == maxScore {
+			winnerID = -1 // Tie
 		}
 	}
-	g.WinningTeam = winnerID
+	return winnerID
+}
+
+// publishGameEndedEvent sends the game ended event.
+func (g *Game) publishGameEndedEvent(winnerID int) {
+	var source interface{} = g
 	if winnerID >= 0 {
-		g.EventBus.Publish(&event.BaseEvent{
-			EventType: event.GameEnded,
-			Source:    g.Teams[winnerID],
-		})
-	} else {
-		g.EventBus.Publish(&event.BaseEvent{
-			EventType: event.GameEnded,
-			Source:    g,
-		})
+		if winner, ok := g.Teams[winnerID]; ok {
+			source = winner
+		}
 	}
+	g.EventBus.Publish(&event.BaseEvent{
+		EventType: event.GameEnded,
+		Source:    source,
+	})
 }
