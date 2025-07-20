@@ -299,22 +299,33 @@ func (g *Game) updatePlanets(deltaTime float64) {
 
 // wrapEntityPosition wraps an entity's position around the world boundaries
 func (g *Game) wrapEntityPosition(e interface{}) {
-	worldSize := g.Config.WorldSize
-	halfWorld := worldSize / 2
-
-	var pos *physics.Vector2D
-	var radius float64
-
-	switch entity := e.(type) {
-	case *entity.Ship:
-		pos = &entity.Position
-		radius = entity.Collider.Radius
-	case *entity.Projectile:
-		pos = &entity.Position
-		radius = entity.Collider.Radius
-	default:
+	pos, radius, ok := g.extractEntityPositionData(e)
+	if !ok {
 		return
 	}
+
+	g.wrapCoordinatesAroundWorld(pos)
+	g.resolvePositionCollisions(e, pos, radius)
+}
+
+// extractEntityPositionData extracts position and radius from an entity interface.
+// It returns the position vector, radius, and whether the extraction was successful.
+func (g *Game) extractEntityPositionData(e interface{}) (*physics.Vector2D, float64, bool) {
+	switch entity := e.(type) {
+	case *entity.Ship:
+		return &entity.Position, entity.Collider.Radius, true
+	case *entity.Projectile:
+		return &entity.Position, entity.Collider.Radius, true
+	default:
+		return nil, 0, false
+	}
+}
+
+// wrapCoordinatesAroundWorld wraps the given position coordinates around world boundaries.
+// It modifies the position in-place to ensure it stays within the world bounds.
+func (g *Game) wrapCoordinatesAroundWorld(pos *physics.Vector2D) {
+	worldSize := g.Config.WorldSize
+	halfWorld := worldSize / 2
 
 	// Wrap X coordinate
 	if pos.X > halfWorld {
@@ -329,8 +340,11 @@ func (g *Game) wrapEntityPosition(e interface{}) {
 	} else if pos.Y < -halfWorld {
 		pos.Y += worldSize
 	}
+}
 
-	// After wrapping, robustly nudge away from any overlapping ship
+// resolvePositionCollisions nudges the entity away from any overlapping ships.
+// It prevents entities from overlapping after position wrapping by adjusting their position.
+func (g *Game) resolvePositionCollisions(e interface{}, pos *physics.Vector2D, radius float64) {
 	for _, other := range g.Ships {
 		if other == e || !other.Active {
 			continue
@@ -343,7 +357,6 @@ func (g *Game) wrapEntityPosition(e interface{}) {
 			*pos = pos.Add(delta)
 		}
 	}
-	// Could add similar logic for projectiles if needed
 }
 
 // detectCollisions checks for and resolves collisions between entities
