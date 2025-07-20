@@ -4,7 +4,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/opd-ai/go-netrek/pkg/entity"
@@ -83,15 +82,9 @@ type GameRules struct {
 
 // LoadConfig loads a configuration from a file
 func LoadConfig(path string) (*GameConfig, error) {
-	file, err := os.Open(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file: %w", err)
-	}
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
 	var config GameConfig
@@ -127,7 +120,7 @@ func SaveConfig(config *GameConfig, path string) error {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := ioutil.WriteFile(path, data, 0o644); err != nil {
+	if err := os.WriteFile(path, data, 0o644); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
@@ -137,86 +130,116 @@ func SaveConfig(config *GameConfig, path string) error {
 // DefaultConfig returns a default game configuration
 func DefaultConfig() *GameConfig {
 	return &GameConfig{
-		WorldSize:  10000,
-		MaxPlayers: 16,
-		Teams: []TeamConfig{
-			{
-				Name:         "Federation",
-				Color:        "#0000FF",
-				MaxShips:     8,
-				StartingShip: "Scout",
-			},
-			{
-				Name:         "Romulans",
-				Color:        "#00FF00",
-				MaxShips:     8,
-				StartingShip: "Scout",
-			},
+		WorldSize:     10000,
+		MaxPlayers:    16,
+		Teams:         createDefaultTeams(),
+		Planets:       createDefaultPlanets(),
+		PhysicsConfig: createDefaultPhysicsConfig(),
+		NetworkConfig: createDefaultNetworkConfig(),
+		GameRules:     createDefaultGameRules(),
+		ShipTypes:     createDefaultShipTypes(),
+	}
+}
+
+// createDefaultTeams creates the default team configurations for a new game.
+func createDefaultTeams() []TeamConfig {
+	return []TeamConfig{
+		{
+			Name:         "Federation",
+			Color:        "#0000FF",
+			MaxShips:     8,
+			StartingShip: "Scout",
 		},
-		Planets: []PlanetConfig{
-			{
-				Name:          "Earth",
-				X:             -4000,
-				Y:             0,
-				Type:          entity.Homeworld,
-				HomeWorld:     true,
-				TeamID:        0,
-				InitialArmies: 30,
-			},
-			{
-				Name:          "Romulus",
-				X:             4000,
-				Y:             0,
-				Type:          entity.Homeworld,
-				HomeWorld:     true,
-				TeamID:        1,
-				InitialArmies: 30,
-			},
-			// Additional planets would be defined here
+		{
+			Name:         "Romulans",
+			Color:        "#00FF00",
+			MaxShips:     8,
+			StartingShip: "Scout",
 		},
-		PhysicsConfig: PhysicsConfig{
-			Gravity:         0,
-			Friction:        0.1,
-			CollisionDamage: 20,
+	}
+}
+
+// createDefaultPlanets creates the default planet configurations for a new game.
+func createDefaultPlanets() []PlanetConfig {
+	return []PlanetConfig{
+		{
+			Name:          "Earth",
+			X:             -4000,
+			Y:             0,
+			Type:          entity.Homeworld,
+			HomeWorld:     true,
+			TeamID:        0,
+			InitialArmies: 30,
 		},
-		NetworkConfig: NetworkConfig{
-			UpdateRate:      20,
-			TicksPerState:   3,
-			UsePartialState: true,
-			ServerPort:      4566,
-			ServerAddress:   "localhost:4566",
+		{
+			Name:          "Romulus",
+			X:             4000,
+			Y:             0,
+			Type:          entity.Homeworld,
+			HomeWorld:     true,
+			TeamID:        1,
+			InitialArmies: 30,
 		},
-		GameRules: GameRules{
-			WinCondition:   "conquest",
-			TimeLimit:      1800,
-			MaxScore:       100,
-			RespawnDelay:   5,
-			FriendlyFire:   false,
-			StartingArmies: 0,
+		// Additional planets would be defined here
+	}
+}
+
+// createDefaultPhysicsConfig creates the default physics configuration for a new game.
+func createDefaultPhysicsConfig() PhysicsConfig {
+	return PhysicsConfig{
+		Gravity:         0,
+		Friction:        0.1,
+		CollisionDamage: 20,
+	}
+}
+
+// createDefaultNetworkConfig creates the default network configuration for a new game.
+func createDefaultNetworkConfig() NetworkConfig {
+	return NetworkConfig{
+		UpdateRate:      20,
+		TicksPerState:   3,
+		UsePartialState: true,
+		ServerPort:      4566,
+		ServerAddress:   "localhost:4566",
+	}
+}
+
+// createDefaultGameRules creates the default game rules configuration for a new game.
+func createDefaultGameRules() GameRules {
+	return GameRules{
+		WinCondition:   "conquest",
+		TimeLimit:      1800,
+		MaxScore:       100,
+		RespawnDelay:   5,
+		FriendlyFire:   false,
+		StartingArmies: 0,
+	}
+}
+
+// createDefaultShipTypes creates the default ship type configurations for a new game.
+func createDefaultShipTypes() map[string]ShipTypeConfig {
+	return map[string]ShipTypeConfig{
+		"Scout": {
+			Name:         "Scout",
+			MaxHull:      100,
+			MaxShields:   100,
+			MaxFuel:      1000,
+			Acceleration: 200,
+			TurnRate:     3.0,
+			MaxSpeed:     300,
+			WeaponSlots:  2,
+			MaxArmies:    2,
 		},
-		ShipTypes: map[string]ShipTypeConfig{
-			"Scout": {
-				Name:         "Scout",
-				MaxHull:      100,
-				MaxShields:   100,
-				MaxFuel:      1000,
-				Acceleration: 200,
-				TurnRate:     3.0,
-				MaxSpeed:     300,
-				WeaponSlots:  2,
-				MaxArmies:    2,
-			},
-			"Destroyer": {
-				Name:         "Destroyer",
-				MaxHull:      150,
-				MaxShields:   150,
-				MaxFuel:      1200,
-				Acceleration: 150,
-				TurnRate:     2.5,
-				MaxSpeed:     250,
-				WeaponSlots:  3,
-				MaxArmies:    5,
-			},
+		"Destroyer": {
+			Name:         "Destroyer",
+			MaxHull:      150,
+			MaxShields:   150,
+			MaxFuel:      1200,
+			Acceleration: 150,
+			TurnRate:     2.5,
+			MaxSpeed:     250,
+			WeaponSlots:  3,
+			MaxArmies:    5,
 		},
 	}
 }
