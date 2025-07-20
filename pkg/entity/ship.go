@@ -88,15 +88,25 @@ func NewShip(id ID, class ShipClass, teamID int, position physics.Vector2D) *Shi
 
 // Update handles the ship's state update for a single game tick
 func (s *Ship) Update(deltaTime float64) {
-	// Handle rotation
+	s.updateRotation(deltaTime)
+	s.updateAcceleration(deltaTime)
+	s.applyDrag(deltaTime)
+	s.BaseEntity.Update(deltaTime)
+	s.regenerateShields(deltaTime)
+}
+
+// updateRotation processes ship rotation based on turn input
+func (s *Ship) updateRotation(deltaTime float64) {
 	if s.TurningCW {
 		s.Rotation += s.Stats.TurnRate * deltaTime
 	}
 	if s.TurningCCW {
 		s.Rotation -= s.Stats.TurnRate * deltaTime
 	}
+}
 
-	// Handle acceleration
+// updateAcceleration handles thrust input, acceleration calculation, speed limiting, and fuel consumption
+func (s *Ship) updateAcceleration(deltaTime float64) {
 	if s.Thrusting && s.Fuel > 0 {
 		// Calculate acceleration vector based on ship heading
 		accelVector := physics.FromAngle(s.Rotation, s.Stats.Acceleration)
@@ -110,16 +120,16 @@ func (s *Ship) Update(deltaTime float64) {
 		// Consume fuel
 		s.Fuel--
 	}
+}
 
-	// Apply drag
+// applyDrag reduces ship velocity over time due to space friction
+func (s *Ship) applyDrag(deltaTime float64) {
 	drag := 0.1 // Drag coefficient
 	s.Velocity = s.Velocity.Scale(1.0 - drag*deltaTime)
+}
 
-	// Update position
-	s.BaseEntity.Update(deltaTime)
-
-	// Update weapons cooldowns
-	// Regenerate shields
+// regenerateShields increases shield strength over time up to maximum capacity
+func (s *Ship) regenerateShields(deltaTime float64) {
 	if s.Shields < s.Stats.MaxShields {
 		s.Shields += int(deltaTime * 5) // Adjust shield regen rate
 		if s.Shields > s.Stats.MaxShields {
