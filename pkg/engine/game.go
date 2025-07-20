@@ -659,75 +659,93 @@ func (g *Game) BeamArmies(shipID, planetID entity.ID, direction string, amount i
 		return 0, errors.New("planet not found")
 	}
 
-	// Check if ship is close enough to the planet
+	if err := g.validateBeamingDistance(ship, planet); err != nil {
+		return 0, err
+	}
+
+	switch direction {
+	case "down":
+		return g.beamArmiesDown(ship, planet, amount)
+	case "up":
+		return g.beamArmiesUp(ship, planet, amount)
+	default:
+		return 0, errors.New("invalid direction, must be 'up' or 'down'")
+	}
+}
+
+// validateBeamingDistance checks if a ship is close enough to a planet to beam armies.
+func (g *Game) validateBeamingDistance(ship *entity.Ship, planet *entity.Planet) error {
 	if ship.Position.Distance(planet.Position) > ship.Collider.Radius+planet.Collider.Radius+50 {
-		return 0, errors.New("ship is too far from planet")
+		return errors.New("ship is too far from planet")
+	}
+	return nil
+}
+
+// beamArmiesDown handles beaming armies from a ship to a planet.
+func (g *Game) beamArmiesDown(ship *entity.Ship, planet *entity.Planet, amount int) (int, error) {
+	if ship.Armies <= 0 {
+		return 0, errors.New("ship has no armies")
 	}
 
-	if direction == "down" {
-		// Beam armies from ship to planet
-		if ship.Armies <= 0 {
-			return 0, errors.New("ship has no armies")
-		}
-
-		if amount > ship.Armies {
-			amount = ship.Armies
-		}
-
-		transferred, captured := planet.BeamDownArmies(ship.TeamID, amount)
-		ship.Armies -= transferred
-
-		// If planet was captured
-		if captured {
-			// Update team planet counts
-			if oldTeam, ok := g.Teams[planet.TeamID]; ok {
-				oldTeam.PlanetCount--
-			}
-
-			if newTeam, ok := g.Teams[ship.TeamID]; ok {
-				newTeam.PlanetCount++
-			}
-
-			// Update player stats
-			if player, ok := g.findPlayerByShipID(shipID); ok {
-				player.Captures++
-				player.Score += 20 // Points for capture
-			}
-
-			// Publish planet captured event
-			g.EventBus.Publish(event.NewPlanetEvent(
-				event.PlanetCaptured,
-				g,
-				uint64(planet.ID),
-				ship.TeamID,
-				-1, // Was neutral
-			))
-		}
-
-		return transferred, nil
-	} else if direction == "up" {
-		// Beam armies from planet to ship
-		if planet.TeamID != ship.TeamID {
-			return 0, errors.New("cannot beam up armies from enemy planet")
-		}
-
-		// Check ship capacity
-		if ship.Armies >= ship.Stats.MaxArmies {
-			return 0, errors.New("ship is at maximum army capacity")
-		}
-
-		spaceAvailable := ship.Stats.MaxArmies - ship.Armies
-		if amount > spaceAvailable {
-			amount = spaceAvailable
-		}
-
-		transferred := planet.BeamUpArmies(ship.TeamID, amount)
-		ship.Armies += transferred
-
-		return transferred, nil
+	if amount > ship.Armies {
+		amount = ship.Armies
 	}
 
-	return 0, errors.New("invalid direction, must be 'up' or 'down'")
+	transferred, captured := planet.BeamDownArmies(ship.TeamID, amount)
+	ship.Armies -= transferred
+
+	if captured {
+		g.handlePlanetCapture(ship, planet)
+	}
+
+	return transferred, nil
+}
+
+// handlePlanetCapture updates game state when a planet is captured.
+func (g *Game) handlePlanetCapture(ship *entity.Ship, planet *entity.Planet) {
+	// Update team planet counts
+	if oldTeam, ok := g.Teams[planet.TeamID]; ok {
+		oldTeam.PlanetCount--
+	}
+	if newTeam, ok := g.Teams[ship.TeamID]; ok {
+		newTeam.PlanetCount++
+	}
+
+	// Update player stats
+	if player, ok := g.findPlayerByShipID(ship.ID); ok {
+		player.Captures++
+		player.Score += 20 // Points for capture
+	}
+
+	// Publish planet captured event
+	g.EventBus.Publish(event.NewPlanetEvent(
+		event.PlanetCaptured,
+		g,
+		uint64(planet.ID),
+		ship.TeamID,
+		-1, // Was neutral
+	))
+}
+
+// beamArmiesUp handles beaming armies from a planet to a ship.
+func (g *Game) beamArmiesUp(ship *entity.Ship, planet *entity.Planet, amount int) (int, error) {
+	if planet.TeamID != ship.TeamID {
+		return 0, errors.New("cannot beam up armies from enemy planet")
+	}
+
+	if ship.Armies >= ship.Stats.MaxArmies {
+		return 0, errors.New("ship is at maximum army capacity")
+	}
+
+	spaceAvailable := ship.Stats.MaxArmies - ship.Armies
+	if amount > spaceAvailable {
+		amount = spaceAvailable
+	}
+
+	transferred := planet.BeamUpArmies(ship.TeamID, amount)
+	ship.Armies += transferred
+
+	return transferred, nil
 }
 
 // FireWeapon fires a weapon from a ship
@@ -793,18 +811,21 @@ func (g *Game) GetGameState() *GameState {
 	g.EntityLock.RLock()
 	defer g.EntityLock.RUnlock()
 
-	state := &GameState{
+	return &GameState{
 		Tick:        g.CurrentTick,
-		Ships:       make(map[entity.ID]ShipState),
-		Planets:     make(map[entity.ID]PlanetState),
-		Projectiles: make(map[entity.ID]ProjectileState),
-		Teams:       make(map[int]TeamState),
+		Ships:       g.getShipStates(),
+		Planets:     g.getPlanetStates(),
+		Projectiles: g.getProjectileStates(),
+		Teams:       g.getTeamStates(),
 	}
+}
 
-	// Copy ship states
+// getShipStates creates a snapshot of the current ship states.
+func (g *Game) getShipStates() map[entity.ID]ShipState {
+	states := make(map[entity.ID]ShipState)
 	for id, ship := range g.Ships {
 		if ship.Active {
-			state.Ships[id] = ShipState{
+			states[id] = ShipState{
 				ID:       id,
 				Position: ship.Position,
 				Rotation: ship.Rotation,
@@ -818,10 +839,14 @@ func (g *Game) GetGameState() *GameState {
 			}
 		}
 	}
+	return states
+}
 
-	// Copy planet states
+// getPlanetStates creates a snapshot of the current planet states.
+func (g *Game) getPlanetStates() map[entity.ID]PlanetState {
+	states := make(map[entity.ID]PlanetState)
 	for id, planet := range g.Planets {
-		state.Planets[id] = PlanetState{
+		states[id] = PlanetState{
 			ID:       id,
 			Name:     planet.Name,
 			Position: planet.Position,
@@ -829,11 +854,15 @@ func (g *Game) GetGameState() *GameState {
 			Armies:   planet.Armies,
 		}
 	}
+	return states
+}
 
-	// Copy projectile states
+// getProjectileStates creates a snapshot of the current projectile states.
+func (g *Game) getProjectileStates() map[entity.ID]ProjectileState {
+	states := make(map[entity.ID]ProjectileState)
 	for id, proj := range g.Projectiles {
 		if proj.Active {
-			state.Projectiles[id] = ProjectileState{
+			states[id] = ProjectileState{
 				ID:       id,
 				Position: proj.Position,
 				Velocity: proj.Velocity,
@@ -842,10 +871,14 @@ func (g *Game) GetGameState() *GameState {
 			}
 		}
 	}
+	return states
+}
 
-	// Copy team states
+// getTeamStates creates a snapshot of the current team states.
+func (g *Game) getTeamStates() map[int]TeamState {
+	states := make(map[int]TeamState)
 	for id, team := range g.Teams {
-		state.Teams[id] = TeamState{
+		states[id] = TeamState{
 			ID:          id,
 			Name:        team.Name,
 			Color:       team.Color,
@@ -854,8 +887,7 @@ func (g *Game) GetGameState() *GameState {
 			PlanetCount: team.PlanetCount,
 		}
 	}
-
-	return state
+	return states
 }
 
 // GameState represents a snapshot of the game state
