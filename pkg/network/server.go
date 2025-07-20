@@ -9,12 +9,14 @@ import (
 	"io"
 	"log"
 	"net"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/opd-ai/go-netrek/pkg/engine"
 	"github.com/opd-ai/go-netrek/pkg/entity"
 	"github.com/opd-ai/go-netrek/pkg/physics"
+	"github.com/opd-ai/go-netrek/pkg/validation"
 )
 
 // MessageType defines the type of network message
@@ -41,8 +43,9 @@ type GameServer struct {
 	running       bool
 	updateRate    time.Duration
 	maxClients    int
-	ticksPerState int  // How many game ticks between full state updates
-	partialState  bool // Whether to send partial updates between full updates
+	ticksPerState int                          // How many game ticks between full state updates
+	partialState  bool                         // Whether to send partial updates between full updates
+	validator     *validation.MessageValidator // Input validation and rate limiting
 }
 
 // Client represents a connected client
@@ -68,6 +71,7 @@ func NewGameServer(game *engine.Game, maxClients int) *GameServer {
 		maxClients:    maxClients,
 		ticksPerState: nc.TicksPerState,
 		partialState:  nc.UsePartialState,
+		validator:     validation.NewMessageValidator(),
 	}
 }
 
@@ -108,6 +112,11 @@ func (s *GameServer) Stop() {
 	// Close listener
 	if s.listener != nil {
 		s.listener.Close()
+	}
+
+	// Stop validator and rate limiter
+	if s.validator != nil {
+		s.validator.Close()
 	}
 
 	// Stop game
@@ -175,10 +184,33 @@ func (s *GameServer) readAndValidateConnectRequest(conn net.Conn) (*connectReque
 		return nil, errors.New("invalid message type")
 	}
 
+	// Use client connection remote address as identifier for rate limiting
+	clientID := conn.RemoteAddr().String()
+
+	// Validate message size and format
+	if err := s.validator.ValidateMessage(data, clientID); err != nil {
+		log.Printf("Message validation failed: %v", err)
+		return nil, fmt.Errorf("validation failed: %w", err)
+	}
+
 	var connectReq connectRequest
 	if err := json.Unmarshal(data, &connectReq); err != nil {
 		log.Printf("Error parsing connect request: %v", err)
 		return nil, err
+	}
+
+	// Validate and sanitize player name
+	sanitizedName, err := validation.ValidatePlayerName(connectReq.PlayerName)
+	if err != nil {
+		log.Printf("Invalid player name: %v", err)
+		return nil, fmt.Errorf("invalid player name: %w", err)
+	}
+	connectReq.PlayerName = sanitizedName
+
+	// Validate team ID
+	if err := validation.ValidateTeamID(connectReq.TeamID); err != nil {
+		log.Printf("Invalid team ID: %v", err)
+		return nil, fmt.Errorf("invalid team ID: %w", err)
 	}
 
 	return &connectReq, nil
@@ -249,6 +281,8 @@ type connectRequest struct {
 
 // handleClientMessages processes messages from a connected client
 func (s *GameServer) handleClientMessages(client *Client) {
+	clientID := client.Conn.RemoteAddr().String() + "/" + strconv.FormatUint(uint64(client.ID), 10)
+
 	for client.Connected && s.running {
 		msgType, data, err := s.readMessage(client.Conn)
 		if err != nil {
@@ -256,6 +290,15 @@ func (s *GameServer) handleClientMessages(client *Client) {
 				log.Printf("Error reading message from client %d: %v", client.ID, err)
 			}
 			break
+		}
+
+		// Validate message for all types except disconnect
+		if msgType != DisconnectNotification {
+			if err := s.validator.ValidateMessage(data, clientID); err != nil {
+				log.Printf("Message validation failed for client %d: %v", client.ID, err)
+				// Don't disconnect client for validation errors, just skip the message
+				continue
+			}
 		}
 
 		// Process message based on type
@@ -321,6 +364,17 @@ func (s *GameServer) parsePlayerInput(data []byte) (*PlayerInputData, error) {
 	if err := json.Unmarshal(data, &input); err != nil {
 		return nil, err
 	}
+
+	// Validate weapon index
+	if err := validation.ValidateWeaponIndex(input.FireWeapon); err != nil {
+		return nil, fmt.Errorf("invalid weapon index: %w", err)
+	}
+
+	// Validate beam amount
+	if err := validation.ValidateBeamAmount(input.BeamAmount); err != nil {
+		return nil, fmt.Errorf("invalid beam amount: %w", err)
+	}
+
 	return &input, nil
 }
 
@@ -387,6 +441,20 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 		return
 	}
 
+	// Validate and sanitize chat message
+	sanitizedMessage, err := validation.ValidateChatMessage(chatMsg.Message)
+	if err != nil {
+		log.Printf("Invalid chat message from client %d: %v", sender.ID, err)
+		// Send error back to sender
+		errorMsg := struct {
+			Error string `json:"error"`
+		}{
+			Error: "Message rejected: " + err.Error(),
+		}
+		s.sendMessage(sender.Conn, ChatMessage, errorMsg)
+		return
+	}
+
 	// Create message with sender info
 	broadcastMsg := struct {
 		SenderID   entity.ID `json:"senderID"`
@@ -397,7 +465,7 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 		SenderID:   sender.PlayerID,
 		SenderName: sender.PlayerName,
 		TeamID:     sender.TeamID,
-		Message:    chatMsg.Message,
+		Message:    sanitizedMessage,
 	}
 
 	// Broadcast to all clients
@@ -547,6 +615,11 @@ func (s *GameServer) readMessage(conn net.Conn) (MessageType, []byte, error) {
 		return 0, nil, err
 	}
 
+	// Check message size limit
+	if int(msgLen) > validation.MaxMessageSize {
+		return 0, nil, fmt.Errorf("message too large: %d bytes (max %d)", msgLen, validation.MaxMessageSize)
+	}
+
 	// Read message data
 	data := make([]byte, msgLen)
 	if _, err := io.ReadFull(conn, data); err != nil {
@@ -565,8 +638,8 @@ func (s *GameServer) sendMessage(conn net.Conn, msgType MessageType, msg interfa
 	}
 
 	// Check message size
-	if len(data) > 65535 {
-		return errors.New("message too large")
+	if len(data) > validation.MaxMessageSize {
+		return fmt.Errorf("message too large: %d bytes (max %d)", len(data), validation.MaxMessageSize)
 	}
 
 	// Write message type
