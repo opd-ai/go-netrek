@@ -926,3 +926,29 @@ func (s *GameServer) sendMessage(ctx context.Context, conn net.Conn, msgType Mes
 		return ctx.Err()
 	}
 }
+
+// IsRunning returns true if the server is currently running and accepting connections.
+func (s *GameServer) IsRunning() bool {
+	return s.running
+}
+
+// GetListenerAddress returns the address the server is listening on,
+// or empty string if the server is not running.
+func (s *GameServer) GetListenerAddress() string {
+	if s.listener == nil {
+		return ""
+	}
+	return s.listener.Addr().String()
+}
+
+// GetClientCount returns the current number of connected clients.
+func (s *GameServer) GetClientCount() int {
+	s.clientsLock.RLock()
+	defer s.clientsLock.RUnlock()
+	return len(s.clients)
+}
+
+// GetGameRunning returns true if the underlying game engine is running.
+func (s *GameServer) GetGameRunning() bool {
+	return s.game.Running
+}
