@@ -17,6 +17,7 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/config"
 	"github.com/opd-ai/go-netrek/pkg/engine"
 	"github.com/opd-ai/go-netrek/pkg/entity"
+	"github.com/opd-ai/go-netrek/pkg/logging"
 	"github.com/opd-ai/go-netrek/pkg/physics"
 	"github.com/opd-ai/go-netrek/pkg/validation"
 )
@@ -52,6 +53,7 @@ type GameServer struct {
 	connectionTimeout time.Duration                // Timeout for connection operations
 	readTimeout       time.Duration                // Timeout for read operations
 	writeTimeout      time.Duration                // Timeout for write operations
+	logger            *logging.Logger              // Structured logger
 }
 
 // Client represents a connected client
@@ -71,11 +73,13 @@ type Client struct {
 // NewGameServer creates a new game server
 func NewGameServer(game *engine.Game, maxClients int) *GameServer {
 	nc := game.Config.NetworkConfig
+	logger := logging.NewLogger()
 
 	// Load environment configuration for timeouts
 	envConfig, err := config.LoadConfigFromEnv()
 	if err != nil {
-		log.Printf("Warning: Failed to load environment config, using defaults: %v", err)
+		logger.Warn(context.Background(), "Failed to load environment config, using defaults",
+			"error", err)
 		envConfig = &config.EnvironmentConfig{
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
@@ -95,6 +99,7 @@ func NewGameServer(game *engine.Game, maxClients int) *GameServer {
 		connectionTimeout: 30 * time.Second, // Default connection timeout
 		readTimeout:       envConfig.ReadTimeout,
 		writeTimeout:      envConfig.WriteTimeout,
+		logger:            logger,
 	}
 }
 
@@ -117,7 +122,12 @@ func (s *GameServer) Start(address string) error {
 	// Start game update loop
 	go s.gameLoop()
 
-	log.Printf("Game server started on %s", address)
+	ctx := context.Background()
+	s.logger.Info(ctx, "Game server started",
+		"address", address,
+		"max_clients", s.maxClients,
+		"update_rate", s.updateRate.String(),
+	)
 	return nil
 }
 
@@ -145,7 +155,8 @@ func (s *GameServer) Stop() {
 	// Stop game
 	s.game.Stop()
 
-	log.Println("Game server stopped")
+	ctx := context.Background()
+	s.logger.Info(ctx, "Game server stopped")
 }
 
 // acceptConnections accepts new client connections

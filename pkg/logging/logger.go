@@ -25,7 +25,7 @@ type Logger struct {
 func NewLogger() *Logger {
 	level := getLogLevelFromEnv()
 	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: level,
+		Level:       level,
 		ReplaceAttr: sanitizeAttributes,
 	})
 	return &Logger{slog.New(handler)}
@@ -113,7 +113,7 @@ func getLogLevelFromEnv() slog.Level {
 // This prevents accidental logging of passwords, tokens, or other sensitive information.
 func sanitizeAttributes(groups []string, a slog.Attr) slog.Attr {
 	key := strings.ToLower(a.Key)
-	
+
 	// List of sensitive keys that should be masked
 	sensitiveKeys := []string{
 		"password", "passwd", "pwd",
@@ -121,7 +121,7 @@ func sanitizeAttributes(groups []string, a slog.Attr) slog.Attr {
 		"secret", "key", "private",
 		"cookie", "session",
 	}
-	
+
 	for _, sensitive := range sensitiveKeys {
 		if strings.Contains(key, sensitive) {
 			return slog.Attr{
@@ -130,7 +130,7 @@ func sanitizeAttributes(groups []string, a slog.Attr) slog.Attr {
 			}
 		}
 	}
-	
+
 	return a
 }
 

@@ -56,7 +56,7 @@ func TestCorrelationID(t *testing.T) {
 	t.Run("generate correlation ID", func(t *testing.T) {
 		id1 := GenerateCorrelationID()
 		id2 := GenerateCorrelationID()
-		
+
 		if id1 == "" {
 			t.Error("GenerateCorrelationID() returned empty string")
 		}
@@ -74,10 +74,10 @@ func TestCorrelationID(t *testing.T) {
 	t.Run("context with correlation ID", func(t *testing.T) {
 		ctx := context.Background()
 		expectedID := "test-correlation-id"
-		
+
 		ctx = WithCorrelationID(ctx, expectedID)
 		actualID := GetCorrelationID(ctx)
-		
+
 		if actualID != expectedID {
 			t.Errorf("GetCorrelationID() = %q, want %q", actualID, expectedID)
 		}
@@ -86,7 +86,7 @@ func TestCorrelationID(t *testing.T) {
 	t.Run("context without correlation ID", func(t *testing.T) {
 		ctx := context.Background()
 		id := GetCorrelationID(ctx)
-		
+
 		if id != "" {
 			t.Errorf("GetCorrelationID() = %q, want empty string", id)
 		}
@@ -95,7 +95,7 @@ func TestCorrelationID(t *testing.T) {
 	t.Run("auto-generate correlation ID", func(t *testing.T) {
 		ctx := context.Background()
 		ctx = WithCorrelationID(ctx, "")
-		
+
 		id := GetCorrelationID(ctx)
 		if id == "" {
 			t.Error("WithCorrelationID() with empty string should auto-generate ID")
@@ -156,24 +156,24 @@ func TestSanitizeAttributes(t *testing.T) {
 
 func TestLoggerMethods(t *testing.T) {
 	var buf bytes.Buffer
-	
+
 	// Create a logger that writes to our buffer
 	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})
 	logger := &Logger{slog.New(handler)}
-	
+
 	ctx := WithCorrelationID(context.Background(), "test-id-123")
 
 	t.Run("info logging", func(t *testing.T) {
 		buf.Reset()
 		logger.Info(ctx, "test info message", "key", "value")
-		
+
 		var logEntry map[string]interface{}
 		if err := json.Unmarshal(buf.Bytes(), &logEntry); err != nil {
 			t.Fatalf("Failed to parse log JSON: %v", err)
 		}
-		
+
 		if logEntry["msg"] != "test info message" {
 			t.Errorf("Expected message 'test info message', got %v", logEntry["msg"])
 		}
@@ -192,12 +192,12 @@ func TestLoggerMethods(t *testing.T) {
 		buf.Reset()
 		testErr := errors.New("test error")
 		logger.Error(ctx, "test error message", testErr, "context", "test")
-		
+
 		var logEntry map[string]interface{}
 		if err := json.Unmarshal(buf.Bytes(), &logEntry); err != nil {
 			t.Fatalf("Failed to parse log JSON: %v", err)
 		}
-		
+
 		if logEntry["msg"] != "test error message" {
 			t.Errorf("Expected message 'test error message', got %v", logEntry["msg"])
 		}
@@ -212,12 +212,12 @@ func TestLoggerMethods(t *testing.T) {
 	t.Run("debug logging", func(t *testing.T) {
 		buf.Reset()
 		logger.Debug(ctx, "debug message", "debug_key", "debug_value")
-		
+
 		var logEntry map[string]interface{}
 		if err := json.Unmarshal(buf.Bytes(), &logEntry); err != nil {
 			t.Fatalf("Failed to parse log JSON: %v", err)
 		}
-		
+
 		if logEntry["level"] != "DEBUG" {
 			t.Errorf("Expected level 'DEBUG', got %v", logEntry["level"])
 		}
@@ -226,12 +226,12 @@ func TestLoggerMethods(t *testing.T) {
 	t.Run("warn logging", func(t *testing.T) {
 		buf.Reset()
 		logger.Warn(ctx, "warning message", "warn_key", "warn_value")
-		
+
 		var logEntry map[string]interface{}
 		if err := json.Unmarshal(buf.Bytes(), &logEntry); err != nil {
 			t.Fatalf("Failed to parse log JSON: %v", err)
 		}
-		
+
 		if logEntry["level"] != "WARN" {
 			t.Errorf("Expected level 'WARN', got %v", logEntry["level"])
 		}
@@ -249,12 +249,12 @@ func TestWrapError(t *testing.T) {
 	t.Run("wrap error with context", func(t *testing.T) {
 		originalErr := errors.New("original error")
 		wrapped := WrapError(originalErr, "additional context")
-		
+
 		expectedMsg := "additional context: original error"
 		if wrapped.Error() != expectedMsg {
 			t.Errorf("WrapError() = %q, want %q", wrapped.Error(), expectedMsg)
 		}
-		
+
 		// Test that the original error is preserved
 		if !errors.Is(wrapped, originalErr) {
 			t.Error("WrapError() should preserve original error")
@@ -264,7 +264,7 @@ func TestWrapError(t *testing.T) {
 	t.Run("wrap error with formatted context", func(t *testing.T) {
 		originalErr := errors.New("original error")
 		wrapped := WrapError(originalErr, "context with %s and %d", "string", 42)
-		
+
 		expectedMsg := "context with string and 42: original error"
 		if wrapped.Error() != expectedMsg {
 			t.Errorf("WrapError() = %q, want %q", wrapped.Error(), expectedMsg)
@@ -274,15 +274,15 @@ func TestWrapError(t *testing.T) {
 
 func TestLogWithoutCorrelationID(t *testing.T) {
 	var buf bytes.Buffer
-	
+
 	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
 	logger := &Logger{slog.New(handler)}
-	
+
 	ctx := context.Background() // No correlation ID
 	logger.Info(ctx, "test message")
-	
+
 	logOutput := buf.String()
 	if strings.Contains(logOutput, "correlation_id") {
 		t.Error("Log should not contain correlation_id when none is set in context")
