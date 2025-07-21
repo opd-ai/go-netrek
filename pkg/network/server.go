@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"strconv"
 	"sync"
@@ -161,11 +160,12 @@ func (s *GameServer) Stop() {
 
 // acceptConnections accepts new client connections
 func (s *GameServer) acceptConnections() {
+	ctx := context.Background()
 	for s.running {
 		conn, err := s.listener.Accept()
 		if err != nil {
 			if s.running {
-				log.Printf("Error accepting connection: %v", err)
+				s.logger.Error(ctx, "Error accepting connection", err)
 			}
 			continue
 		}
@@ -176,7 +176,11 @@ func (s *GameServer) acceptConnections() {
 		s.clientsLock.RUnlock()
 
 		if clientCount >= s.maxClients {
-			log.Printf("Rejecting connection, server full")
+			s.logger.Warn(ctx, "Rejecting connection, server full",
+				"current_clients", clientCount,
+				"max_clients", s.maxClients,
+				"remote_addr", conn.RemoteAddr().String(),
+			)
 			conn.Close()
 			continue
 		}
@@ -194,26 +198,42 @@ func (s *GameServer) handleConnection(conn net.Conn) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.connectionTimeout)
 	defer cancel()
 
+	// Add correlation ID for tracking this connection
+	ctx = logging.WithCorrelationID(ctx, "")
+	remoteAddr := conn.RemoteAddr().String()
+
 	connectReq, err := s.readAndValidateConnectRequest(ctx, conn)
 	if err != nil {
-		log.Printf("Connection failed during connect request: %v", err)
+		s.logger.Error(ctx, "Connection failed during connect request", err,
+			"remote_addr", remoteAddr,
+		)
 		return
 	}
 
 	playerID, err := s.addPlayerToGame(conn, connectReq)
 	if err != nil {
-		log.Printf("Connection failed during player addition: %v", err)
+		s.logger.Error(ctx, "Connection failed during player addition", err,
+			"remote_addr", remoteAddr,
+			"player_name", connectReq.PlayerName,
+		)
 		return
 	}
 
 	client := s.createAndRegisterClient(ctx, conn, playerID, connectReq)
 	if client == nil {
-		log.Printf("Connection failed during client creation")
+		s.logger.Error(ctx, "Connection failed during client creation", nil,
+			"remote_addr", remoteAddr,
+			"player_id", playerID,
+		)
 		return
 	}
 
 	if err := s.sendConnectionSuccessResponse(ctx, conn, playerID, client.ID); err != nil {
-		log.Printf("Connection failed during success response: %v", err)
+		s.logger.Error(ctx, "Connection failed during success response", err,
+			"remote_addr", remoteAddr,
+			"player_id", playerID,
+			"client_id", client.ID,
+		)
 		s.removeClient(client)
 		return
 	}
@@ -225,12 +245,15 @@ func (s *GameServer) handleConnection(conn net.Conn) {
 func (s *GameServer) readAndValidateConnectRequest(ctx context.Context, conn net.Conn) (*connectRequest, error) {
 	msgType, data, err := s.readMessage(ctx, conn)
 	if err != nil {
-		log.Printf("Error reading connect request: %v", err)
+		s.logger.Error(ctx, "Error reading connect request", err)
 		return nil, err
 	}
 
 	if msgType != ConnectRequest {
-		log.Printf("Expected connect request, got %d", msgType)
+		s.logger.Error(ctx, "Expected connect request, got different message type", nil,
+			"expected", ConnectRequest,
+			"actual", msgType,
+		)
 		return nil, errors.New("invalid message type")
 	}
 
@@ -239,27 +262,38 @@ func (s *GameServer) readAndValidateConnectRequest(ctx context.Context, conn net
 
 	// Validate message size and format
 	if err := s.validator.ValidateMessage(data, clientID); err != nil {
-		log.Printf("Message validation failed: %v", err)
+		s.logger.Error(ctx, "Message validation failed", err,
+			"client_id", clientID,
+			"message_size", len(data),
+		)
 		return nil, fmt.Errorf("validation failed: %w", err)
 	}
 
 	var connectReq connectRequest
 	if err := json.Unmarshal(data, &connectReq); err != nil {
-		log.Printf("Error parsing connect request: %v", err)
+		s.logger.Error(ctx, "Error parsing connect request", err,
+			"client_id", clientID,
+		)
 		return nil, err
 	}
 
 	// Validate and sanitize player name
 	sanitizedName, err := validation.ValidatePlayerName(connectReq.PlayerName)
 	if err != nil {
-		log.Printf("Invalid player name: %v", err)
+		s.logger.Error(ctx, "Invalid player name", err,
+			"client_id", clientID,
+			"player_name", connectReq.PlayerName,
+		)
 		return nil, fmt.Errorf("invalid player name: %w", err)
 	}
 	connectReq.PlayerName = sanitizedName
 
 	// Validate team ID
 	if err := validation.ValidateTeamID(connectReq.TeamID); err != nil {
-		log.Printf("Invalid team ID: %v", err)
+		s.logger.Error(ctx, "Invalid team ID", err,
+			"client_id", clientID,
+			"team_id", connectReq.TeamID,
+		)
 		return nil, fmt.Errorf("invalid team ID: %w", err)
 	}
 
@@ -270,7 +304,11 @@ func (s *GameServer) readAndValidateConnectRequest(ctx context.Context, conn net
 func (s *GameServer) addPlayerToGame(conn net.Conn, connectReq *connectRequest) (entity.ID, error) {
 	playerID, err := s.game.AddPlayer(connectReq.PlayerName, connectReq.TeamID)
 	if err != nil {
-		log.Printf("Error adding player: %v", err)
+		ctx := context.Background()
+		s.logger.Error(ctx, "Error adding player", err,
+			"player_name", connectReq.PlayerName,
+			"team_id", connectReq.TeamID,
+		)
 		s.sendConnectionErrorResponse(conn, err)
 		return 0, err
 	}
@@ -318,7 +356,9 @@ func (s *GameServer) sendConnectionErrorResponse(conn net.Conn, err error) {
 	defer cancel()
 
 	if sendErr := s.sendMessage(ctx, conn, ConnectResponse, errorResp); sendErr != nil {
-		log.Printf("Failed to send connection error response: %v", sendErr)
+		s.logger.Error(ctx, "Failed to send connection error response", sendErr,
+			"original_error", err.Error(),
+		)
 	}
 }
 
@@ -346,6 +386,9 @@ type connectRequest struct {
 func (s *GameServer) handleClientMessages(client *Client) {
 	clientID := client.Conn.RemoteAddr().String() + "/" + strconv.FormatUint(uint64(client.ID), 10)
 
+	// Create context with correlation ID for this client session
+	ctx := logging.WithCorrelationID(context.Background(), "")
+
 	for client.Connected && s.running {
 		// Create context with read timeout for each message
 		msgCtx, msgCancel := context.WithTimeout(client.ctx, s.readTimeout)
@@ -355,7 +398,10 @@ func (s *GameServer) handleClientMessages(client *Client) {
 
 		if err != nil {
 			if err != io.EOF && err != context.DeadlineExceeded && err != context.Canceled {
-				log.Printf("Error reading message from client %d: %v", client.ID, err)
+				s.logger.Error(ctx, "Error reading message from client", err,
+					"client_id", client.ID,
+					"remote_addr", client.Conn.RemoteAddr().String(),
+				)
 			}
 			break
 		}
@@ -363,7 +409,12 @@ func (s *GameServer) handleClientMessages(client *Client) {
 		// Validate message for all types except disconnect
 		if msgType != DisconnectNotification {
 			if err := s.validator.ValidateMessage(data, clientID); err != nil {
-				log.Printf("Message validation failed for client %d: %v", client.ID, err)
+				s.logger.Warn(ctx, "Message validation failed for client",
+					"client_id", client.ID,
+					"error", err,
+					"message_type", msgType,
+					"message_size", len(data),
+				)
 				// Don't disconnect client for validation errors, just skip the message
 				continue
 			}
@@ -378,7 +429,9 @@ func (s *GameServer) handleClientMessages(client *Client) {
 			// Respond to ping request with ping response
 			responseCtx, responseCancel := context.WithTimeout(client.ctx, s.writeTimeout)
 			if err := s.sendMessage(responseCtx, client.Conn, PingResponse, data); err != nil {
-				log.Printf("Failed to send ping response to client %d: %v", client.ID, err)
+				s.logger.Error(ctx, "Failed to send ping response to client", err,
+					"client_id", client.ID,
+				)
 			}
 			responseCancel()
 
@@ -388,11 +441,17 @@ func (s *GameServer) handleClientMessages(client *Client) {
 
 		case DisconnectNotification:
 			// Client is disconnecting gracefully
-			log.Printf("Client %d disconnecting", client.ID)
+			s.logger.Info(ctx, "Client disconnecting",
+				"client_id", client.ID,
+				"player_name", client.PlayerName,
+			)
 			client.Connected = false
 
 		default:
-			log.Printf("Unknown message type %d from client %d", msgType, client.ID)
+			s.logger.Warn(ctx, "Unknown message type from client",
+				"message_type", msgType,
+				"client_id", client.ID,
+			)
 		}
 	}
 
@@ -414,9 +473,13 @@ type PlayerInputData struct {
 
 // handlePlayerInput processes player input messages
 func (s *GameServer) handlePlayerInput(client *Client, data []byte) {
+	ctx := context.Background()
 	input, err := s.parsePlayerInput(data)
 	if err != nil {
-		log.Printf("Error parsing player input: %v", err)
+		s.logger.Error(ctx, "Error parsing player input", err,
+			"client_id", client.ID,
+			"player_id", client.PlayerID,
+		)
 		return
 	}
 
@@ -503,20 +566,28 @@ func (s *GameServer) applyBeamingInput(ship *entity.Ship, input *PlayerInputData
 
 // broadcastChatMessage sends a chat message to all connected clients
 func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
+	ctx := context.Background()
 	var chatMsg struct {
 		Message string `json:"message"`
 		// Can include info about who sent it already
 	}
 
 	if err := json.Unmarshal(data, &chatMsg); err != nil {
-		log.Printf("Error parsing chat message: %v", err)
+		s.logger.Error(ctx, "Error parsing chat message", err,
+			"client_id", sender.ID,
+			"player_name", sender.PlayerName,
+		)
 		return
 	}
 
 	// Validate and sanitize chat message
 	sanitizedMessage, err := validation.ValidateChatMessage(chatMsg.Message)
 	if err != nil {
-		log.Printf("Invalid chat message from client %d: %v", sender.ID, err)
+		s.logger.Warn(ctx, "Invalid chat message from client",
+			"client_id", sender.ID,
+			"player_name", sender.PlayerName,
+			"error", err,
+		)
 		// Send error back to sender
 		errorMsg := struct {
 			Error string `json:"error"`
@@ -527,7 +598,9 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 		// Use a short timeout for error response
 		ctx, cancel := context.WithTimeout(sender.ctx, 5*time.Second)
 		if sendErr := s.sendMessage(ctx, sender.Conn, ChatMessage, errorMsg); sendErr != nil {
-			log.Printf("Failed to send chat error to client %d: %v", sender.ID, sendErr)
+			s.logger.Error(ctx, "Failed to send chat error to client", sendErr,
+				"client_id", sender.ID,
+			)
 		}
 		cancel()
 		return
@@ -553,7 +626,10 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 			// Use client context with write timeout for each message
 			ctx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
 			if err := s.sendMessage(ctx, client.Conn, ChatMessage, broadcastMsg); err != nil {
-				log.Printf("Failed to send chat message to client %d: %v", client.ID, err)
+				s.logger.Error(ctx, "Failed to send chat message to client", err,
+					"client_id", client.ID,
+					"sender_id", sender.ID,
+				)
 			}
 			cancel()
 		}
@@ -575,7 +651,12 @@ func (s *GameServer) removeClient(client *Client) {
 	// Remove player from game
 	s.game.RemovePlayer(client.PlayerID)
 
-	log.Printf("Client %d removed", client.ID)
+	ctx := context.Background()
+	s.logger.Info(ctx, "Client removed",
+		"client_id", client.ID,
+		"player_id", client.PlayerID,
+		"player_name", client.PlayerName,
+	)
 }
 
 // gameLoop runs the main game loop
@@ -603,14 +684,17 @@ func (s *GameServer) gameLoop() {
 // sendFullStateUpdate sends a complete game state to all clients
 func (s *GameServer) sendFullStateUpdate() {
 	gameState := s.game.GetGameState()
+	ctx := context.Background()
 
 	s.clientsLock.RLock()
 	for _, client := range s.clients {
 		if client.Connected {
 			// Use client context with write timeout
-			ctx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
-			if err := s.sendMessage(ctx, client.Conn, GameStateUpdate, gameState); err != nil {
-				log.Printf("Failed to send full state update to client %d: %v", client.ID, err)
+			sendCtx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
+			if err := s.sendMessage(sendCtx, client.Conn, GameStateUpdate, gameState); err != nil {
+				s.logger.Error(ctx, "Failed to send full state update to client", err,
+					"client_id", client.ID,
+				)
 			}
 			cancel()
 		}
@@ -621,6 +705,7 @@ func (s *GameServer) sendFullStateUpdate() {
 // sendPartialStateUpdate sends only changed game state to clients
 func (s *GameServer) sendPartialStateUpdate() {
 	currentState := s.game.GetGameState()
+	ctx := context.Background()
 
 	s.clientsLock.RLock()
 	defer s.clientsLock.RUnlock()
@@ -633,9 +718,11 @@ func (s *GameServer) sendPartialStateUpdate() {
 		partialState := s.createPartialStateForClient(client, currentState)
 
 		// Use client context with write timeout
-		ctx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
-		if err := s.sendMessage(ctx, client.Conn, GameStateUpdate, partialState); err != nil {
-			log.Printf("Failed to send partial state update to client %d: %v", client.ID, err)
+		sendCtx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
+		if err := s.sendMessage(sendCtx, client.Conn, GameStateUpdate, partialState); err != nil {
+			s.logger.Error(ctx, "Failed to send partial state update to client", err,
+				"client_id", client.ID,
+			)
 		}
 		cancel()
 	}
