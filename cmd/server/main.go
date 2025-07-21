@@ -147,16 +147,16 @@ func main() {
 
 	<-sigChan
 	logger.Info(ctx, "Shutting down server")
-	
+
 	// Create shutdown context with timeout
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	// Shutdown health check server
 	if err := healthServer.Shutdown(shutdownCtx); err != nil {
 		logger.Error(ctx, "Health check server shutdown failed", err)
 	}
-	
+
 	// Stop game server
 	server.Stop()
 }
