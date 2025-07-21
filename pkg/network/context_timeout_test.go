@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/binary"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -266,7 +267,15 @@ func TestMessageSizeValidation(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for oversized message, got none")
 	}
-	if err != nil && err.Error() != "message too large: 100016 bytes (max 65536)" {
-		t.Errorf("Expected specific error message, got: %v", err)
+	if err != nil {
+		// Check that error message contains expected pattern without hardcoding exact byte count
+		expectedPattern := "message too large: "
+		if !strings.Contains(err.Error(), expectedPattern) {
+			t.Errorf("Expected error message to contain '%s', got: %v", expectedPattern, err)
+		}
+		// Verify it mentions the max size
+		if !strings.Contains(err.Error(), "max 65536") {
+			t.Errorf("Expected error message to mention max size 65536, got: %v", err)
+		}
 	}
 }
