@@ -2,6 +2,7 @@
 package network
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -13,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/opd-ai/go-netrek/pkg/config"
 	"github.com/opd-ai/go-netrek/pkg/engine"
 	"github.com/opd-ai/go-netrek/pkg/entity"
 	"github.com/opd-ai/go-netrek/pkg/physics"
@@ -36,16 +38,20 @@ const (
 
 // GameServer handles network communication and game state
 type GameServer struct {
-	listener      net.Listener
-	game          *engine.Game
-	clients       map[entity.ID]*Client
-	clientsLock   sync.RWMutex
-	running       bool
-	updateRate    time.Duration
-	maxClients    int
-	ticksPerState int                          // How many game ticks between full state updates
-	partialState  bool                         // Whether to send partial updates between full updates
-	validator     *validation.MessageValidator // Input validation and rate limiting
+	listener          net.Listener
+	game              *engine.Game
+	clients           map[entity.ID]*Client
+	clientsLock       sync.RWMutex
+	running           bool
+	updateRate        time.Duration
+	maxClients        int
+	ticksPerState     int                          // How many game ticks between full state updates
+	partialState      bool                         // Whether to send partial updates between full updates
+	validator         *validation.MessageValidator // Input validation and rate limiting
+	config            *config.EnvironmentConfig    // Configuration for timeouts
+	connectionTimeout time.Duration                // Timeout for connection operations
+	readTimeout       time.Duration                // Timeout for read operations
+	writeTimeout      time.Duration                // Timeout for write operations
 }
 
 // Client represents a connected client
@@ -58,20 +64,37 @@ type Client struct {
 	Connected  bool
 	LastInput  time.Time
 	Latency    time.Duration
+	ctx        context.Context    // Context for client operations
+	cancel     context.CancelFunc // Cancel function for client context
 }
 
 // NewGameServer creates a new game server
 func NewGameServer(game *engine.Game, maxClients int) *GameServer {
 	nc := game.Config.NetworkConfig
+
+	// Load environment configuration for timeouts
+	envConfig, err := config.LoadConfigFromEnv()
+	if err != nil {
+		log.Printf("Warning: Failed to load environment config, using defaults: %v", err)
+		envConfig = &config.EnvironmentConfig{
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 30 * time.Second,
+		}
+	}
+
 	return &GameServer{
-		game:          game,
-		clients:       make(map[entity.ID]*Client),
-		running:       false,
-		updateRate:    time.Second / time.Duration(nc.UpdateRate),
-		maxClients:    maxClients,
-		ticksPerState: nc.TicksPerState,
-		partialState:  nc.UsePartialState,
-		validator:     validation.NewMessageValidator(),
+		game:              game,
+		clients:           make(map[entity.ID]*Client),
+		running:           false,
+		updateRate:        time.Second / time.Duration(nc.UpdateRate),
+		maxClients:        maxClients,
+		ticksPerState:     nc.TicksPerState,
+		partialState:      nc.UsePartialState,
+		validator:         validation.NewMessageValidator(),
+		config:            envConfig,
+		connectionTimeout: 30 * time.Second, // Default connection timeout
+		readTimeout:       envConfig.ReadTimeout,
+		writeTimeout:      envConfig.WriteTimeout,
 	}
 }
 
@@ -156,24 +179,40 @@ func (s *GameServer) acceptConnections() {
 func (s *GameServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
-	connectReq, err := s.readAndValidateConnectRequest(conn)
+	// Create context with timeout for connection operations
+	ctx, cancel := context.WithTimeout(context.Background(), s.connectionTimeout)
+	defer cancel()
+
+	connectReq, err := s.readAndValidateConnectRequest(ctx, conn)
 	if err != nil {
+		log.Printf("Connection failed during connect request: %v", err)
 		return
 	}
 
 	playerID, err := s.addPlayerToGame(conn, connectReq)
 	if err != nil {
+		log.Printf("Connection failed during player addition: %v", err)
 		return
 	}
 
-	client := s.createAndRegisterClient(conn, playerID, connectReq)
-	s.sendConnectionSuccessResponse(conn, playerID, client.ID)
+	client := s.createAndRegisterClient(ctx, conn, playerID, connectReq)
+	if client == nil {
+		log.Printf("Connection failed during client creation")
+		return
+	}
+
+	if err := s.sendConnectionSuccessResponse(ctx, conn, playerID, client.ID); err != nil {
+		log.Printf("Connection failed during success response: %v", err)
+		s.removeClient(client)
+		return
+	}
+
 	s.handleClientMessages(client)
 }
 
 // readAndValidateConnectRequest reads and validates the initial connection request.
-func (s *GameServer) readAndValidateConnectRequest(conn net.Conn) (*connectRequest, error) {
-	msgType, data, err := s.readMessage(conn)
+func (s *GameServer) readAndValidateConnectRequest(ctx context.Context, conn net.Conn) (*connectRequest, error) {
+	msgType, data, err := s.readMessage(ctx, conn)
 	if err != nil {
 		log.Printf("Error reading connect request: %v", err)
 		return nil, err
@@ -228,8 +267,12 @@ func (s *GameServer) addPlayerToGame(conn net.Conn, connectReq *connectRequest) 
 }
 
 // createAndRegisterClient creates a new client and registers it with the server.
-func (s *GameServer) createAndRegisterClient(conn net.Conn, playerID entity.ID, connectReq *connectRequest) *Client {
+func (s *GameServer) createAndRegisterClient(ctx context.Context, conn net.Conn, playerID entity.ID, connectReq *connectRequest) *Client {
 	clientID := entity.GenerateID()
+
+	// Create context for client operations with connection timeout
+	clientCtx, clientCancel := context.WithCancel(ctx)
+
 	client := &Client{
 		ID:         clientID,
 		Conn:       conn,
@@ -238,6 +281,8 @@ func (s *GameServer) createAndRegisterClient(conn net.Conn, playerID entity.ID, 
 		TeamID:     connectReq.TeamID,
 		Connected:  true,
 		LastInput:  time.Now(),
+		ctx:        clientCtx,
+		cancel:     clientCancel,
 	}
 
 	s.clientsLock.Lock()
@@ -256,11 +301,18 @@ func (s *GameServer) sendConnectionErrorResponse(conn net.Conn, err error) {
 		Success: false,
 		Error:   err.Error(),
 	}
-	s.sendMessage(conn, ConnectResponse, errorResp)
+
+	// Use a short timeout for error responses
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if sendErr := s.sendMessage(ctx, conn, ConnectResponse, errorResp); sendErr != nil {
+		log.Printf("Failed to send connection error response: %v", sendErr)
+	}
 }
 
 // sendConnectionSuccessResponse sends a success response for established connections.
-func (s *GameServer) sendConnectionSuccessResponse(conn net.Conn, playerID, clientID entity.ID) {
+func (s *GameServer) sendConnectionSuccessResponse(ctx context.Context, conn net.Conn, playerID, clientID entity.ID) error {
 	successResp := struct {
 		Success  bool      `json:"success"`
 		PlayerID entity.ID `json:"playerID"`
@@ -270,7 +322,7 @@ func (s *GameServer) sendConnectionSuccessResponse(conn net.Conn, playerID, clie
 		PlayerID: playerID,
 		ClientID: clientID,
 	}
-	s.sendMessage(conn, ConnectResponse, successResp)
+	return s.sendMessage(ctx, conn, ConnectResponse, successResp)
 }
 
 // connectRequest represents the structure of connection request data.
@@ -284,9 +336,14 @@ func (s *GameServer) handleClientMessages(client *Client) {
 	clientID := client.Conn.RemoteAddr().String() + "/" + strconv.FormatUint(uint64(client.ID), 10)
 
 	for client.Connected && s.running {
-		msgType, data, err := s.readMessage(client.Conn)
+		// Create context with read timeout for each message
+		msgCtx, msgCancel := context.WithTimeout(client.ctx, s.readTimeout)
+
+		msgType, data, err := s.readMessage(msgCtx, client.Conn)
+		msgCancel() // Clean up timeout context
+
 		if err != nil {
-			if err != io.EOF {
+			if err != io.EOF && err != context.DeadlineExceeded && err != context.Canceled {
 				log.Printf("Error reading message from client %d: %v", client.ID, err)
 			}
 			break
@@ -308,7 +365,11 @@ func (s *GameServer) handleClientMessages(client *Client) {
 
 		case PingRequest:
 			// Respond to ping request with ping response
-			s.sendMessage(client.Conn, PingResponse, data)
+			responseCtx, responseCancel := context.WithTimeout(client.ctx, s.writeTimeout)
+			if err := s.sendMessage(responseCtx, client.Conn, PingResponse, data); err != nil {
+				log.Printf("Failed to send ping response to client %d: %v", client.ID, err)
+			}
+			responseCancel()
 
 		case ChatMessage:
 			// Broadcast chat message to all clients
@@ -451,7 +512,13 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 		}{
 			Error: "Message rejected: " + err.Error(),
 		}
-		s.sendMessage(sender.Conn, ChatMessage, errorMsg)
+
+		// Use a short timeout for error response
+		ctx, cancel := context.WithTimeout(sender.ctx, 5*time.Second)
+		if sendErr := s.sendMessage(ctx, sender.Conn, ChatMessage, errorMsg); sendErr != nil {
+			log.Printf("Failed to send chat error to client %d: %v", sender.ID, sendErr)
+		}
+		cancel()
 		return
 	}
 
@@ -472,7 +539,12 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 	s.clientsLock.RLock()
 	for _, client := range s.clients {
 		if client.Connected {
-			s.sendMessage(client.Conn, ChatMessage, broadcastMsg)
+			// Use client context with write timeout for each message
+			ctx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
+			if err := s.sendMessage(ctx, client.Conn, ChatMessage, broadcastMsg); err != nil {
+				log.Printf("Failed to send chat message to client %d: %v", client.ID, err)
+			}
+			cancel()
 		}
 	}
 	s.clientsLock.RUnlock()
@@ -480,6 +552,11 @@ func (s *GameServer) broadcastChatMessage(sender *Client, data []byte) {
 
 // removeClient removes a client from the server
 func (s *GameServer) removeClient(client *Client) {
+	// Cancel client context to clean up any ongoing operations
+	if client.cancel != nil {
+		client.cancel()
+	}
+
 	s.clientsLock.Lock()
 	delete(s.clients, client.ID)
 	s.clientsLock.Unlock()
@@ -519,7 +596,12 @@ func (s *GameServer) sendFullStateUpdate() {
 	s.clientsLock.RLock()
 	for _, client := range s.clients {
 		if client.Connected {
-			s.sendMessage(client.Conn, GameStateUpdate, gameState)
+			// Use client context with write timeout
+			ctx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
+			if err := s.sendMessage(ctx, client.Conn, GameStateUpdate, gameState); err != nil {
+				log.Printf("Failed to send full state update to client %d: %v", client.ID, err)
+			}
+			cancel()
 		}
 	}
 	s.clientsLock.RUnlock()
@@ -538,7 +620,13 @@ func (s *GameServer) sendPartialStateUpdate() {
 		}
 
 		partialState := s.createPartialStateForClient(client, currentState)
-		s.sendMessage(client.Conn, GameStateUpdate, partialState)
+
+		// Use client context with write timeout
+		ctx, cancel := context.WithTimeout(client.ctx, s.writeTimeout)
+		if err := s.sendMessage(ctx, client.Conn, GameStateUpdate, partialState); err != nil {
+			log.Printf("Failed to send partial state update to client %d: %v", client.ID, err)
+		}
+		cancel()
 	}
 }
 
@@ -602,39 +690,81 @@ func (s *GameServer) addAllPlanets(partialState *engine.GameState, currentState 
 }
 
 // readMessage reads a message from a connection
-func (s *GameServer) readMessage(conn net.Conn) (MessageType, []byte, error) {
-	// Read message type
-	var msgType MessageType
-	if err := binary.Read(conn, binary.BigEndian, &msgType); err != nil {
-		return 0, nil, err
+// readMessage reads a message from a connection with context timeout support
+func (s *GameServer) readMessage(ctx context.Context, conn net.Conn) (MessageType, []byte, error) {
+	// Set read deadline based on context
+	if deadline, ok := ctx.Deadline(); ok {
+		conn.SetReadDeadline(deadline)
+	} else {
+		// Fallback to configured timeout
+		conn.SetReadDeadline(time.Now().Add(s.readTimeout))
+	}
+	defer conn.SetReadDeadline(time.Time{}) // Clear deadline
+
+	// Channel to handle the read operation
+	type readResult struct {
+		msgType MessageType
+		data    []byte
+		err     error
 	}
 
-	// Read message length
-	var msgLen uint16
-	if err := binary.Read(conn, binary.BigEndian, &msgLen); err != nil {
-		return 0, nil, err
-	}
+	resultChan := make(chan readResult, 1)
 
-	// Check message size limit
-	if int(msgLen) > validation.MaxMessageSize {
-		return 0, nil, fmt.Errorf("message too large: %d bytes (max %d)", msgLen, validation.MaxMessageSize)
-	}
+	// Perform read operation in goroutine
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				resultChan <- readResult{err: fmt.Errorf("panic during read: %v", r)}
+			}
+		}()
 
-	// Read message data
-	data := make([]byte, msgLen)
-	if _, err := io.ReadFull(conn, data); err != nil {
-		return 0, nil, err
-	}
+		// Read message type
+		var msgType MessageType
+		if err := binary.Read(conn, binary.BigEndian, &msgType); err != nil {
+			resultChan <- readResult{err: err}
+			return
+		}
 
-	return msgType, data, nil
+		// Read message length
+		var msgLen uint16
+		if err := binary.Read(conn, binary.BigEndian, &msgLen); err != nil {
+			resultChan <- readResult{err: err}
+			return
+		}
+
+		// Check message size limit
+		if int(msgLen) > validation.MaxMessageSize {
+			resultChan <- readResult{err: fmt.Errorf("message too large: %d bytes (max %d)", msgLen, validation.MaxMessageSize)}
+			return
+		}
+
+		// Read message data
+		data := make([]byte, msgLen)
+		if _, err := io.ReadFull(conn, data); err != nil {
+			resultChan <- readResult{err: err}
+			return
+		}
+
+		resultChan <- readResult{msgType: msgType, data: data, err: nil}
+	}()
+
+	// Wait for read completion or context cancellation
+	select {
+	case result := <-resultChan:
+		return result.msgType, result.data, result.err
+	case <-ctx.Done():
+		// Force connection close on timeout
+		conn.Close()
+		return 0, nil, ctx.Err()
+	}
 }
 
-// sendMessage sends a message to a connection
-func (s *GameServer) sendMessage(conn net.Conn, msgType MessageType, msg interface{}) error {
+// sendMessage sends a message to a connection with context timeout support
+func (s *GameServer) sendMessage(ctx context.Context, conn net.Conn, msgType MessageType, msg interface{}) error {
 	// Serialize message
 	data, err := json.Marshal(msg)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marshal message: %w", err)
 	}
 
 	// Check message size
@@ -642,21 +772,59 @@ func (s *GameServer) sendMessage(conn net.Conn, msgType MessageType, msg interfa
 		return fmt.Errorf("message too large: %d bytes (max %d)", len(data), validation.MaxMessageSize)
 	}
 
-	// Write message type
-	if err := binary.Write(conn, binary.BigEndian, msgType); err != nil {
-		return err
+	// Set write deadline based on context
+	if deadline, ok := ctx.Deadline(); ok {
+		conn.SetWriteDeadline(deadline)
+	} else {
+		// Fallback to configured timeout
+		conn.SetWriteDeadline(time.Now().Add(s.writeTimeout))
+	}
+	defer conn.SetWriteDeadline(time.Time{}) // Clear deadline
+
+	// Channel to handle the write operation
+	type writeResult struct {
+		err error
 	}
 
-	// Write message length
-	msgLen := uint16(len(data))
-	if err := binary.Write(conn, binary.BigEndian, msgLen); err != nil {
-		return err
-	}
+	resultChan := make(chan writeResult, 1)
 
-	// Write message data
-	if _, err := conn.Write(data); err != nil {
-		return err
-	}
+	// Perform write operation in goroutine
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				resultChan <- writeResult{err: fmt.Errorf("panic during write: %v", r)}
+			}
+		}()
 
-	return nil
+		// Write message type
+		if err := binary.Write(conn, binary.BigEndian, msgType); err != nil {
+			resultChan <- writeResult{err: err}
+			return
+		}
+
+		// Write message length
+		msgLen := uint16(len(data))
+		if err := binary.Write(conn, binary.BigEndian, msgLen); err != nil {
+			resultChan <- writeResult{err: err}
+			return
+		}
+
+		// Write message data
+		if _, err := conn.Write(data); err != nil {
+			resultChan <- writeResult{err: err}
+			return
+		}
+
+		resultChan <- writeResult{err: nil}
+	}()
+
+	// Wait for write completion or context cancellation
+	select {
+	case result := <-resultChan:
+		return result.err
+	case <-ctx.Done():
+		// Force connection close on timeout
+		conn.Close()
+		return ctx.Err()
+	}
 }

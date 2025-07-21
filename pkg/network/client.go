@@ -2,6 +2,7 @@
 package network
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -11,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/opd-ai/go-netrek/pkg/config"
 	"github.com/opd-ai/go-netrek/pkg/engine"
 	"github.com/opd-ai/go-netrek/pkg/entity"
 	"github.com/opd-ai/go-netrek/pkg/event"
@@ -33,16 +35,36 @@ type GameClient struct {
 	reconnectAttempts    int
 	maxReconnectAttempts int
 	DesiredShipClass     entity.ShipClass
+
+	// Context and timeout support
+	ctx               context.Context
+	cancel            context.CancelFunc
+	connectionTimeout time.Duration
+	readTimeout       time.Duration
+	writeTimeout      time.Duration
 }
 
 // NewGameClient creates a new game client
 func NewGameClient(eventBus *event.Bus) *GameClient {
+	// Load environment configuration for timeouts
+	envConfig, err := config.LoadConfigFromEnv()
+	if err != nil {
+		// Use defaults if config loading fails
+		envConfig = &config.EnvironmentConfig{
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 30 * time.Second,
+		}
+	}
+
 	return &GameClient{
 		receivedStates:       make(chan *engine.GameState, 10),
 		eventBus:             eventBus,
 		pingInterval:         time.Second * 5,
 		reconnectDelay:       time.Second * 3,
 		maxReconnectAttempts: 5,
+		connectionTimeout:    30 * time.Second,
+		readTimeout:          envConfig.ReadTimeout,
+		writeTimeout:         envConfig.WriteTimeout,
 	}
 }
 
@@ -63,6 +85,9 @@ func (c *GameClient) RequestShipClass(class entity.ShipClass) error {
 func (c *GameClient) Connect(address, playerName string, teamID int) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	// Create context for connection operations
+	c.ctx, c.cancel = context.WithCancel(context.Background())
 
 	c.prepareConnection(address)
 
@@ -90,11 +115,18 @@ func (c *GameClient) prepareConnection(address string) {
 
 // establishTCPConnection creates a TCP connection to the server.
 func (c *GameClient) establishTCPConnection(address string) error {
-	var err error
-	c.conn, err = net.Dial("tcp", address)
+	// Create context with connection timeout
+	ctx, cancel := context.WithTimeout(c.ctx, c.connectionTimeout)
+	defer cancel()
+
+	// Use DialContext for timeout support
+	dialer := &net.Dialer{}
+	conn, err := dialer.DialContext(ctx, "tcp", address)
 	if err != nil {
 		return fmt.Errorf("failed to connect to server: %w", err)
 	}
+
+	c.conn = conn
 	return nil
 }
 
@@ -131,7 +163,11 @@ func (c *GameClient) sendConnectRequest(playerName string, teamID int) error {
 
 // processConnectResponse reads and validates the server's connection response.
 func (c *GameClient) processConnectResponse() error {
-	msgType, data, err := c.readMessage()
+	// Use connection timeout for reading response
+	ctx, cancel := context.WithTimeout(c.ctx, c.connectionTimeout)
+	defer cancel()
+
+	msgType, data, err := c.readMessage(ctx)
 	if err != nil {
 		c.cleanupConnection()
 		return fmt.Errorf("failed to read connect response: %w", err)
@@ -188,6 +224,12 @@ func (c *GameClient) cleanupConnection() {
 		c.conn = nil
 	}
 	c.connected = false
+
+	// Cancel context to stop any ongoing operations
+	if c.cancel != nil {
+		c.cancel()
+		c.cancel = nil
+	}
 }
 
 // Disconnect disconnects from the game server
@@ -199,8 +241,10 @@ func (c *GameClient) Disconnect() error {
 		return nil
 	}
 
-	// Send disconnect notification
-	c.sendMessage(DisconnectNotification, nil)
+	// Send disconnect notification with short timeout
+	ctx, cancel := context.WithTimeout(c.ctx, 5*time.Second)
+	c.sendMessageWithContext(ctx, DisconnectNotification, nil)
+	cancel()
 
 	// Clean up connection
 	c.cleanupConnection()
@@ -268,9 +312,14 @@ func (c *GameClient) GetGameStateChannel() <-chan *engine.GameState {
 // messageLoop handles incoming messages from the server
 func (c *GameClient) messageLoop() {
 	for c.connected {
-		msgType, data, err := c.readMessage()
+		// Create context with read timeout for each message
+		ctx, cancel := context.WithTimeout(c.ctx, c.readTimeout)
+
+		msgType, data, err := c.readMessage(ctx)
+		cancel() // Clean up timeout context
+
 		if err != nil {
-			if c.connected {
+			if c.connected && err != context.DeadlineExceeded && err != context.Canceled {
 				c.handleDisconnect(err)
 			}
 			return
@@ -421,30 +470,80 @@ func (c *GameClient) attemptReconnect() {
 }
 
 // readMessage reads a message from the server
-func (c *GameClient) readMessage() (MessageType, []byte, error) {
-	// Read message type
-	var msgType MessageType
-	if err := binary.Read(c.conn, binary.BigEndian, &msgType); err != nil {
-		return 0, nil, err
+// readMessage reads a message from the server with context timeout support
+func (c *GameClient) readMessage(ctx context.Context) (MessageType, []byte, error) {
+	// Set read deadline based on context
+	if deadline, ok := ctx.Deadline(); ok {
+		c.conn.SetReadDeadline(deadline)
+	} else {
+		// Fallback to configured timeout
+		c.conn.SetReadDeadline(time.Now().Add(c.readTimeout))
+	}
+	defer c.conn.SetReadDeadline(time.Time{}) // Clear deadline
+
+	// Channel to handle the read operation
+	type readResult struct {
+		msgType MessageType
+		data    []byte
+		err     error
 	}
 
-	// Read message length
-	var msgLen uint16
-	if err := binary.Read(c.conn, binary.BigEndian, &msgLen); err != nil {
-		return 0, nil, err
-	}
+	resultChan := make(chan readResult, 1)
 
-	// Read message data
-	data := make([]byte, msgLen)
-	if _, err := io.ReadFull(c.conn, data); err != nil {
-		return 0, nil, err
-	}
+	// Perform read operation in goroutine
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				resultChan <- readResult{err: fmt.Errorf("panic during read: %v", r)}
+			}
+		}()
 
-	return msgType, data, nil
+		// Read message type
+		var msgType MessageType
+		if err := binary.Read(c.conn, binary.BigEndian, &msgType); err != nil {
+			resultChan <- readResult{err: err}
+			return
+		}
+
+		// Read message length
+		var msgLen uint16
+		if err := binary.Read(c.conn, binary.BigEndian, &msgLen); err != nil {
+			resultChan <- readResult{err: err}
+			return
+		}
+
+		// Read message data
+		data := make([]byte, msgLen)
+		if _, err := io.ReadFull(c.conn, data); err != nil {
+			resultChan <- readResult{err: err}
+			return
+		}
+
+		resultChan <- readResult{msgType: msgType, data: data, err: nil}
+	}()
+
+	// Wait for read completion or context cancellation
+	select {
+	case result := <-resultChan:
+		return result.msgType, result.data, result.err
+	case <-ctx.Done():
+		// Force connection close on timeout
+		c.conn.Close()
+		return 0, nil, ctx.Err()
+	}
 }
 
-// sendMessage sends a message to the server
+// sendMessage sends a message to the server with context timeout support
 func (c *GameClient) sendMessage(msgType MessageType, msg interface{}) error {
+	ctx := c.ctx
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return c.sendMessageWithContext(ctx, msgType, msg)
+}
+
+// sendMessageWithContext sends a message to the server with explicit context
+func (c *GameClient) sendMessageWithContext(ctx context.Context, msgType MessageType, msg interface{}) error {
 	// Serialize message
 	var data []byte
 	var err error
@@ -452,7 +551,7 @@ func (c *GameClient) sendMessage(msgType MessageType, msg interface{}) error {
 	if msg != nil {
 		data, err = json.Marshal(msg)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to marshal message: %w", err)
 		}
 	} else {
 		data = []byte{}
@@ -470,23 +569,61 @@ func (c *GameClient) sendMessage(msgType MessageType, msg interface{}) error {
 		return errors.New("not connected")
 	}
 
-	// Write message type
-	if err := binary.Write(c.conn, binary.BigEndian, msgType); err != nil {
-		return err
+	// Set write deadline based on context
+	if deadline, ok := ctx.Deadline(); ok {
+		c.conn.SetWriteDeadline(deadline)
+	} else {
+		// Fallback to configured timeout
+		c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
+	}
+	defer c.conn.SetWriteDeadline(time.Time{}) // Clear deadline
+
+	// Channel to handle the write operation
+	type writeResult struct {
+		err error
 	}
 
-	// Write message length
-	msgLen := uint16(len(data))
-	if err := binary.Write(c.conn, binary.BigEndian, msgLen); err != nil {
-		return err
-	}
+	resultChan := make(chan writeResult, 1)
 
-	// Write message data
-	if _, err := c.conn.Write(data); err != nil {
-		return err
-	}
+	// Perform write operation in goroutine
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				resultChan <- writeResult{err: fmt.Errorf("panic during write: %v", r)}
+			}
+		}()
 
-	return nil
+		// Write message type
+		if err := binary.Write(c.conn, binary.BigEndian, msgType); err != nil {
+			resultChan <- writeResult{err: err}
+			return
+		}
+
+		// Write message length
+		msgLen := uint16(len(data))
+		if err := binary.Write(c.conn, binary.BigEndian, msgLen); err != nil {
+			resultChan <- writeResult{err: err}
+			return
+		}
+
+		// Write message data
+		if _, err := c.conn.Write(data); err != nil {
+			resultChan <- writeResult{err: err}
+			return
+		}
+
+		resultChan <- writeResult{err: nil}
+	}()
+
+	// Wait for write completion or context cancellation
+	select {
+	case result := <-resultChan:
+		return result.err
+	case <-ctx.Done():
+		// Force connection close on timeout
+		c.conn.Close()
+		return ctx.Err()
+	}
 }
 
 // Client event types
