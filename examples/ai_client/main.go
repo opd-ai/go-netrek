@@ -235,52 +235,56 @@ func (ai *AIClient) executeExplorerBehavior(myShip engine.ShipState) {
 
 // executeAggressorBehavior makes the AI seek and attack enemies
 func (ai *AIClient) executeAggressorBehavior(myShip engine.ShipState) {
-	// Find the nearest enemy ship
 	nearestEnemy := ai.findNearestEnemyShip(myShip.Position)
 
 	thrust := true
-	turnLeft := false
-	turnRight := false
+	turnLeft, turnRight := false, false
 	fireWeapon := -1
 
 	if nearestEnemy != nil {
-		// Calculate angle to enemy
-		targetVector := nearestEnemy.Position.Sub(myShip.Position)
-		targetAngle := targetVector.Angle()
-
-		// Calculate angle difference
-		angleDiff := targetAngle - myShip.Rotation
-
-		// Normalize angle difference to [-π, π]
-		for angleDiff > math.Pi {
-			angleDiff -= 2 * math.Pi
-		}
-		for angleDiff < -math.Pi {
-			angleDiff += 2 * math.Pi
-		}
-
-		// Turn towards enemy
-		if math.Abs(angleDiff) > 0.1 {
-			if angleDiff > 0 {
-				turnLeft = true
-			} else {
-				turnRight = true
-			}
-		}
-
-		// Fire if pointing roughly at enemy
-		distance := targetVector.Length()
-		if math.Abs(angleDiff) < 0.3 && distance < 1000 {
-			fireWeapon = 0 // Fire first weapon
-		}
-
-		// Taunt enemies occasionally
-		if ai.random.Float64() < 0.01 {
-			ai.client.SendChatMessage("Prepare for battle!")
-		}
+		angleDiff := ai.calculateAngleToTarget(myShip, nearestEnemy.Position)
+		turnLeft, turnRight = ai.calculateTurnTowardsTarget(angleDiff)
+		fireWeapon = ai.calculateWeaponFiring(angleDiff, myShip.Position, nearestEnemy.Position)
+		ai.sendRandomTaunt()
 	}
 
 	ai.client.SendInput(thrust, turnLeft, turnRight, fireWeapon, false, false, 0, 0)
+}
+
+// calculateAngleToTarget computes the normalized angle difference to turn towards a target position.
+func (ai *AIClient) calculateAngleToTarget(myShip engine.ShipState, targetPosition physics.Vector2D) float64 {
+	targetVector := targetPosition.Sub(myShip.Position)
+	targetAngle := targetVector.Angle()
+	angleDiff := targetAngle - myShip.Rotation
+
+	return ai.normalizeAngleDifference(angleDiff)
+}
+
+// calculateTurnTowardsTarget determines turn direction based on angle difference to target.
+func (ai *AIClient) calculateTurnTowardsTarget(angleDiff float64) (turnLeft bool, turnRight bool) {
+	if math.Abs(angleDiff) > 0.1 {
+		if angleDiff > 0 {
+			return true, false
+		}
+		return false, true
+	}
+	return false, false
+}
+
+// calculateWeaponFiring determines if the ship should fire based on target alignment and distance.
+func (ai *AIClient) calculateWeaponFiring(angleDiff float64, myPosition, targetPosition physics.Vector2D) int {
+	distance := targetPosition.Sub(myPosition).Length()
+	if math.Abs(angleDiff) < 0.3 && distance < 1000 {
+		return 0 // Fire first weapon
+	}
+	return -1 // Don't fire
+}
+
+// sendRandomTaunt occasionally sends a taunt message to enemies.
+func (ai *AIClient) sendRandomTaunt() {
+	if ai.random.Float64() < 0.01 {
+		ai.client.SendChatMessage("Prepare for battle!")
+	}
 }
 
 // executeDefenderBehavior makes the AI defend home planets
