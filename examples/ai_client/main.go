@@ -361,43 +361,58 @@ func (ai *AIClient) executePatrolBehavior() (turnLeft bool, turnRight bool) {
 
 // executeBomberBehavior makes the AI attack enemy planets
 func (ai *AIClient) executeBomberBehavior(myShip engine.ShipState) {
-	// Find enemy planets to bomb
 	target := ai.findEnemyPlanet(myShip.Position)
 
 	thrust := true
-	turnLeft := false
-	turnRight := false
-	beamDown := false
-
-	if target != nil {
-		// Move towards target planet
-		targetVector := target.Position.Sub(myShip.Position)
-		distance := targetVector.Length()
-		targetAngle := targetVector.Angle()
-
-		angleDiff := targetAngle - myShip.Rotation
-		for angleDiff > math.Pi {
-			angleDiff -= 2 * math.Pi
-		}
-		for angleDiff < -math.Pi {
-			angleDiff += 2 * math.Pi
-		}
-
-		if math.Abs(angleDiff) > 0.1 {
-			if angleDiff > 0 {
-				turnLeft = true
-			} else {
-				turnRight = true
-			}
-		}
-
-		// If close to planet, beam down armies (bomb)
-		if distance < 100 && myShip.Armies > 0 {
-			beamDown = true
-		}
-	}
+	turnLeft, turnRight := ai.calculateBomberNavigation(myShip, target)
+	beamDown := ai.shouldBeamDown(myShip, target)
 
 	ai.client.SendInput(thrust, turnLeft, turnRight, -1, beamDown, false, 1, 0)
+}
+
+// calculateBomberNavigation determines the navigation controls for approaching a target planet.
+func (ai *AIClient) calculateBomberNavigation(myShip engine.ShipState, target *engine.PlanetState) (turnLeft bool, turnRight bool) {
+	if target == nil {
+		return false, false
+	}
+
+	targetVector := target.Position.Sub(myShip.Position)
+	targetAngle := targetVector.Angle()
+	angleDiff := ai.normalizeBomberAngle(targetAngle - myShip.Rotation)
+
+	return ai.determineBomberTurn(angleDiff)
+}
+
+// normalizeBomberAngle normalizes angle difference to the range [-π, π] for bomber navigation.
+func (ai *AIClient) normalizeBomberAngle(angleDiff float64) float64 {
+	for angleDiff > math.Pi {
+		angleDiff -= 2 * math.Pi
+	}
+	for angleDiff < -math.Pi {
+		angleDiff += 2 * math.Pi
+	}
+	return angleDiff
+}
+
+// determineBomberTurn calculates turn direction based on angle difference for bombing approach.
+func (ai *AIClient) determineBomberTurn(angleDiff float64) (turnLeft bool, turnRight bool) {
+	if math.Abs(angleDiff) > 0.1 {
+		if angleDiff > 0 {
+			return true, false
+		}
+		return false, true
+	}
+	return false, false
+}
+
+// shouldBeamDown determines if the bomber should deploy armies based on proximity and army count.
+func (ai *AIClient) shouldBeamDown(myShip engine.ShipState, target *engine.PlanetState) bool {
+	if target == nil {
+		return false
+	}
+
+	distance := target.Position.Sub(myShip.Position).Length()
+	return distance < 100 && myShip.Armies > 0
 }
 
 // Helper functions for AI decision making
