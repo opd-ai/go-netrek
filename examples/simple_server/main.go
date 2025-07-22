@@ -17,51 +17,33 @@ import (
 )
 
 func main() {
-	// Command line flags
-	port := flag.String("port", "4566", "Server port")
-	maxClients := flag.Int("max-clients", 8, "Maximum number of clients")
-	flag.Parse()
+	// Parse command line arguments
+	port, maxClients := parseCommandLineFlags()
 
 	log.Println("Starting Simple Netrek Server...")
 
-	// Create a simple game configuration
-	gameConfig := createSimpleGameConfig(*port, *maxClients)
+	// Initialize and configure the game
+	game, gameConfig := initializeGame(port, maxClients)
 
-	// Create game engine
-	game := engine.NewGame(gameConfig)
-	log.Printf("Game created with %d teams and %d planets", len(gameConfig.Teams), len(gameConfig.Planets))
+	// Start the server
+	server := startGameServer(game, gameConfig, port)
 
-	// Create and start server
-	server := network.NewGameServer(game, gameConfig.MaxPlayers)
-	serverAddr := "localhost:" + *port
+	// Start background game loop
+	startGameLoop(game)
 
-	log.Printf("Starting server on %s", serverAddr)
-	if err := server.Start(serverAddr); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
-
-	// Start game loop in background
-	go func() {
-		log.Println("Starting game loop...")
-		for game.Running {
-			game.Update()
-			time.Sleep(time.Second / 60) // 60 FPS
-		}
-	}()
-
-	log.Printf("Server is ready! Connect with:")
-	log.Printf("  go run examples/ai_client/main.go -server=localhost:%s -name=Player1 -team=0", *port)
-	log.Printf("  go run examples/ai_client/main.go -server=localhost:%s -name=Player2 -team=1", *port)
+	// Display connection instructions
+	displayConnectionInstructions(port)
 
 	// Handle graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	handleGracefulShutdown(server, game)
+}
 
-	<-sigChan
-	log.Println("Shutting down server...")
-	server.Stop()
-	game.Stop()
-	log.Println("Server stopped.")
+// parseCommandLineFlags parses and returns command line arguments for server configuration.
+func parseCommandLineFlags() (string, int) {
+	port := flag.String("port", "4566", "Server port")
+	maxClients := flag.Int("max-clients", 8, "Maximum number of clients")
+	flag.Parse()
+	return *port, *maxClients
 }
 
 // createSimpleGameConfig creates a basic game configuration suitable for testing
@@ -142,4 +124,54 @@ func createSimpleGameConfig(port string, maxClients int) *config.GameConfig {
 			StartingArmies: 0,
 		},
 	}
+}
+
+// initializeGame creates and configures the game engine with the specified parameters.
+func initializeGame(port string, maxClients int) (*engine.Game, *config.GameConfig) {
+	gameConfig := createSimpleGameConfig(port, maxClients)
+	game := engine.NewGame(gameConfig)
+	log.Printf("Game created with %d teams and %d planets", len(gameConfig.Teams), len(gameConfig.Planets))
+	return game, gameConfig
+}
+
+// startGameServer creates and starts the network server for the game.
+func startGameServer(game *engine.Game, gameConfig *config.GameConfig, port string) *network.GameServer {
+	server := network.NewGameServer(game, gameConfig.MaxPlayers)
+	serverAddr := "localhost:" + port
+
+	log.Printf("Starting server on %s", serverAddr)
+	if err := server.Start(serverAddr); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+	return server
+}
+
+// startGameLoop initiates the background game update loop.
+func startGameLoop(game *engine.Game) {
+	go func() {
+		log.Println("Starting game loop...")
+		for game.Running {
+			game.Update()
+			time.Sleep(time.Second / 60) // 60 FPS
+		}
+	}()
+}
+
+// displayConnectionInstructions shows users how to connect clients to the server.
+func displayConnectionInstructions(port string) {
+	log.Printf("Server is ready! Connect with:")
+	log.Printf("  go run examples/ai_client/main.go -server=localhost:%s -name=Player1 -team=0", port)
+	log.Printf("  go run examples/ai_client/main.go -server=localhost:%s -name=Player2 -team=1", port)
+}
+
+// handleGracefulShutdown manages clean server shutdown on interruption signals.
+func handleGracefulShutdown(server *network.GameServer, game *engine.Game) {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	<-sigChan
+	log.Println("Shutting down server...")
+	server.Stop()
+	game.Stop()
+	log.Println("Server stopped.")
 }
