@@ -472,57 +472,72 @@ func (c *GameClient) attemptReconnect() {
 // readMessage reads a message from the server
 // readMessage reads a message from the server with context timeout support
 func (c *GameClient) readMessage(ctx context.Context) (MessageType, []byte, error) {
-	// Set read deadline based on context
+	c.setReadDeadline(ctx)
+	defer c.conn.SetReadDeadline(time.Time{}) // Clear deadline
+
+	resultChan := make(chan readResult, 1)
+
+	// Start read operation in separate goroutine
+	go c.executeRead(resultChan)
+
+	// Wait for completion or context cancellation
+	return c.waitForReadCompletion(ctx, resultChan)
+}
+
+// readResult contains the result of a read operation
+type readResult struct {
+	msgType MessageType
+	data    []byte
+	err     error
+}
+
+// setReadDeadline configures the read timeout based on context or fallback
+func (c *GameClient) setReadDeadline(ctx context.Context) {
 	if deadline, ok := ctx.Deadline(); ok {
 		c.conn.SetReadDeadline(deadline)
 	} else {
 		// Fallback to configured timeout
 		c.conn.SetReadDeadline(time.Now().Add(c.readTimeout))
 	}
-	defer c.conn.SetReadDeadline(time.Time{}) // Clear deadline
+}
 
-	// Channel to handle the read operation
-	type readResult struct {
-		msgType MessageType
-		data    []byte
-		err     error
-	}
-
-	resultChan := make(chan readResult, 1)
-
-	// Perform read operation in goroutine
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				resultChan <- readResult{err: fmt.Errorf("panic during read: %v", r)}
-			}
-		}()
-
-		// Read message type
-		var msgType MessageType
-		if err := binary.Read(c.conn, binary.BigEndian, &msgType); err != nil {
-			resultChan <- readResult{err: err}
-			return
+// executeRead performs the actual read operation with panic recovery
+func (c *GameClient) executeRead(resultChan chan readResult) {
+	defer func() {
+		if r := recover(); r != nil {
+			resultChan <- readResult{err: fmt.Errorf("panic during read: %v", r)}
 		}
-
-		// Read message length
-		var msgLen uint16
-		if err := binary.Read(c.conn, binary.BigEndian, &msgLen); err != nil {
-			resultChan <- readResult{err: err}
-			return
-		}
-
-		// Read message data
-		data := make([]byte, msgLen)
-		if _, err := io.ReadFull(c.conn, data); err != nil {
-			resultChan <- readResult{err: err}
-			return
-		}
-
-		resultChan <- readResult{msgType: msgType, data: data, err: nil}
 	}()
 
-	// Wait for read completion or context cancellation
+	msgType, data, err := c.readMessageData()
+	resultChan <- readResult{msgType: msgType, data: data, err: err}
+}
+
+// readMessageData reads the message type, length, and data from the connection
+func (c *GameClient) readMessageData() (MessageType, []byte, error) {
+	// Read message type
+	var msgType MessageType
+	if err := binary.Read(c.conn, binary.BigEndian, &msgType); err != nil {
+		return 0, nil, err
+	}
+
+	// Read message length
+	var msgLen uint16
+	if err := binary.Read(c.conn, binary.BigEndian, &msgLen); err != nil {
+		return 0, nil, err
+	}
+
+	// Read message data
+	data := make([]byte, msgLen)
+	if _, err := io.ReadFull(c.conn, data); err != nil {
+		return 0, nil, err
+	}
+
+	return msgType, data, nil
+}
+
+// waitForReadCompletion waits for read completion or handles context cancellation
+func (c *GameClient) waitForReadCompletion(ctx context.Context, resultChan chan readResult) (MessageType, []byte, error) {
 	select {
 	case result := <-resultChan:
 		return result.msgType, result.data, result.err
@@ -544,15 +559,30 @@ func (c *GameClient) sendMessage(msgType MessageType, msg interface{}) error {
 
 // sendMessageWithContext sends a message to the server with explicit context
 func (c *GameClient) sendMessageWithContext(ctx context.Context, msgType MessageType, msg interface{}) error {
-	data, err := c.serializeMessage(msg)
+	data, err := c.prepareMessageData(msg)
 	if err != nil {
 		return err
 	}
 
-	if err := c.validateMessageSize(data); err != nil {
-		return err
+	return c.sendPreparedMessage(ctx, msgType, data)
+}
+
+// prepareMessageData serializes and validates the message data
+func (c *GameClient) prepareMessageData(msg interface{}) ([]byte, error) {
+	data, err := c.serializeMessage(msg)
+	if err != nil {
+		return nil, err
 	}
 
+	if err := c.validateMessageSize(data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+// sendPreparedMessage sends already serialized data to the server with proper synchronization
+func (c *GameClient) sendPreparedMessage(ctx context.Context, msgType MessageType, data []byte) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -608,29 +638,32 @@ func (c *GameClient) setWriteDeadline(ctx context.Context) {
 
 // performAsyncWrite executes the write operation in a goroutine with context cancellation
 func (c *GameClient) performAsyncWrite(ctx context.Context, msgType MessageType, data []byte) error {
-	// Channel to handle the write operation
-	type writeResult struct {
-		err error
-	}
+	resultChan := make(chan error, 1)
 
-	resultChan := make(chan writeResult, 1)
+	// Start write operation in separate goroutine
+	go c.executeWrite(resultChan, msgType, data)
 
-	// Perform write operation in goroutine
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				resultChan <- writeResult{err: fmt.Errorf("panic during write: %v", r)}
-			}
-		}()
+	// Wait for completion or context cancellation
+	return c.waitForWriteCompletion(ctx, resultChan)
+}
 
-		err := c.writeMessageData(msgType, data)
-		resultChan <- writeResult{err: err}
+// executeWrite performs the actual write operation with panic recovery
+func (c *GameClient) executeWrite(resultChan chan error, msgType MessageType, data []byte) {
+	defer func() {
+		if r := recover(); r != nil {
+			resultChan <- fmt.Errorf("panic during write: %v", r)
+		}
 	}()
 
-	// Wait for write completion or context cancellation
+	err := c.writeMessageData(msgType, data)
+	resultChan <- err
+}
+
+// waitForWriteCompletion waits for write completion or handles context cancellation
+func (c *GameClient) waitForWriteCompletion(ctx context.Context, resultChan chan error) error {
 	select {
-	case result := <-resultChan:
-		return result.err
+	case err := <-resultChan:
+		return err
 	case <-ctx.Done():
 		// Force connection close on timeout
 		c.conn.Close()
