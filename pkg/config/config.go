@@ -60,7 +60,23 @@ func LoadConfigFromEnv() (*EnvironmentConfig, error) {
 
 // validateEnvironmentConfig validates the environment configuration
 func validateEnvironmentConfig(config *EnvironmentConfig) error {
-	// Validate server address
+	if err := validateNetworkConfig(config); err != nil {
+		return err
+	}
+
+	if err := validateTimeoutConfig(config); err != nil {
+		return err
+	}
+
+	if err := validateGameplayConfig(config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateNetworkConfig validates network-related configuration settings
+func validateNetworkConfig(config *EnvironmentConfig) error {
 	if strings.TrimSpace(config.ServerAddr) == "" {
 		return &ValidationError{
 			Field:   "ServerAddr",
@@ -69,7 +85,6 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 		}
 	}
 
-	// Validate server port
 	if config.ServerPort < 1024 || config.ServerPort > 65535 {
 		return &ValidationError{
 			Field:   "ServerPort",
@@ -78,7 +93,6 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 		}
 	}
 
-	// Validate max clients
 	if config.MaxClients < 1 || config.MaxClients > 1000 {
 		return &ValidationError{
 			Field:   "MaxClients",
@@ -87,7 +101,11 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 		}
 	}
 
-	// Validate timeouts
+	return nil
+}
+
+// validateTimeoutConfig validates timeout-related configuration settings
+func validateTimeoutConfig(config *EnvironmentConfig) error {
 	if config.ReadTimeout < time.Second || config.ReadTimeout > time.Minute {
 		return &ValidationError{
 			Field:   "ReadTimeout",
@@ -104,7 +122,11 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 		}
 	}
 
-	// Validate update rate
+	return nil
+}
+
+// validateGameplayConfig validates gameplay-related configuration settings
+func validateGameplayConfig(config *EnvironmentConfig) error {
 	if config.UpdateRate < 1 || config.UpdateRate > 100 {
 		return &ValidationError{
 			Field:   "UpdateRate",
@@ -113,7 +135,6 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 		}
 	}
 
-	// Validate ticks per state
 	if config.TicksPerState < 1 || config.TicksPerState > 10 {
 		return &ValidationError{
 			Field:   "TicksPerState",
@@ -122,7 +143,6 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 		}
 	}
 
-	// Validate world size
 	if config.WorldSize < 1000.0 || config.WorldSize > 100000.0 {
 		return &ValidationError{
 			Field:   "WorldSize",

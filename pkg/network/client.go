@@ -544,40 +544,70 @@ func (c *GameClient) sendMessage(msgType MessageType, msg interface{}) error {
 
 // sendMessageWithContext sends a message to the server with explicit context
 func (c *GameClient) sendMessageWithContext(ctx context.Context, msgType MessageType, msg interface{}) error {
-	// Serialize message
-	var data []byte
-	var err error
-
-	if msg != nil {
-		data, err = json.Marshal(msg)
-		if err != nil {
-			return fmt.Errorf("failed to marshal message: %w", err)
-		}
-	} else {
-		data = []byte{}
+	data, err := c.serializeMessage(msg)
+	if err != nil {
+		return err
 	}
 
-	// Check message size
-	if len(data) > 65535 {
-		return errors.New("message too large")
+	if err := c.validateMessageSize(data); err != nil {
+		return err
 	}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if err := c.validateConnection(); err != nil {
+		return err
+	}
+
+	c.setWriteDeadline(ctx)
+	defer c.conn.SetWriteDeadline(time.Time{}) // Clear deadline
+
+	return c.performAsyncWrite(ctx, msgType, data)
+}
+
+// serializeMessage serializes the message payload to JSON bytes
+func (c *GameClient) serializeMessage(msg interface{}) ([]byte, error) {
+	if msg == nil {
+		return []byte{}, nil
+	}
+
+	data, err := json.Marshal(msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal message: %w", err)
+	}
+
+	return data, nil
+}
+
+// validateMessageSize checks if the message size is within allowed limits
+func (c *GameClient) validateMessageSize(data []byte) error {
+	if len(data) > 65535 {
+		return errors.New("message too large")
+	}
+	return nil
+}
+
+// validateConnection ensures the client is connected before sending
+func (c *GameClient) validateConnection() error {
 	if !c.connected {
 		return errors.New("not connected")
 	}
+	return nil
+}
 
-	// Set write deadline based on context
+// setWriteDeadline configures the write timeout based on context or fallback
+func (c *GameClient) setWriteDeadline(ctx context.Context) {
 	if deadline, ok := ctx.Deadline(); ok {
 		c.conn.SetWriteDeadline(deadline)
 	} else {
 		// Fallback to configured timeout
 		c.conn.SetWriteDeadline(time.Now().Add(c.writeTimeout))
 	}
-	defer c.conn.SetWriteDeadline(time.Time{}) // Clear deadline
+}
 
+// performAsyncWrite executes the write operation in a goroutine with context cancellation
+func (c *GameClient) performAsyncWrite(ctx context.Context, msgType MessageType, data []byte) error {
 	// Channel to handle the write operation
 	type writeResult struct {
 		err error
@@ -593,26 +623,8 @@ func (c *GameClient) sendMessageWithContext(ctx context.Context, msgType Message
 			}
 		}()
 
-		// Write message type
-		if err := binary.Write(c.conn, binary.BigEndian, msgType); err != nil {
-			resultChan <- writeResult{err: err}
-			return
-		}
-
-		// Write message length
-		msgLen := uint16(len(data))
-		if err := binary.Write(c.conn, binary.BigEndian, msgLen); err != nil {
-			resultChan <- writeResult{err: err}
-			return
-		}
-
-		// Write message data
-		if _, err := c.conn.Write(data); err != nil {
-			resultChan <- writeResult{err: err}
-			return
-		}
-
-		resultChan <- writeResult{err: nil}
+		err := c.writeMessageData(msgType, data)
+		resultChan <- writeResult{err: err}
 	}()
 
 	// Wait for write completion or context cancellation
@@ -624,6 +636,27 @@ func (c *GameClient) sendMessageWithContext(ctx context.Context, msgType Message
 		c.conn.Close()
 		return ctx.Err()
 	}
+}
+
+// writeMessageData writes the message type, length, and data to the connection
+func (c *GameClient) writeMessageData(msgType MessageType, data []byte) error {
+	// Write message type
+	if err := binary.Write(c.conn, binary.BigEndian, msgType); err != nil {
+		return err
+	}
+
+	// Write message length
+	msgLen := uint16(len(data))
+	if err := binary.Write(c.conn, binary.BigEndian, msgLen); err != nil {
+		return err
+	}
+
+	// Write message data
+	if _, err := c.conn.Write(data); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Client event types
