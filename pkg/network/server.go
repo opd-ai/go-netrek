@@ -859,67 +859,92 @@ func (s *GameServer) readMessage(ctx context.Context, conn net.Conn) (MessageTyp
 
 // sendMessage sends a message to a connection with context timeout support
 func (s *GameServer) sendMessage(ctx context.Context, conn net.Conn, msgType MessageType, msg interface{}) error {
+	data, err := s.prepareServerMessage(msg)
+	if err != nil {
+		return err
+	}
+
+	return s.sendPreparedServerMessage(ctx, conn, msgType, data)
+}
+
+// prepareServerMessage serializes and validates the message data for server transmission
+func (s *GameServer) prepareServerMessage(msg interface{}) ([]byte, error) {
 	// Serialize message
 	data, err := json.Marshal(msg)
 	if err != nil {
-		return fmt.Errorf("failed to marshal message: %w", err)
+		return nil, fmt.Errorf("failed to marshal message: %w", err)
 	}
 
 	// Check message size
 	if len(data) > validation.MaxMessageSize {
-		return fmt.Errorf("message too large: %d bytes (max %d)", len(data), validation.MaxMessageSize)
+		return nil, fmt.Errorf("message too large: %d bytes (max %d)", len(data), validation.MaxMessageSize)
 	}
 
-	// Set write deadline based on context
+	return data, nil
+}
+
+// sendPreparedServerMessage sends already serialized data to connection with timeout handling
+func (s *GameServer) sendPreparedServerMessage(ctx context.Context, conn net.Conn, msgType MessageType, data []byte) error {
+	s.setServerWriteDeadline(ctx, conn)
+	defer conn.SetWriteDeadline(time.Time{}) // Clear deadline
+
+	resultChan := make(chan error, 1)
+
+	// Start write operation in separate goroutine
+	go s.executeServerWrite(resultChan, conn, msgType, data)
+
+	// Wait for completion or context cancellation
+	return s.waitForServerWriteCompletion(ctx, conn, resultChan)
+}
+
+// setServerWriteDeadline configures the write timeout based on context or fallback
+func (s *GameServer) setServerWriteDeadline(ctx context.Context, conn net.Conn) {
 	if deadline, ok := ctx.Deadline(); ok {
 		conn.SetWriteDeadline(deadline)
 	} else {
 		// Fallback to configured timeout
 		conn.SetWriteDeadline(time.Now().Add(s.writeTimeout))
 	}
-	defer conn.SetWriteDeadline(time.Time{}) // Clear deadline
+}
 
-	// Channel to handle the write operation
-	type writeResult struct {
-		err error
-	}
-
-	resultChan := make(chan writeResult, 1)
-
-	// Perform write operation in goroutine
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				resultChan <- writeResult{err: fmt.Errorf("panic during write: %v", r)}
-			}
-		}()
-
-		// Write message type
-		if err := binary.Write(conn, binary.BigEndian, msgType); err != nil {
-			resultChan <- writeResult{err: err}
-			return
+// executeServerWrite performs the actual write operation with panic recovery
+func (s *GameServer) executeServerWrite(resultChan chan error, conn net.Conn, msgType MessageType, data []byte) {
+	defer func() {
+		if r := recover(); r != nil {
+			resultChan <- fmt.Errorf("panic during write: %v", r)
 		}
-
-		// Write message length
-		msgLen := uint16(len(data))
-		if err := binary.Write(conn, binary.BigEndian, msgLen); err != nil {
-			resultChan <- writeResult{err: err}
-			return
-		}
-
-		// Write message data
-		if _, err := conn.Write(data); err != nil {
-			resultChan <- writeResult{err: err}
-			return
-		}
-
-		resultChan <- writeResult{err: nil}
 	}()
 
-	// Wait for write completion or context cancellation
+	err := s.writeServerMessageData(conn, msgType, data)
+	resultChan <- err
+}
+
+// writeServerMessageData writes the message type, length, and data to the connection
+func (s *GameServer) writeServerMessageData(conn net.Conn, msgType MessageType, data []byte) error {
+	// Write message type
+	if err := binary.Write(conn, binary.BigEndian, msgType); err != nil {
+		return err
+	}
+
+	// Write message length
+	msgLen := uint16(len(data))
+	if err := binary.Write(conn, binary.BigEndian, msgLen); err != nil {
+		return err
+	}
+
+	// Write message data
+	if _, err := conn.Write(data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// waitForServerWriteCompletion waits for write completion or handles context cancellation
+func (s *GameServer) waitForServerWriteCompletion(ctx context.Context, conn net.Conn, resultChan chan error) error {
 	select {
-	case result := <-resultChan:
-		return result.err
+	case err := <-resultChan:
+		return err
 	case <-ctx.Done():
 		// Force connection close on timeout
 		conn.Close()
