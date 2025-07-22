@@ -23,6 +23,27 @@ func main() {
 	logger := logging.NewLogger()
 	ctx := context.Background()
 
+	// Parse command line flags and handle default config creation
+	configPath := parseCommandLineFlags(logger, ctx)
+
+	// Load and configure the game
+	gameConfig := loadGameConfiguration(logger, ctx, configPath)
+
+	// Initialize core game components
+	_, server := initializeGameComponents(gameConfig)
+
+	// Setup health monitoring
+	healthServer := setupHealthMonitoring(logger, ctx, server)
+
+	// Start the game server
+	startGameServer(logger, ctx, server, gameConfig)
+
+	// Handle graceful shutdown
+	handleGracefulShutdown(logger, ctx, healthServer, server)
+}
+
+// parseCommandLineFlags parses command line arguments and handles default config creation if requested.
+func parseCommandLineFlags(logger *logging.Logger, ctx context.Context) string {
 	configPath := flag.String("config", "config.json", "Path to configuration file")
 	createDefault := flag.Bool("default", false, "Create default configuration file")
 	flag.Parse()
@@ -39,22 +60,27 @@ func main() {
 		logger.Info(ctx, "Created default configuration file",
 			"config_path", *configPath,
 		)
-		return
+		os.Exit(0)
 	}
 
-	// Load configuration
+	return *configPath
+}
+
+// loadGameConfiguration loads the game configuration from file or uses defaults.
+func loadGameConfiguration(logger *logging.Logger, ctx context.Context, configPath string) *config.GameConfig {
 	var gameConfig *config.GameConfig
 
-	if _, err := os.Stat(*configPath); os.IsNotExist(err) {
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		logger.Info(ctx, "Configuration file not found, using default configuration",
-			"config_path", *configPath,
+			"config_path", configPath,
 		)
 		gameConfig = config.DefaultConfig()
 	} else {
-		gameConfig, err = config.LoadConfig(*configPath)
+		var err error
+		gameConfig, err = config.LoadConfig(configPath)
 		if err != nil {
 			logger.Error(ctx, "Failed to load configuration", err,
-				"config_path", *configPath,
+				"config_path", configPath,
 			)
 			os.Exit(1)
 		}
@@ -66,13 +92,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Create game
+	return gameConfig
+}
+
+// initializeGameComponents creates the core game engine and server components.
+func initializeGameComponents(gameConfig *config.GameConfig) (*engine.Game, *network.GameServer) {
 	game := engine.NewGame(gameConfig)
-
-	// Create server
 	server := network.NewGameServer(game, gameConfig.MaxPlayers)
+	return game, server
+}
 
-	// Setup health checks
+// setupHealthMonitoring configures and starts the health check HTTP server.
+func setupHealthMonitoring(logger *logging.Logger, ctx context.Context, server *network.GameServer) *http.Server {
 	healthChecker := health.NewHealthChecker()
 
 	// Add game engine health check
@@ -92,24 +123,8 @@ func main() {
 		return int64(m.Alloc / 1024 / 1024)
 	}))
 
-	// Start health check HTTP server
-	healthPort := "8080" // Default health check port
-	if envPort := os.Getenv("NETREK_HEALTH_PORT"); envPort != "" {
-		if _, err := strconv.Atoi(envPort); err == nil {
-			healthPort = envPort
-		}
-	}
-
-	healthMux := http.NewServeMux()
-	healthMux.HandleFunc("/health", healthChecker.LivenessHandler)
-	healthMux.HandleFunc("/ready", healthChecker.ReadinessHandler)
-
-	healthServer := &http.Server{
-		Addr:         ":" + healthPort,
-		Handler:      healthMux,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
-	}
+	healthPort := determineHealthPort()
+	healthServer := createHealthServer(healthPort, healthChecker)
 
 	// Start health check server in background
 	go func() {
@@ -121,7 +136,36 @@ func main() {
 		}
 	}()
 
-	// Start server
+	return healthServer
+}
+
+// determineHealthPort gets the health check port from environment or uses default.
+func determineHealthPort() string {
+	healthPort := "8080" // Default health check port
+	if envPort := os.Getenv("NETREK_HEALTH_PORT"); envPort != "" {
+		if _, err := strconv.Atoi(envPort); err == nil {
+			healthPort = envPort
+		}
+	}
+	return healthPort
+}
+
+// createHealthServer creates and configures the HTTP server for health checks.
+func createHealthServer(healthPort string, healthChecker *health.HealthChecker) *http.Server {
+	healthMux := http.NewServeMux()
+	healthMux.HandleFunc("/health", healthChecker.LivenessHandler)
+	healthMux.HandleFunc("/ready", healthChecker.ReadinessHandler)
+
+	return &http.Server{
+		Addr:         ":" + healthPort,
+		Handler:      healthMux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+	}
+}
+
+// startGameServer validates configuration and starts the game server.
+func startGameServer(logger *logging.Logger, ctx context.Context, server *network.GameServer, gameConfig *config.GameConfig) {
 	serverAddr := gameConfig.NetworkConfig.ServerAddress
 	if serverAddr == "" {
 		logger.Error(ctx, "Server address not configured", nil,
@@ -140,8 +184,10 @@ func main() {
 		)
 		os.Exit(1)
 	}
+}
 
-	// Handle graceful shutdown
+// handleGracefulShutdown waits for shutdown signals and gracefully stops all services.
+func handleGracefulShutdown(logger *logging.Logger, ctx context.Context, healthServer *http.Server, server *network.GameServer) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
