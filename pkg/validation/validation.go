@@ -66,44 +66,80 @@ func (v *MessageValidator) ValidateMessage(data []byte, clientID string) error {
 	return nil
 }
 
-// ValidatePlayerName validates and sanitizes a player name
+// ValidatePlayerName validates and sanitizes player names according to game rules.
 func ValidatePlayerName(name string) (string, error) {
+	if err := validatePlayerNameLength(name); err != nil {
+		return "", err
+	}
+
+	if err := validatePlayerNameEncoding(name); err != nil {
+		return "", err
+	}
+
+	trimmed, err := processPlayerNameWhitespace(name)
+	if err != nil {
+		return "", err
+	}
+
+	if err := validatePlayerNameCharacters(trimmed); err != nil {
+		return "", err
+	}
+
+	return sanitizePlayerName(trimmed), nil
+}
+
+// validatePlayerNameLength checks if the player name meets length requirements.
+func validatePlayerNameLength(name string) error {
 	if name == "" {
-		return "", fmt.Errorf("player name cannot be empty")
+		return fmt.Errorf("player name cannot be empty")
 	}
 
-	// Check length
 	if len(name) > MaxPlayerNameLen {
-		return "", fmt.Errorf("player name too long: %d characters (max %d)", len(name), MaxPlayerNameLen)
+		return fmt.Errorf("player name too long: %d characters (max %d)", len(name), MaxPlayerNameLen)
 	}
 
-	// Check UTF-8 validity
+	return nil
+}
+
+// validatePlayerNameEncoding checks if the player name contains valid UTF-8 characters.
+func validatePlayerNameEncoding(name string) error {
 	if !utf8.ValidString(name) {
-		return "", fmt.Errorf("player name contains invalid UTF-8 characters")
+		return fmt.Errorf("player name contains invalid UTF-8 characters")
 	}
 
-	// Trim whitespace
+	return nil
+}
+
+// processPlayerNameWhitespace trims whitespace and validates the result.
+func processPlayerNameWhitespace(name string) (string, error) {
 	trimmed := strings.TrimSpace(name)
 	if trimmed == "" {
 		return "", fmt.Errorf("player name cannot be only whitespace")
 	}
 
+	return trimmed, nil
+}
+
+// validatePlayerNameCharacters checks for control characters and valid character set.
+func validatePlayerNameCharacters(name string) error {
 	// Check for control characters first
-	for _, r := range trimmed {
+	for _, r := range name {
 		if unicode.IsControl(r) {
-			return "", fmt.Errorf("player name contains control characters")
+			return fmt.Errorf("player name contains control characters")
 		}
 	}
 
 	// Check for allowed character set
-	if !validPlayerNameChars.MatchString(trimmed) {
-		return "", fmt.Errorf("player name contains invalid characters (only alphanumeric, spaces, hyphens, underscores, and basic punctuation allowed)")
+	if !validPlayerNameChars.MatchString(name) {
+		return fmt.Errorf("player name contains invalid characters (only alphanumeric, spaces, hyphens, underscores, and basic punctuation allowed)")
 	}
 
-	// Escape HTML to prevent XSS
-	sanitized := html.EscapeString(trimmed)
+	return nil
+}
 
-	return sanitized, nil
+// sanitizePlayerName escapes HTML to prevent XSS attacks.
+func sanitizePlayerName(name string) string {
+	return html.EscapeString(name)
 }
 
 // ValidateChatMessage validates and sanitizes a chat message
