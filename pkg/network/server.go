@@ -789,64 +789,98 @@ func (s *GameServer) addAllPlanets(partialState *engine.GameState, currentState 
 
 // readMessage reads a message from a connection
 // readMessage reads a message from a connection with context timeout support
+// readMessage reads a message from the connection with context timeout support
 func (s *GameServer) readMessage(ctx context.Context, conn net.Conn) (MessageType, []byte, error) {
-	// Set read deadline based on context
+	s.configureReadDeadline(ctx, conn)
+	defer conn.SetReadDeadline(time.Time{}) // Clear deadline
+
+	resultChan := make(chan readResult, 1)
+	go s.executeAsyncRead(conn, resultChan)
+
+	return s.waitForReadResult(ctx, conn, resultChan)
+}
+
+// configureReadDeadline sets the read deadline based on context or fallback timeout
+func (s *GameServer) configureReadDeadline(ctx context.Context, conn net.Conn) {
 	if deadline, ok := ctx.Deadline(); ok {
 		conn.SetReadDeadline(deadline)
 	} else {
 		// Fallback to configured timeout
 		conn.SetReadDeadline(time.Now().Add(s.readTimeout))
 	}
-	defer conn.SetReadDeadline(time.Time{}) // Clear deadline
+}
 
-	// Channel to handle the read operation
-	type readResult struct {
-		msgType MessageType
-		data    []byte
-		err     error
-	}
-
-	resultChan := make(chan readResult, 1)
-
-	// Perform read operation in goroutine
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				resultChan <- readResult{err: fmt.Errorf("panic during read: %v", r)}
-			}
-		}()
-
-		// Read message type
-		var msgType MessageType
-		if err := binary.Read(conn, binary.BigEndian, &msgType); err != nil {
-			resultChan <- readResult{err: err}
-			return
+// executeAsyncRead performs the read operation in a goroutine with panic recovery
+func (s *GameServer) executeAsyncRead(conn net.Conn, resultChan chan<- readResult) {
+	defer func() {
+		if r := recover(); r != nil {
+			resultChan <- readResult{err: fmt.Errorf("panic during read: %v", r)}
 		}
-
-		// Read message length
-		var msgLen uint16
-		if err := binary.Read(conn, binary.BigEndian, &msgLen); err != nil {
-			resultChan <- readResult{err: err}
-			return
-		}
-
-		// Check message size limit
-		if int(msgLen) > validation.MaxMessageSize {
-			resultChan <- readResult{err: fmt.Errorf("message too large: %d bytes (max %d)", msgLen, validation.MaxMessageSize)}
-			return
-		}
-
-		// Read message data
-		data := make([]byte, msgLen)
-		if _, err := io.ReadFull(conn, data); err != nil {
-			resultChan <- readResult{err: err}
-			return
-		}
-
-		resultChan <- readResult{msgType: msgType, data: data, err: nil}
 	}()
 
-	// Wait for read completion or context cancellation
+	msgType, err := s.readMessageType(conn)
+	if err != nil {
+		resultChan <- readResult{err: err}
+		return
+	}
+
+	msgLen, err := s.readMessageLength(conn)
+	if err != nil {
+		resultChan <- readResult{err: err}
+		return
+	}
+
+	if err := s.validateMessageSize(msgLen); err != nil {
+		resultChan <- readResult{err: err}
+		return
+	}
+
+	data, err := s.readMessagePayload(conn, msgLen)
+	if err != nil {
+		resultChan <- readResult{err: err}
+		return
+	}
+
+	resultChan <- readResult{msgType: msgType, data: data, err: nil}
+}
+
+// readMessageType reads the message type from the connection
+func (s *GameServer) readMessageType(conn net.Conn) (MessageType, error) {
+	var msgType MessageType
+	if err := binary.Read(conn, binary.BigEndian, &msgType); err != nil {
+		return 0, err
+	}
+	return msgType, nil
+}
+
+// readMessageLength reads the message length from the connection
+func (s *GameServer) readMessageLength(conn net.Conn) (uint16, error) {
+	var msgLen uint16
+	if err := binary.Read(conn, binary.BigEndian, &msgLen); err != nil {
+		return 0, err
+	}
+	return msgLen, nil
+}
+
+// validateMessageSize validates that the message size is within limits
+func (s *GameServer) validateMessageSize(msgLen uint16) error {
+	if int(msgLen) > validation.MaxMessageSize {
+		return fmt.Errorf("message too large: %d bytes (max %d)", msgLen, validation.MaxMessageSize)
+	}
+	return nil
+}
+
+// readMessagePayload reads the message payload data from the connection
+func (s *GameServer) readMessagePayload(conn net.Conn, msgLen uint16) ([]byte, error) {
+	data := make([]byte, msgLen)
+	if _, err := io.ReadFull(conn, data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// waitForReadResult waits for the read operation to complete or context cancellation
+func (s *GameServer) waitForReadResult(ctx context.Context, conn net.Conn, resultChan <-chan readResult) (MessageType, []byte, error) {
 	select {
 	case result := <-resultChan:
 		return result.msgType, result.data, result.err
