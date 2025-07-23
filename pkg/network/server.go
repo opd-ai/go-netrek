@@ -764,7 +764,7 @@ func (s *GameServer) findPlayerShipPosition(client *Client, currentState *engine
 }
 
 // addNearbyEntities adds ships and projectiles within the view radius to the partial state.
-func (s *GameServer) addNearbyEntities(partialState *engine.GameState, currentState *engine.GameState, playerPos physics.Vector2D) {
+func (s *GameServer) addNearbyEntities(partialState, currentState *engine.GameState, playerPos physics.Vector2D) {
 	viewRadius := 3000.0 // Default view radius
 
 	// Add nearby ships
@@ -783,7 +783,7 @@ func (s *GameServer) addNearbyEntities(partialState *engine.GameState, currentSt
 }
 
 // addAllPlanets includes all planets in the partial state as they are always visible.
-func (s *GameServer) addAllPlanets(partialState *engine.GameState, currentState *engine.GameState) {
+func (s *GameServer) addAllPlanets(partialState, currentState *engine.GameState) {
 	partialState.Planets = currentState.Planets
 }
 

@@ -142,7 +142,7 @@ func TestLoadConfig_Success(t *testing.T) {
 		t.Fatalf("Failed to marshal test config: %v", err)
 	}
 
-	err = os.WriteFile(configPath, data, 0644)
+	err = os.WriteFile(configPath, data, 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write test config file: %v", err)
 	}
@@ -198,7 +198,7 @@ func TestLoadConfig_InvalidJSON(t *testing.T) {
 	configPath := filepath.Join(tempDir, "invalid_config.json")
 
 	invalidJSON := `{"worldSize": 5000, "maxPlayers": 8, invalid json}`
-	err := os.WriteFile(configPath, []byte(invalidJSON), 0644)
+	err := os.WriteFile(configPath, []byte(invalidJSON), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write invalid JSON file: %v", err)
 	}
@@ -303,7 +303,6 @@ func TestSaveConfig_NilConfig(t *testing.T) {
 
 	// nil marshals to "null" in JSON, which is valid
 	err := SaveConfig(nil, configPath)
-
 	if err != nil {
 		t.Errorf("Unexpected error when saving nil config: %v", err)
 	}

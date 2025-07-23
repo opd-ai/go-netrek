@@ -1164,7 +1164,7 @@ func (g *Game) endGameWithWinner() {
 	g.Status = GameStatusEnded
 	g.EndTime = time.Now()
 
-	var winnerID = -1
+	winnerID := -1
 	maxPlanets := 0
 
 	for id, t := range g.Teams {

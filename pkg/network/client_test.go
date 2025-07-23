@@ -38,6 +38,7 @@ func (m *mockConn) Read(b []byte) (int, error) {
 	}
 	return m.readBuf.Read(b)
 }
+
 func (m *mockConn) Write(b []byte) (int, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -46,6 +47,7 @@ func (m *mockConn) Write(b []byte) (int, error) {
 	}
 	return m.writeBuf.Write(b)
 }
+
 func (m *mockConn) Close() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()

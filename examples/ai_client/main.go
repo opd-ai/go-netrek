@@ -261,7 +261,7 @@ func (ai *AIClient) calculateAngleToTarget(myShip engine.ShipState, targetPositi
 }
 
 // calculateTurnTowardsTarget determines turn direction based on angle difference to target.
-func (ai *AIClient) calculateTurnTowardsTarget(angleDiff float64) (turnLeft bool, turnRight bool) {
+func (ai *AIClient) calculateTurnTowardsTarget(angleDiff float64) (turnLeft, turnRight bool) {
 	if math.Abs(angleDiff) > 0.1 {
 		if angleDiff > 0 {
 			return true, false
@@ -307,7 +307,7 @@ func (ai *AIClient) executeDefenderBehavior(myShip engine.ShipState) {
 }
 
 // initializeDefenseInputs sets up the default input state for defensive behavior.
-func (ai *AIClient) initializeDefenseInputs() (thrust bool, turnLeft bool, turnRight bool) {
+func (ai *AIClient) initializeDefenseInputs() (thrust, turnLeft, turnRight bool) {
 	return true, false, false
 }
 
@@ -318,7 +318,7 @@ func (ai *AIClient) calculateDistanceToHome(shipPosition, homePosition physics.V
 }
 
 // calculateNavigationToHome determines turn direction to navigate toward the home planet.
-func (ai *AIClient) calculateNavigationToHome(myShip engine.ShipState, homePlanet *engine.PlanetState) (turnLeft bool, turnRight bool) {
+func (ai *AIClient) calculateNavigationToHome(myShip engine.ShipState, homePlanet *engine.PlanetState) (turnLeft, turnRight bool) {
 	homeVector := homePlanet.Position.Sub(myShip.Position)
 	targetAngle := homeVector.Angle()
 	angleDiff := ai.normalizeAngleDifference(targetAngle - myShip.Rotation)
@@ -338,7 +338,7 @@ func (ai *AIClient) normalizeAngleDifference(angleDiff float64) float64 {
 }
 
 // determineTurnDirection decides whether to turn left or right based on angle difference.
-func (ai *AIClient) determineTurnDirection(angleDiff float64) (turnLeft bool, turnRight bool) {
+func (ai *AIClient) determineTurnDirection(angleDiff float64) (turnLeft, turnRight bool) {
 	if math.Abs(angleDiff) > 0.1 {
 		if angleDiff > 0 {
 			return true, false
@@ -349,7 +349,7 @@ func (ai *AIClient) determineTurnDirection(angleDiff float64) (turnLeft bool, tu
 }
 
 // executePatrolBehavior implements random patrol movement around the home planet.
-func (ai *AIClient) executePatrolBehavior() (turnLeft bool, turnRight bool) {
+func (ai *AIClient) executePatrolBehavior() (turnLeft, turnRight bool) {
 	if ai.random.Float64() < 0.2 {
 		if ai.random.Float64() < 0.5 {
 			return true, false
@@ -371,7 +371,7 @@ func (ai *AIClient) executeBomberBehavior(myShip engine.ShipState) {
 }
 
 // calculateBomberNavigation determines the navigation controls for approaching a target planet.
-func (ai *AIClient) calculateBomberNavigation(myShip engine.ShipState, target *engine.PlanetState) (turnLeft bool, turnRight bool) {
+func (ai *AIClient) calculateBomberNavigation(myShip engine.ShipState, target *engine.PlanetState) (turnLeft, turnRight bool) {
 	if target == nil {
 		return false, false
 	}
@@ -395,7 +395,7 @@ func (ai *AIClient) normalizeBomberAngle(angleDiff float64) float64 {
 }
 
 // determineBomberTurn calculates turn direction based on angle difference for bombing approach.
-func (ai *AIClient) determineBomberTurn(angleDiff float64) (turnLeft bool, turnRight bool) {
+func (ai *AIClient) determineBomberTurn(angleDiff float64) (turnLeft, turnRight bool) {
 	if math.Abs(angleDiff) > 0.1 {
 		if angleDiff > 0 {
 			return true, false

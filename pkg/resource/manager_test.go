@@ -58,7 +58,6 @@ func TestResourceManager_StartGoroutine(t *testing.T) {
 			defer wg.Done()
 			time.Sleep(100 * time.Millisecond) // Short work
 		})
-
 		if err != nil {
 			t.Errorf("Expected no error for goroutine %d, got: %v", i, err)
 		}
@@ -104,7 +103,6 @@ func TestResourceManager_StartGoroutinePanicRecovery(t *testing.T) {
 		defer func() { done <- true }()
 		panic("test panic")
 	})
-
 	if err != nil {
 		t.Errorf("Expected no error starting goroutine, got: %v", err)
 	}
@@ -292,7 +290,6 @@ func TestResourceManager_ShutdownTimeout(t *testing.T) {
 			}
 		}
 	})
-
 	if err != nil {
 		t.Errorf("Expected no error starting goroutine, got: %v", err)
 	}

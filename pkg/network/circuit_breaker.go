@@ -66,7 +66,6 @@ func (ns *NetworkService) Execute(ctx context.Context, operation NetworkOperatio
 	_, err := ns.breaker.Execute(func() (interface{}, error) {
 		return nil, operation()
 	})
-
 	if err != nil {
 		ns.logger.LogWithContext(ctx, slog.LevelError, "circuit breaker execution failed",
 			"error", err,

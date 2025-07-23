@@ -43,7 +43,6 @@ func TestResourceHealthCheck_Check_Healthy(t *testing.T) {
 
 	check := NewResourceHealthCheck(rm)
 	err := check.Check(context.Background())
-
 	if err != nil {
 		t.Errorf("Expected healthy check to pass, got error: %v", err)
 	}

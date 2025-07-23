@@ -145,7 +145,6 @@ func (is *InputSystem) sendInputToServer() {
 		beamAmount,
 		is.targetID,
 	)
-
 	if err != nil {
 		// Log error (use fmt.Printf since engo.Log doesn't exist)
 		// fmt.Printf("Failed to send input: %v\n", err)

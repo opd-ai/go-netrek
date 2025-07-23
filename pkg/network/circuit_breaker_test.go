@@ -27,7 +27,6 @@ func TestNetworkService_Execute(t *testing.T) {
 		err := ns.Execute(ctx, func() error {
 			return nil // Success
 		})
-
 		if err != nil {
 			t.Errorf("Expected nil error, got %v", err)
 		}
@@ -123,7 +122,6 @@ func TestNetworkService_CircuitBreakerRecovery(t *testing.T) {
 	err := ns.Execute(ctx, func() error {
 		return nil // Success
 	})
-
 	if err != nil {
 		t.Errorf("Expected successful operation, got error: %v", err)
 	}
@@ -160,7 +158,6 @@ func TestNetworkService_ExecuteWithRetry(t *testing.T) {
 			}
 			return nil // Succeed on third attempt
 		})
-
 		if err != nil {
 			t.Errorf("Expected eventual success, got error: %v", err)
 		}
