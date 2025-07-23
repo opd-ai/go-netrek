@@ -17,7 +17,7 @@ The go-netrek codebase demonstrates strong architectural foundations with clean 
 - ✅ **PHASE 1 COMPLETED** - Comprehensive error handling and observability
 - ✅ **PHASE 1 COMPLETED** - Health monitoring and structured logging
 - ✅ **PHASE 2 STARTED** - Circuit breaker implementation completed (Task 2.1)
-- ❌ Resource management and monitoring (Phase 2.2)
+- ✅ **PHASE 2 CONTINUED** - Resource management and monitoring completed (Task 2.2)
 - ❌ Full operational excellence features (Phase 3)
 
 ## PHASE 1 COMPLETION SUMMARY ✅
@@ -439,97 +439,25 @@ func (ns *NetworkService) sendMessageWithRetry(ctx context.Context, msg *Message
 - [ ] Automatic recovery detection within 30s
 - [ ] Circuit breaker state monitoring and alerting
 
-#### Task 2.2: Resource Management and Monitoring
-**Files to modify:** `pkg/engine/game.go`, `pkg/network/server.go`
+#### ✅ Task 2.2: Resource Management and Monitoring (COMPLETED - July 23, 2025)
+**Files created:** `pkg/resource/manager.go`, `pkg/resource/manager_test.go`, `pkg/resource/health.go`, `pkg/resource/health_test.go`, `pkg/resource/README.md`
+**Files modified:** `pkg/config/config.go`, `pkg/config/env_config_test.go`, `pkg/engine/game.go`, `cmd/server/main.go`
 
-```go
-// Implementation Requirements:
-1. Add memory limits and monitoring
-2. Implement proper goroutine lifecycle management
-3. Add resource cleanup on shutdown
-4. Resource usage metrics
-
-// Required Pattern:
-type ResourceManager struct {
-    maxMemoryMB     int64
-    maxGoroutines   int
-    shutdownTimeout time.Duration
-    goroutineCount  int64
-    memoryUsageMB   int64
-    mu              sync.RWMutex
-}
-
-func NewResourceManager(maxMemoryMB int64, maxGoroutines int) *ResourceManager {
-    return &ResourceManager{
-        maxMemoryMB:     maxMemoryMB,
-        maxGoroutines:   maxGoroutines,
-        shutdownTimeout: 30 * time.Second,
-    }
-}
-
-func (rm *ResourceManager) StartGoroutine(ctx context.Context, name string, fn func(context.Context)) error {
-    if !rm.canStartGoroutine() {
-        return fmt.Errorf("goroutine limit exceeded: %d", rm.maxGoroutines)
-    }
-    
-    rm.incrementGoroutineCount()
-    
-    go func() {
-        defer rm.decrementGoroutineCount()
-        defer func() {
-            if r := recover(); r != nil {
-                slog.Error("goroutine panic", "name", name, "panic", r)
-            }
-        }()
-        
-        fn(ctx)
-    }()
-    
-    return nil
-}
-
-func (rm *ResourceManager) CheckMemoryUsage() error {
-    var m runtime.MemStats
-    runtime.ReadMemStats(&m)
-    
-    currentMB := int64(m.Alloc / 1024 / 1024)
-    rm.mu.Lock()
-    rm.memoryUsageMB = currentMB
-    rm.mu.Unlock()
-    
-    if currentMB > rm.maxMemoryMB {
-        return fmt.Errorf("memory usage %dMB exceeds limit %dMB", currentMB, rm.maxMemoryMB)
-    }
-    
-    return nil
-}
-
-func (rm *ResourceManager) Shutdown(ctx context.Context) error {
-    shutdownCtx, cancel := context.WithTimeout(ctx, rm.shutdownTimeout)
-    defer cancel()
-    
-    // Wait for goroutines to finish
-    for {
-        if rm.getGoroutineCount() == 0 {
-            return nil
-        }
-        
-        select {
-        case <-time.After(100 * time.Millisecond):
-            continue
-        case <-shutdownCtx.Done():
-            return fmt.Errorf("shutdown timeout: %d goroutines still running", rm.getGoroutineCount())
-        }
-    }
-}
-```
+**Implementation Summary:**
+- Complete resource management system with memory and goroutine monitoring
+- Configurable resource limits via environment variables (MaxMemoryMB, MaxGoroutines, etc.)
+- Atomic counters for thread-safe resource tracking
+- Automatic resource limit enforcement with proper error handling
+- Graceful shutdown with configurable timeout and resource cleanup
+- Health check integration for resource status monitoring
+- Comprehensive test coverage with edge case handling
 
 **Acceptance Criteria:**
-- [ ] Memory usage stays within configured limits (500MB default)
-- [ ] No goroutine leaks during normal operation
-- [ ] Clean shutdown with resource cleanup within 30s
-- [ ] Resource monitoring and alerting via metrics
-- [ ] Automatic resource limit enforcement
+- [x] Memory usage stays within configured limits (500MB default)
+- [x] No goroutine leaks during normal operation
+- [x] Clean shutdown with resource cleanup within 30s
+- [x] Resource monitoring and alerting via metrics
+- [x] Automatic resource limit enforcement
 
 #### Task 2.3: Health Check Endpoints ✅ COMPLETED (July 22, 2025)
 **Files created:** `pkg/health/health.go`, `pkg/health/health_test.go`, `pkg/health/integration_test.go`, `pkg/health/README.md`
@@ -898,16 +826,17 @@ This roadmap provides a systematic transformation of go-netrek from a developmen
 **Project Status Update (July 22, 2025):**
 - ✅ **Phase 1 Complete:** All critical foundation requirements implemented
 - ✅ **Phase 2 Started:** Circuit breaker implementation completed (Task 2.1)
-- 🔄 **Phase 2 In Progress:** Resource management and monitoring (Task 2.2) ready to begin
+- 🔄 **Phase 2 In Progress:** Task 2.2 completed (Resource Management) - ready for Task 2.3
 - 📋 **Phase 3 Planned:** Operational excellence features await Phase 2 completion
 
 **Current Timeline Status:**
 - **Phase 1 Completed:** 2 weeks (July 20-22, 2025) - **ON SCHEDULE**
 - **Phase 2 Started:** Circuit breaker completed (July 22, 2025) - **ON SCHEDULE**
-- **Phase 2 Estimated Completion:** 2-3 weeks (targeting mid-August 2025)
-- **Phase 3 Estimated:** 2-3 weeks (targeting early September 2025)
+- **Phase 2 Continued:** Resource management completed (July 23, 2025) - **ON SCHEDULE**
+- **Phase 2 Estimated Completion:** 1-2 weeks (targeting early August 2025)
+- **Phase 3 Estimated:** 2-3 weeks (targeting mid-August 2025)
 
 **Resource Requirements:** 1-2 Go developers, 1 DevOps engineer (part-time)
-**Success Probability:** Very High - Phase 1 and Task 2.1 successful completion validates approach
+**Success Probability:** Very High - Phase 1, Task 2.1, and Task 2.2 successful completion validates approach
 
-The implementation has successfully established a secure, reliable foundation with circuit breaker protection while maintaining the core game functionality and performance characteristics that make go-netrek an engaging multiplayer experience. The codebase now includes production-ready network resilience patterns and is ready for the next phase of resource management optimization.
+The implementation has successfully established a secure, reliable foundation with circuit breaker protection and comprehensive resource management while maintaining the core game functionality and performance characteristics that make go-netrek an engaging multiplayer experience. The codebase now includes production-ready network resilience patterns and resource monitoring capabilities, making it ready for the final tasks of Phase 2.
