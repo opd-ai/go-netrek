@@ -359,6 +359,24 @@ func LoadConfig(path string) (*GameConfig, error) {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
+	// Apply custom ship configurations to the entity system
+	if len(config.ShipTypes) > 0 {
+		shipStats := make(map[string]entity.ShipStats)
+		for name, shipConfig := range config.ShipTypes {
+			shipStats[name] = entity.ShipStats{
+				MaxHull:      shipConfig.MaxHull,
+				MaxShields:   shipConfig.MaxShields,
+				MaxFuel:      shipConfig.MaxFuel,
+				Acceleration: shipConfig.Acceleration,
+				TurnRate:     shipConfig.TurnRate,
+				MaxSpeed:     shipConfig.MaxSpeed,
+				WeaponSlots:  shipConfig.WeaponSlots,
+				MaxArmies:    shipConfig.MaxArmies,
+			}
+		}
+		entity.SetShipTypeStats(shipStats)
+	}
+
 	return &config, nil
 }
 

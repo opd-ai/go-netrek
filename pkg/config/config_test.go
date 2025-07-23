@@ -184,7 +184,7 @@ func TestLoadConfig_FileNotFound(t *testing.T) {
 	}
 
 	// Check error message contains expected information
-	expectedSubstring := "failed to open config file"
+	expectedSubstring := "failed to read config file"
 	if err != nil && len(err.Error()) > 0 {
 		if !contains(err.Error(), expectedSubstring) {
 			t.Errorf("Expected error to contain '%s', got '%s'", expectedSubstring, err.Error())
