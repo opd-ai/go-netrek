@@ -251,17 +251,50 @@ func getShipStats(class ShipClass) ShipStats {
 			WeaponSlots:  3,
 			MaxArmies:    5,
 		}
-	// Other ship classes would be defined here
-	default:
+	case Cruiser:
 		return ShipStats{
-			MaxHull:      120,
+			MaxHull:      200,
+			MaxShields:   200,
+			MaxFuel:      1400,
+			Acceleration: 120,
+			TurnRate:     2.0,
+			MaxSpeed:     220,
+			WeaponSlots:  4,
+			MaxArmies:    8,
+		}
+	case Battleship:
+		return ShipStats{
+			MaxHull:      300,
+			MaxShields:   250,
+			MaxFuel:      1600,
+			Acceleration: 80,
+			TurnRate:     1.5,
+			MaxSpeed:     180,
+			WeaponSlots:  5,
+			MaxArmies:    12,
+		}
+	case Assault:
+		return ShipStats{
+			MaxHull:      180,
 			MaxShields:   120,
+			MaxFuel:      1300,
+			Acceleration: 140,
+			TurnRate:     2.2,
+			MaxSpeed:     240,
+			WeaponSlots:  3,
+			MaxArmies:    15,
+		}
+	default:
+		// Fallback to Scout stats for unknown classes
+		return ShipStats{
+			MaxHull:      100,
+			MaxShields:   100,
 			MaxFuel:      1000,
-			Acceleration: 180,
-			TurnRate:     2.8,
-			MaxSpeed:     280,
+			Acceleration: 200,
+			TurnRate:     3.0,
+			MaxSpeed:     300,
 			WeaponSlots:  2,
-			MaxArmies:    3,
+			MaxArmies:    2,
 		}
 	}
 }

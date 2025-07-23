@@ -518,6 +518,59 @@ func TestGetShipStats(t *testing.T) {
 	}
 }
 
+// TestShipClassDifferentiation verifies that each ship class has distinct stats
+func TestShipClassDifferentiation(t *testing.T) {
+	position := physics.Vector2D{X: 0, Y: 0}
+
+	// Create ships of each class
+	scout := NewShip(1, Scout, 1, position)
+	destroyer := NewShip(2, Destroyer, 1, position)
+	cruiser := NewShip(3, Cruiser, 1, position)
+	battleship := NewShip(4, Battleship, 1, position)
+	assault := NewShip(5, Assault, 1, position)
+
+	ships := []*Ship{scout, destroyer, cruiser, battleship, assault}
+	names := []string{"Scout", "Destroyer", "Cruiser", "Battleship", "Assault"}
+
+	// Verify all ship classes have different stats (no two should be identical)
+	for i := 0; i < len(ships); i++ {
+		for j := i + 1; j < len(ships); j++ {
+			ship1, ship2 := ships[i], ships[j]
+			name1, name2 := names[i], names[j]
+
+			// At least one stat should be different between any two ship classes
+			if ship1.Stats.MaxHull == ship2.Stats.MaxHull &&
+				ship1.Stats.MaxShields == ship2.Stats.MaxShields &&
+				ship1.Stats.Acceleration == ship2.Stats.Acceleration &&
+				ship1.Stats.MaxSpeed == ship2.Stats.MaxSpeed &&
+				ship1.Stats.WeaponSlots == ship2.Stats.WeaponSlots &&
+				ship1.Stats.MaxArmies == ship2.Stats.MaxArmies {
+				t.Errorf("%s and %s have identical stats - ship classes should be differentiated", name1, name2)
+			}
+		}
+	}
+
+	// Verify expected ship progression: Scout -> Destroyer -> Cruiser -> Battleship
+	// Hull should generally increase with ship size
+	if scout.Stats.MaxHull >= destroyer.Stats.MaxHull {
+		t.Error("Scout hull should be less than Destroyer hull")
+	}
+	if destroyer.Stats.MaxHull >= cruiser.Stats.MaxHull {
+		t.Error("Destroyer hull should be less than Cruiser hull")
+	}
+	if cruiser.Stats.MaxHull >= battleship.Stats.MaxHull {
+		t.Error("Cruiser hull should be less than Battleship hull")
+	}
+
+	// Speed should generally decrease with ship size (larger ships are slower)
+	if scout.Stats.MaxSpeed <= destroyer.Stats.MaxSpeed {
+		t.Error("Scout should be faster than Destroyer")
+	}
+	if destroyer.Stats.MaxSpeed <= battleship.Stats.MaxSpeed {
+		t.Error("Destroyer should be faster than Battleship")
+	}
+}
+
 // Benchmark tests for performance verification
 func BenchmarkNewShip(b *testing.B) {
 	position := physics.Vector2D{X: 100, Y: 200}
