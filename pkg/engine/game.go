@@ -194,12 +194,13 @@ func (g *Game) Stop() {
 
 // Update advances the game state by one tick
 func (g *Game) Update() {
-	g.checkTimeLimit()
 	deltaTime := g.calculateDeltaTime()
 
+	// Lock the entire update to ensure consistency across all entity operations
 	g.EntityLock.Lock()
 	defer g.EntityLock.Unlock()
 
+	g.checkTimeLimit()
 	g.updateGameState(deltaTime)
 }
 
@@ -209,7 +210,7 @@ func (g *Game) checkTimeLimit() {
 		g.ElapsedTime = time.Since(g.StartTime).Seconds()
 		if g.Config.GameRules.TimeLimit > 0 &&
 			g.ElapsedTime >= float64(g.Config.GameRules.TimeLimit) {
-			g.endGame()
+			g.endGameInternal()
 		}
 	}
 }
@@ -265,6 +266,7 @@ func (g *Game) prepareSpatialIndex() {
 
 // populateSpatialIndex adds all active entities to the spatial index.
 func (g *Game) populateSpatialIndex() {
+	// Note: Called from within locked context in Update()
 	for _, ship := range g.Ships {
 		if ship.Active {
 			g.SpatialIndex.Insert(ship.Position, ship)
@@ -289,6 +291,7 @@ func (g *Game) processCollisions() {
 
 // updateShips updates all ships
 func (g *Game) updateShips(deltaTime float64) {
+	// Note: Called from within locked context in Update()
 	for _, ship := range g.Ships {
 		if ship.Active {
 			ship.Update(deltaTime)
@@ -301,6 +304,7 @@ func (g *Game) updateShips(deltaTime float64) {
 
 // updateProjectiles updates all projectiles
 func (g *Game) updateProjectiles(deltaTime float64) {
+	// Note: Called from within locked context in Update()
 	for _, proj := range g.Projectiles {
 		if proj.Active {
 			proj.Update(deltaTime)
@@ -313,6 +317,7 @@ func (g *Game) updateProjectiles(deltaTime float64) {
 
 // updatePlanets updates all planets
 func (g *Game) updatePlanets(deltaTime float64) {
+	// Note: Called from within locked context in Update()
 	for _, planet := range g.Planets {
 		planet.Update(deltaTime)
 	}
@@ -366,6 +371,8 @@ func (g *Game) wrapCoordinatesAroundWorld(pos *physics.Vector2D) {
 // resolvePositionCollisions nudges the entity away from any overlapping ships.
 // It prevents entities from overlapping after position wrapping by adjusting their position.
 func (g *Game) resolvePositionCollisions(e interface{}, pos *physics.Vector2D, radius float64) {
+	// Note: This method is called from within already-locked sections,
+	// so we don't need additional locking here
 	for _, other := range g.Ships {
 		if other == e || !other.Active {
 			continue
@@ -389,6 +396,7 @@ func (g *Game) detectCollisions() {
 
 // processShipProjectileCollisions handles collisions between ships and projectiles.
 func (g *Game) processShipProjectileCollisions() {
+	// Note: Called from within locked context in Update()
 	for _, ship := range g.Ships {
 		g.checkCollisionsForShip(ship)
 	}
@@ -469,6 +477,7 @@ func (g *Game) updatePlayerStatsOnShipDestruction(ship *entity.Ship, projectile 
 
 // processShipPlanetCollisions handles ship-planet proximity and collision responses.
 func (g *Game) processShipPlanetCollisions() {
+	// Note: Called from within locked context in Update()
 	for _, ship := range g.Ships {
 		g.checkInteractionsForShip(ship)
 	}
@@ -507,6 +516,7 @@ func (g *Game) handleShipPlanetInteraction(ship *entity.Ship, planet *entity.Pla
 
 // processProjectilePlanetCollisions handles collisions between projectiles and planets.
 func (g *Game) processProjectilePlanetCollisions() {
+	// Note: Called from within locked context in Update()
 	for _, proj := range g.Projectiles {
 		g.checkCollisionsForProjectile(proj)
 	}
@@ -580,6 +590,9 @@ func (g *Game) findPlayerByShipID(shipID entity.ID) (*Player, bool) {
 
 // cleanupInactiveEntities removes inactive entities
 func (g *Game) cleanupInactiveEntities() {
+	// Note: This method is called from within already-locked sections (Update method),
+	// so we don't need additional locking here
+
 	// Remove inactive projectiles
 	for id, proj := range g.Projectiles {
 		if !proj.Active {
@@ -1142,7 +1155,12 @@ func (g *Game) handleShipDestroyedEvent(e event.Event) {
 }
 
 // endGameWithWinner determines the winner and ends the game.
+// Note: This method should only be called from within a locked context.
 func (g *Game) endGameWithWinner() {
+	if g.Status == GameStatusEnded {
+		return // Game already ended
+	}
+
 	g.Status = GameStatusEnded
 	g.EndTime = time.Now()
 
@@ -1171,8 +1189,16 @@ func (g *Game) endGameWithWinner() {
 	g.Running = false
 }
 
-// Add helper method for ending the game
+// endGame ends the game safely, acquiring lock if needed
 func (g *Game) endGame() {
+	g.EntityLock.Lock()
+	defer g.EntityLock.Unlock()
+
+	g.endGameInternal()
+}
+
+// endGameInternal ends the game (must be called with lock held)
+func (g *Game) endGameInternal() {
 	if g.Status == GameStatusEnded {
 		return
 	}
