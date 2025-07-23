@@ -284,30 +284,27 @@ func TestVector2D_Normalize(t *testing.T) {
 	})
 }
 
-func TestVector2D_NormalizeZeroVectorInconsistency(t *testing.T) {
-	// This test verifies the fix: normalizing a zero vector now returns a unit vector
+func TestVector2D_NormalizeZeroVector_ReturnsUnitVector(t *testing.T) {
+	// Test that normalizing a zero vector returns a default unit vector
+	// instead of returning zero vector which would create mathematical inconsistencies
 	zeroVector := Vector2D{X: 0, Y: 0}
 	normalized := zeroVector.Normalize()
 
-	// The fix: normalized should be a unit vector (length 1)
-	length := normalized.Length()
-	if math.Abs(length-1) < 1e-9 {
-		// This is the correct behavior after the fix
-		t.Log("Zero vector normalization returns unit vector (correct)")
-	} else {
-		t.Errorf("Zero vector normalization should return unit vector, got length=%v", length)
+	// Should return default unit vector (1, 0)
+	expected := Vector2D{X: 1, Y: 0}
+	if normalized.X != expected.X || normalized.Y != expected.Y {
+		t.Errorf("Normalize() on zero vector = %v, expected %v", normalized, expected)
 	}
 
-	// Verify the mathematical consistency: using this normalized vector in calculations
-	velocity := Vector2D{X: 0, Y: 0}
-	direction := velocity.Normalize() // Now returns {1, 0}
+	// Verify it's actually a unit vector
+	length := normalized.Length()
+	if math.Abs(length-1) > 1e-9 {
+		t.Errorf("Normalized zero vector length = %v, expected 1", length)
+	}
 
-	// Applying thrust in this direction now works correctly
-	thrust := direction.Scale(10.0) // Should move ship forward
-	if thrust.X != 10.0 || thrust.Y != 0.0 {
-		t.Errorf("Expected thrust of (10, 0), got (%v, %v)", thrust.X, thrust.Y)
-	} else {
-		t.Log("Applying thrust in normalized zero direction now works correctly")
+	// Regression test: ensure we don't return zero vector which breaks physics
+	if normalized.X == 0 && normalized.Y == 0 {
+		t.Error("Normalize() on zero vector must not return zero vector - this creates mathematical inconsistencies in physics calculations")
 	}
 }
 
