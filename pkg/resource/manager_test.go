@@ -128,14 +128,14 @@ func TestResourceManager_StartGoroutinePanicRecovery(t *testing.T) {
 
 func TestResourceManager_CheckMemoryUsage(t *testing.T) {
 	// First test with reasonable limit
-	config := &config.EnvironmentConfig{
+	cfg := &config.EnvironmentConfig{
 		MaxMemoryMB:           1000, // Reasonable limit
 		MaxGoroutines:         10,
 		ShutdownTimeout:       5 * time.Second,
 		ResourceCheckInterval: 1 * time.Second,
 	}
 
-	rm := NewResourceManager(config)
+	rm := NewResourceManager(cfg)
 	defer rm.Shutdown(context.Background())
 
 	// Allocate some memory to ensure memory usage is recorded
@@ -154,17 +154,32 @@ func TestResourceManager_CheckMemoryUsage(t *testing.T) {
 		t.Errorf("Expected memory usage to be > 0, got %d MB", usage)
 	}
 
-	// Test failure case by directly checking against current usage
-	if usage > 0 {
-		// Set a limit below current usage
-		rmLow := &ResourceManager{
-			maxMemoryMB: usage - 1, // Set limit below current usage
-		}
+	// Test failure case with very low limit
+	configLow := &config.EnvironmentConfig{
+		MaxMemoryMB:           1, // Very low limit (1MB)
+		MaxGoroutines:         10,
+		ShutdownTimeout:       5 * time.Second,
+		ResourceCheckInterval: 1 * time.Second,
+	}
 
-		err = rmLow.CheckMemoryUsage()
-		if err == nil {
-			t.Error("Expected memory check to fail with limit below current usage")
-		}
+	rmLow := NewResourceManager(configLow)
+	defer rmLow.Shutdown(context.Background())
+
+	// Allocate much more memory to definitely exceed the low limit
+	// Keep references to prevent garbage collection
+	var memoryHogs [][]byte
+	for i := 0; i < 10; i++ {
+		memoryHogs = append(memoryHogs, make([]byte, 2*1024*1024)) // 2MB each, total 20MB
+	}
+	_ = memoryHogs
+
+	// Don't call GC - we want to keep the memory allocated
+	// Just check memory usage immediately
+	err = rmLow.CheckMemoryUsage()
+	if err == nil {
+		// Get current usage for debugging
+		currentUsage := rmLow.GetMemoryUsage()
+		t.Errorf("Expected memory check to fail with 1MB limit, but got no error. Current usage: %dMB", currentUsage)
 	}
 }
 
