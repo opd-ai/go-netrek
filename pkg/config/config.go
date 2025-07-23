@@ -23,6 +23,12 @@ type EnvironmentConfig struct {
 	TicksPerState   int           `env:"NETREK_TICKS_PER_STATE"`
 	UsePartialState bool          `env:"NETREK_USE_PARTIAL_STATE"`
 	WorldSize       float64       `env:"NETREK_WORLD_SIZE"`
+
+	// Circuit Breaker Configuration
+	CircuitBreakerMaxRequests         int           `env:"NETREK_CB_MAX_REQUESTS"`
+	CircuitBreakerInterval            time.Duration `env:"NETREK_CB_INTERVAL"`
+	CircuitBreakerTimeout             time.Duration `env:"NETREK_CB_TIMEOUT"`
+	CircuitBreakerMaxConsecutiveFails int           `env:"NETREK_CB_MAX_CONSECUTIVE_FAILS"`
 }
 
 // ValidationError represents a configuration validation error
@@ -49,6 +55,12 @@ func LoadConfigFromEnv() (*EnvironmentConfig, error) {
 		TicksPerState:   getEnvAsIntOrDefault("NETREK_TICKS_PER_STATE", 3),
 		UsePartialState: getEnvAsBoolOrDefault("NETREK_USE_PARTIAL_STATE", true),
 		WorldSize:       getEnvAsFloatOrDefault("NETREK_WORLD_SIZE", 10000.0),
+
+		// Circuit Breaker defaults - conservative settings for game stability
+		CircuitBreakerMaxRequests:         getEnvAsIntOrDefault("NETREK_CB_MAX_REQUESTS", 3),
+		CircuitBreakerInterval:            getEnvAsDurationOrDefault("NETREK_CB_INTERVAL", 60*time.Second),
+		CircuitBreakerTimeout:             getEnvAsDurationOrDefault("NETREK_CB_TIMEOUT", 30*time.Second),
+		CircuitBreakerMaxConsecutiveFails: getEnvAsIntOrDefault("NETREK_CB_MAX_CONSECUTIVE_FAILS", 5),
 	}
 
 	if err := validateEnvironmentConfig(config); err != nil {
@@ -69,6 +81,10 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 	}
 
 	if err := validateGameplayConfig(config); err != nil {
+		return err
+	}
+
+	if err := validateCircuitBreakerConfig(config); err != nil {
 		return err
 	}
 
@@ -148,6 +164,43 @@ func validateGameplayConfig(config *EnvironmentConfig) error {
 			Field:   "WorldSize",
 			Value:   config.WorldSize,
 			Message: "world size must be between 1000.0 and 100000.0",
+		}
+	}
+
+	return nil
+}
+
+// validateCircuitBreakerConfig validates circuit breaker-related configuration settings
+func validateCircuitBreakerConfig(config *EnvironmentConfig) error {
+	if config.CircuitBreakerMaxRequests < 1 || config.CircuitBreakerMaxRequests > 100 {
+		return &ValidationError{
+			Field:   "CircuitBreakerMaxRequests",
+			Value:   config.CircuitBreakerMaxRequests,
+			Message: "circuit breaker max requests must be between 1 and 100",
+		}
+	}
+
+	if config.CircuitBreakerInterval < 1*time.Second || config.CircuitBreakerInterval > 300*time.Second {
+		return &ValidationError{
+			Field:   "CircuitBreakerInterval",
+			Value:   config.CircuitBreakerInterval,
+			Message: "circuit breaker interval must be between 1s and 300s",
+		}
+	}
+
+	if config.CircuitBreakerTimeout < 1*time.Second || config.CircuitBreakerTimeout > 120*time.Second {
+		return &ValidationError{
+			Field:   "CircuitBreakerTimeout",
+			Value:   config.CircuitBreakerTimeout,
+			Message: "circuit breaker timeout must be between 1s and 120s",
+		}
+	}
+
+	if config.CircuitBreakerMaxConsecutiveFails < 1 || config.CircuitBreakerMaxConsecutiveFails > 50 {
+		return &ValidationError{
+			Field:   "CircuitBreakerMaxConsecutiveFails",
+			Value:   config.CircuitBreakerMaxConsecutiveFails,
+			Message: "circuit breaker max consecutive fails must be between 1 and 50",
 		}
 	}
 
@@ -298,30 +351,12 @@ type GameRules struct {
 func LoadConfig(path string) (*GameConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file: %w", err)
+		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
 	var config GameConfig
 	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
-	}
-
-	// Convert ShipTypes to entity.ShipStats and inject
-	if len(config.ShipTypes) > 0 {
-		stats := make(map[string]entity.ShipStats)
-		for name, st := range config.ShipTypes {
-			stats[name] = entity.ShipStats{
-				MaxHull:      st.MaxHull,
-				MaxShields:   st.MaxShields,
-				MaxFuel:      st.MaxFuel,
-				Acceleration: st.Acceleration,
-				TurnRate:     st.TurnRate,
-				MaxSpeed:     st.MaxSpeed,
-				WeaponSlots:  st.WeaponSlots,
-				MaxArmies:    st.MaxArmies,
-			}
-		}
-		entity.SetShipTypeStats(stats)
 	}
 
 	return &config, nil

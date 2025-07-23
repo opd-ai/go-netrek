@@ -42,6 +42,9 @@ type GameClient struct {
 	connectionTimeout time.Duration
 	readTimeout       time.Duration
 	writeTimeout      time.Duration
+
+	// Circuit breaker for reliable network operations
+	networkService *NetworkService
 }
 
 // NewGameClient creates a new game client
@@ -65,6 +68,7 @@ func NewGameClient(eventBus *event.Bus) *GameClient {
 		connectionTimeout:    30 * time.Second,
 		readTimeout:          envConfig.ReadTimeout,
 		writeTimeout:         envConfig.WriteTimeout,
+		networkService:       NewNetworkService(envConfig),
 	}
 }
 
@@ -119,15 +123,18 @@ func (c *GameClient) establishTCPConnection(address string) error {
 	ctx, cancel := context.WithTimeout(c.ctx, c.connectionTimeout)
 	defer cancel()
 
-	// Use DialContext for timeout support
-	dialer := &net.Dialer{}
-	conn, err := dialer.DialContext(ctx, "tcp", address)
-	if err != nil {
-		return fmt.Errorf("failed to connect to server: %w", err)
-	}
+	// Use circuit breaker for connection establishment
+	return c.networkService.ExecuteWithRetry(ctx, func() error {
+		// Use DialContext for timeout support
+		dialer := &net.Dialer{}
+		conn, err := dialer.DialContext(ctx, "tcp", address)
+		if err != nil {
+			return fmt.Errorf("failed to connect to server: %w", err)
+		}
 
-	c.conn = conn
-	return nil
+		c.conn = conn
+		return nil
+	})
 }
 
 // performHandshake sends a connect request and processes the server's response.
@@ -583,17 +590,20 @@ func (c *GameClient) prepareMessageData(msg interface{}) ([]byte, error) {
 
 // sendPreparedMessage sends already serialized data to the server with proper synchronization
 func (c *GameClient) sendPreparedMessage(ctx context.Context, msgType MessageType, data []byte) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	// Use circuit breaker with retry for network operations
+	return c.networkService.ExecuteWithRetry(ctx, func() error {
+		c.mu.Lock()
+		defer c.mu.Unlock()
 
-	if err := c.validateConnection(); err != nil {
-		return err
-	}
+		if err := c.validateConnection(); err != nil {
+			return err
+		}
 
-	c.setWriteDeadline(ctx)
-	defer c.conn.SetWriteDeadline(time.Time{}) // Clear deadline
+		c.setWriteDeadline(ctx)
+		defer c.conn.SetWriteDeadline(time.Time{}) // Clear deadline
 
-	return c.performAsyncWrite(ctx, msgType, data)
+		return c.performAsyncWrite(ctx, msgType, data)
+	})
 }
 
 // serializeMessage serializes the message payload to JSON bytes
