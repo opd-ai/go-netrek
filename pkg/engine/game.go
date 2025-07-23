@@ -201,6 +201,7 @@ func (g *Game) Update() {
 	defer g.EntityLock.Unlock()
 
 	g.checkTimeLimit()
+	g.checkWinConditions() // Check for conquest/score-based win conditions
 	g.updateGameState(deltaTime)
 }
 
@@ -211,6 +212,57 @@ func (g *Game) checkTimeLimit() {
 		if g.Config.GameRules.TimeLimit > 0 &&
 			g.ElapsedTime >= float64(g.Config.GameRules.TimeLimit) {
 			g.endGameInternal()
+		}
+	}
+}
+
+// checkWinConditions checks if win conditions have been met (conquest or score-based).
+func (g *Game) checkWinConditions() {
+	if g.Status != GameStatusActive {
+		return
+	}
+
+	winCondition := g.Config.GameRules.WinCondition
+	switch winCondition {
+	case "conquest":
+		g.checkConquestWin()
+	case "score":
+		g.checkScoreWin()
+	}
+}
+
+// checkConquestWin checks if any team has conquered all planets.
+func (g *Game) checkConquestWin() {
+	// Count planets per team
+	teamPlanetCounts := make(map[int]int)
+	totalPlanets := len(g.Planets)
+
+	for _, planet := range g.Planets {
+		if planet.TeamID >= 0 { // Only count conquered planets
+			teamPlanetCounts[planet.TeamID]++
+		}
+	}
+
+	// Check if any team has conquered all planets
+	for _, planetCount := range teamPlanetCounts {
+		if planetCount == totalPlanets && totalPlanets > 0 {
+			g.endGameInternal()
+			return
+		}
+	}
+}
+
+// checkScoreWin checks if any team has reached the maximum score.
+func (g *Game) checkScoreWin() {
+	maxScore := g.Config.GameRules.MaxScore
+	if maxScore <= 0 {
+		return // No score limit configured
+	}
+
+	for _, team := range g.Teams {
+		if team.Score >= maxScore {
+			g.endGameInternal()
+			return
 		}
 	}
 }
