@@ -98,20 +98,15 @@ The go-netrek codebase demonstrates strong architectural foundations with clean 
 
 ### 🟡 Performance Concerns - **PHASE 2 TARGETS**
 
-#### 🔄 Connection Management (PENDING)
-- **Issue:** No connection pooling in `pkg/network/client.go`
-- **Planned Solution:** Connection pooling and lifecycle management
-- **Target Phase:** Phase 2.1
-
 #### 🔄 Circuit Breakers (PENDING)
 - **Issue:** No protection against cascading failures
 - **Planned Solution:** Circuit breaker implementation with retry logic
-- **Target Phase:** Phase 2.2
+- **Target Phase:** Phase 2.1
 
 #### 🔄 Resource Management (PENDING)
 - **Issue:** No memory limits or goroutine management
 - **Planned Solution:** Resource monitoring and automatic limits
-- **Target Phase:** Phase 2.3
+- **Target Phase:** Phase 2.2
 
 ## IMPLEMENTATION ROADMAP
 
@@ -344,71 +339,7 @@ func (s *GameServer) processMessage(ctx context.Context, msg *Message) error {
 ### 🔧 Phase 2: Performance & Reliability (3-4 weeks)
 **Focus:** Production resilience and performance optimization
 
-#### Task 2.1: Connection Management and Pooling
-**Files to modify:** `pkg/network/client.go`, `pkg/network/server.go`
-
-```go
-// Implementation Requirements:
-1. Add connection pooling for client connections
-2. Implement proper connection lifecycle management
-3. Add connection health monitoring
-4. Resource limits and cleanup
-
-// Required Pattern:
-type ConnectionPool struct {
-    conns    chan net.Conn
-    factory  func() (net.Conn, error)
-    cleanup  func(net.Conn) error
-    maxConns int
-    mu       sync.RWMutex
-    health   map[net.Conn]time.Time
-}
-
-func NewConnectionPool(maxConns int, factory func() (net.Conn, error)) *ConnectionPool {
-    return &ConnectionPool{
-        conns:    make(chan net.Conn, maxConns),
-        factory:  factory,
-        maxConns: maxConns,
-        health:   make(map[net.Conn]time.Time),
-    }
-}
-
-func (p *ConnectionPool) Get(ctx context.Context) (net.Conn, error) {
-    select {
-    case conn := <-p.conns:
-        if p.isHealthy(conn) {
-            return conn, nil
-        }
-        conn.Close() // Close unhealthy connection
-        fallthrough
-    default:
-        return p.factory()
-    case <-ctx.Done():
-        return nil, ctx.Err()
-    }
-}
-
-func (p *ConnectionPool) Put(conn net.Conn) {
-    p.mu.Lock()
-    p.health[conn] = time.Now()
-    p.mu.Unlock()
-    
-    select {
-    case p.conns <- conn:
-    default:
-        conn.Close() // Pool full, close connection
-    }
-}
-```
-
-**Acceptance Criteria:**
-- [ ] Connection reuse reduces overhead by 50%
-- [ ] Automatic cleanup of stale connections
-- [ ] Health checks detect failed connections within 30s
-- [ ] Resource limits prevent exhaustion
-- [ ] Graceful pool shutdown with connection cleanup
-
-#### Task 2.2: Circuit Breaker Implementation
+#### Task 2.1: Circuit Breaker Implementation
 **Files to modify:** `pkg/network/client.go`
 
 ```go
@@ -490,7 +421,7 @@ func (ns *NetworkService) sendMessageWithRetry(ctx context.Context, msg *Message
 - [ ] Automatic recovery detection within 30s
 - [ ] Circuit breaker state monitoring and alerting
 
-#### Task 2.3: Resource Management and Monitoring
+#### Task 2.2: Resource Management and Monitoring
 **Files to modify:** `pkg/engine/game.go`, `pkg/network/server.go`
 
 ```go
@@ -582,7 +513,7 @@ func (rm *ResourceManager) Shutdown(ctx context.Context) error {
 - [ ] Resource monitoring and alerting via metrics
 - [ ] Automatic resource limit enforcement
 
-#### Task 2.4: Health Check Endpoints ✅ COMPLETED (July 22, 2025)
+#### Task 2.3: Health Check Endpoints ✅ COMPLETED (July 22, 2025)
 **Files created:** `pkg/health/health.go`, `pkg/health/health_test.go`, `pkg/health/integration_test.go`, `pkg/health/README.md`
 **Files modified:** `cmd/server/main.go`, `pkg/network/server.go`
 
