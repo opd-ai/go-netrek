@@ -12,6 +12,7 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/entity"
 	"github.com/opd-ai/go-netrek/pkg/event"
 	"github.com/opd-ai/go-netrek/pkg/physics"
+	"github.com/opd-ai/go-netrek/pkg/resource"
 )
 
 // pkg/engine/game.go
@@ -50,6 +51,9 @@ type Game struct {
 	ElapsedTime  float64 // seconds
 
 	CustomWinCondition WinCondition // Optional custom win condition
+
+	// Resource management
+	ResourceManager *resource.ResourceManager
 }
 
 // Team represents a player team in the game
@@ -91,13 +95,30 @@ func NewGame(config *config.GameConfig) *Game {
 		EventBus:    event.NewEventBus(),
 	}
 
-	// Initialize game components
+	// Initialize game components first
 	game.initSpatialIndex()
 	game.initTeams()
 	game.initPlanets()
 	game.registerEventHandlers()
 
 	return game
+}
+
+// InitializeResourceManager initializes the resource manager with environment configuration.
+// This is called separately to avoid circular dependencies during game creation.
+func (g *Game) InitializeResourceManager() error {
+	envConfig, err := config.LoadConfigFromEnv()
+	if err != nil {
+		// Use safe defaults if environment config fails
+		envConfig = &config.EnvironmentConfig{
+			MaxMemoryMB:           500,
+			MaxGoroutines:         1000,
+			ShutdownTimeout:       30 * time.Second,
+			ResourceCheckInterval: 10 * time.Second,
+		}
+	}
+	g.ResourceManager = resource.NewResourceManager(envConfig)
+	return g.ResourceManager.Start()
 }
 
 // initSpatialIndex creates the spatial index for collision detection.

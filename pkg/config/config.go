@@ -29,6 +29,12 @@ type EnvironmentConfig struct {
 	CircuitBreakerInterval            time.Duration `env:"NETREK_CB_INTERVAL"`
 	CircuitBreakerTimeout             time.Duration `env:"NETREK_CB_TIMEOUT"`
 	CircuitBreakerMaxConsecutiveFails int           `env:"NETREK_CB_MAX_CONSECUTIVE_FAILS"`
+
+	// Resource Management Configuration
+	MaxMemoryMB           int64         `env:"NETREK_MAX_MEMORY_MB"`
+	MaxGoroutines         int           `env:"NETREK_MAX_GOROUTINES"`
+	ShutdownTimeout       time.Duration `env:"NETREK_SHUTDOWN_TIMEOUT"`
+	ResourceCheckInterval time.Duration `env:"NETREK_RESOURCE_CHECK_INTERVAL"`
 }
 
 // ValidationError represents a configuration validation error
@@ -61,6 +67,12 @@ func LoadConfigFromEnv() (*EnvironmentConfig, error) {
 		CircuitBreakerInterval:            getEnvAsDurationOrDefault("NETREK_CB_INTERVAL", 60*time.Second),
 		CircuitBreakerTimeout:             getEnvAsDurationOrDefault("NETREK_CB_TIMEOUT", 30*time.Second),
 		CircuitBreakerMaxConsecutiveFails: getEnvAsIntOrDefault("NETREK_CB_MAX_CONSECUTIVE_FAILS", 5),
+
+		// Resource Management defaults - conservative production settings
+		MaxMemoryMB:           getEnvAsInt64OrDefault("NETREK_MAX_MEMORY_MB", 500),
+		MaxGoroutines:         getEnvAsIntOrDefault("NETREK_MAX_GOROUTINES", 1000),
+		ShutdownTimeout:       getEnvAsDurationOrDefault("NETREK_SHUTDOWN_TIMEOUT", 30*time.Second),
+		ResourceCheckInterval: getEnvAsDurationOrDefault("NETREK_RESOURCE_CHECK_INTERVAL", 10*time.Second),
 	}
 
 	if err := validateEnvironmentConfig(config); err != nil {
@@ -85,6 +97,10 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 	}
 
 	if err := validateCircuitBreakerConfig(config); err != nil {
+		return err
+	}
+
+	if err := validateResourceManagementConfig(config); err != nil {
 		return err
 	}
 
@@ -207,6 +223,43 @@ func validateCircuitBreakerConfig(config *EnvironmentConfig) error {
 	return nil
 }
 
+// validateResourceManagementConfig validates resource management-related configuration settings
+func validateResourceManagementConfig(config *EnvironmentConfig) error {
+	if config.MaxMemoryMB < 128 || config.MaxMemoryMB > 8192 {
+		return &ValidationError{
+			Field:   "MaxMemoryMB",
+			Value:   config.MaxMemoryMB,
+			Message: "max memory (MB) must be between 128 and 8192",
+		}
+	}
+
+	if config.MaxGoroutines < 10 || config.MaxGoroutines > 1000 {
+		return &ValidationError{
+			Field:   "MaxGoroutines",
+			Value:   config.MaxGoroutines,
+			Message: "max goroutines must be between 10 and 1000",
+		}
+	}
+
+	if config.ShutdownTimeout < 1*time.Second || config.ShutdownTimeout > 60*time.Second {
+		return &ValidationError{
+			Field:   "ShutdownTimeout",
+			Value:   config.ShutdownTimeout,
+			Message: "shutdown timeout must be between 1s and 60s",
+		}
+	}
+
+	if config.ResourceCheckInterval < 1*time.Second || config.ResourceCheckInterval > 60*time.Second {
+		return &ValidationError{
+			Field:   "ResourceCheckInterval",
+			Value:   config.ResourceCheckInterval,
+			Message: "resource check interval must be between 1s and 60s",
+		}
+	}
+
+	return nil
+}
+
 // getEnvOrDefault returns the environment variable value or default if not set
 func getEnvOrDefault(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
@@ -220,6 +273,16 @@ func getEnvAsIntOrDefault(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		if intValue, err := strconv.Atoi(value); err == nil {
 			return intValue
+		}
+	}
+	return defaultValue
+}
+
+// getEnvAsInt64OrDefault returns the environment variable as int64 or default if not set or invalid
+func getEnvAsInt64OrDefault(key string, defaultValue int64) int64 {
+	if value := os.Getenv(key); value != "" {
+		if int64Value, err := strconv.ParseInt(value, 10, 64); err == nil {
+			return int64Value
 		}
 	}
 	return defaultValue

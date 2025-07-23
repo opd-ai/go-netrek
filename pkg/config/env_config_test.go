@@ -7,6 +7,31 @@ import (
 	"time"
 )
 
+// createValidConfig creates a valid EnvironmentConfig for testing
+func createValidConfig() *EnvironmentConfig {
+	return &EnvironmentConfig{
+		ServerAddr:      "localhost",
+		ServerPort:      4566,
+		MaxClients:      32,
+		ReadTimeout:     30 * time.Second,
+		WriteTimeout:    30 * time.Second,
+		UpdateRate:      20,
+		TicksPerState:   3,
+		UsePartialState: true,
+		WorldSize:       10000.0,
+		// Circuit Breaker Configuration
+		CircuitBreakerMaxRequests:         3,
+		CircuitBreakerInterval:            60 * time.Second,
+		CircuitBreakerTimeout:             30 * time.Second,
+		CircuitBreakerMaxConsecutiveFails: 5,
+		// Resource Management Configuration
+		MaxMemoryMB:           500,
+		MaxGoroutines:         100,
+		ShutdownTimeout:       30 * time.Second,
+		ResourceCheckInterval: 10 * time.Second,
+	}
+}
+
 func TestLoadConfigFromEnv(t *testing.T) {
 	// Save original environment
 	originalEnv := make(map[string]string)
@@ -130,238 +155,137 @@ func TestValidateEnvironmentConfig(t *testing.T) {
 		errorField  string
 	}{
 		{
-			name: "ValidConfig",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-				// Circuit Breaker Configuration
-				CircuitBreakerMaxRequests:         3,
-				CircuitBreakerInterval:            60 * time.Second,
-				CircuitBreakerTimeout:             30 * time.Second,
-				CircuitBreakerMaxConsecutiveFails: 5,
-			},
+			name:        "ValidConfig",
+			config:      createValidConfig(),
 			expectError: false,
 		},
 		{
 			name: "EmptyServerAddr",
-			config: &EnvironmentConfig{
-				ServerAddr:      "",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.ServerAddr = ""
+				return c
+			}(),
 			expectError: true,
 			errorField:  "ServerAddr",
 		},
 		{
 			name: "InvalidServerPortTooLow",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      1023,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.ServerPort = 1023
+				return c
+			}(),
 			expectError: true,
 			errorField:  "ServerPort",
 		},
 		{
 			name: "InvalidServerPortTooHigh",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      65536,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.ServerPort = 65536
+				return c
+			}(),
 			expectError: true,
 			errorField:  "ServerPort",
 		},
 		{
 			name: "InvalidMaxClientsTooLow",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      0,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.MaxClients = 0
+				return c
+			}(),
 			expectError: true,
 			errorField:  "MaxClients",
 		},
 		{
 			name: "InvalidMaxClientsTooHigh",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      1001,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.MaxClients = 1001
+				return c
+			}(),
 			expectError: true,
 			errorField:  "MaxClients",
 		},
 		{
 			name: "InvalidReadTimeoutTooShort",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     500 * time.Millisecond,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.ReadTimeout = 500 * time.Millisecond
+				return c
+			}(),
 			expectError: true,
 			errorField:  "ReadTimeout",
 		},
 		{
 			name: "InvalidReadTimeoutTooLong",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     2 * time.Minute,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.ReadTimeout = 2 * time.Minute
+				return c
+			}(),
 			expectError: true,
 			errorField:  "ReadTimeout",
 		},
 		{
 			name: "InvalidUpdateRateTooLow",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      0,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.UpdateRate = 0
+				return c
+			}(),
 			expectError: true,
 			errorField:  "UpdateRate",
 		},
 		{
 			name: "InvalidUpdateRateTooHigh",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      101,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       10000.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.UpdateRate = 101
+				return c
+			}(),
 			expectError: true,
 			errorField:  "UpdateRate",
 		},
 		{
 			name: "InvalidWorldSizeTooSmall",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       999.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.WorldSize = 999.0
+				return c
+			}(),
 			expectError: true,
 			errorField:  "WorldSize",
 		},
 		{
 			name: "InvalidWorldSizeTooLarge",
-			config: &EnvironmentConfig{
-				ServerAddr:      "localhost",
-				ServerPort:      4566,
-				MaxClients:      32,
-				ReadTimeout:     30 * time.Second,
-				WriteTimeout:    30 * time.Second,
-				UpdateRate:      20,
-				TicksPerState:   3,
-				UsePartialState: true,
-				WorldSize:       100001.0,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.WorldSize = 100001.0
+				return c
+			}(),
 			expectError: true,
 			errorField:  "WorldSize",
 		},
 		{
 			name: "InvalidCircuitBreakerMaxRequestsTooLow",
-			config: &EnvironmentConfig{
-				ServerAddr:                        "localhost",
-				ServerPort:                        4566,
-				MaxClients:                        32,
-				ReadTimeout:                       30 * time.Second,
-				WriteTimeout:                      30 * time.Second,
-				UpdateRate:                        20,
-				TicksPerState:                     3,
-				UsePartialState:                   true,
-				WorldSize:                         10000.0,
-				CircuitBreakerMaxRequests:         0,
-				CircuitBreakerInterval:            60 * time.Second,
-				CircuitBreakerTimeout:             30 * time.Second,
-				CircuitBreakerMaxConsecutiveFails: 5,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.CircuitBreakerMaxRequests = 0
+				return c
+			}(),
 			expectError: true,
 			errorField:  "CircuitBreakerMaxRequests",
 		},
 		{
 			name: "InvalidCircuitBreakerIntervalTooShort",
-			config: &EnvironmentConfig{
-				ServerAddr:                        "localhost",
-				ServerPort:                        4566,
-				MaxClients:                        32,
-				ReadTimeout:                       30 * time.Second,
-				WriteTimeout:                      30 * time.Second,
-				UpdateRate:                        20,
-				TicksPerState:                     3,
-				UsePartialState:                   true,
-				WorldSize:                         10000.0,
-				CircuitBreakerMaxRequests:         3,
-				CircuitBreakerInterval:            500 * time.Millisecond,
-				CircuitBreakerTimeout:             30 * time.Second,
-				CircuitBreakerMaxConsecutiveFails: 5,
-			},
+			config: func() *EnvironmentConfig {
+				c := createValidConfig()
+				c.CircuitBreakerInterval = 500 * time.Millisecond
+				return c
+			}(),
 			expectError: true,
 			errorField:  "CircuitBreakerInterval",
 		},

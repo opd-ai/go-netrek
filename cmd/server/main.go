@@ -17,6 +17,7 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/health"
 	"github.com/opd-ai/go-netrek/pkg/logging"
 	"github.com/opd-ai/go-netrek/pkg/network"
+	"github.com/opd-ai/go-netrek/pkg/resource"
 )
 
 func main() {
@@ -30,16 +31,16 @@ func main() {
 	gameConfig := loadGameConfiguration(logger, ctx, configPath)
 
 	// Initialize core game components
-	_, server := initializeGameComponents(gameConfig)
+	game, server := initializeGameComponents(gameConfig)
 
 	// Setup health monitoring
-	healthServer := setupHealthMonitoring(logger, ctx, server)
+	healthServer := setupHealthMonitoring(logger, ctx, server, game)
 
 	// Start the game server
 	startGameServer(logger, ctx, server, gameConfig)
 
 	// Handle graceful shutdown
-	handleGracefulShutdown(logger, ctx, healthServer, server)
+	handleGracefulShutdown(logger, ctx, healthServer, server, game)
 }
 
 // parseCommandLineFlags parses command line arguments and handles default config creation if requested.
@@ -98,12 +99,21 @@ func loadGameConfiguration(logger *logging.Logger, ctx context.Context, configPa
 // initializeGameComponents creates the core game engine and server components.
 func initializeGameComponents(gameConfig *config.GameConfig) (*engine.Game, *network.GameServer) {
 	game := engine.NewGame(gameConfig)
+
+	// Initialize resource management
+	if err := game.InitializeResourceManager(); err != nil {
+		// Log warning but continue - resource management is optional for basic operation
+		logger := logging.NewLogger()
+		logger.Warn(context.Background(), "Failed to initialize resource manager",
+			"error", err)
+	}
+
 	server := network.NewGameServer(game, gameConfig.MaxPlayers)
 	return game, server
 }
 
 // setupHealthMonitoring configures and starts the health check HTTP server.
-func setupHealthMonitoring(logger *logging.Logger, ctx context.Context, server *network.GameServer) *http.Server {
+func setupHealthMonitoring(logger *logging.Logger, ctx context.Context, server *network.GameServer, game *engine.Game) *http.Server {
 	healthChecker := health.NewHealthChecker()
 
 	// Add game engine health check
@@ -122,6 +132,12 @@ func setupHealthMonitoring(logger *logging.Logger, ctx context.Context, server *
 		runtime.ReadMemStats(&m)
 		return int64(m.Alloc / 1024 / 1024)
 	}))
+
+	// Add resource health check if resource manager is available
+	if game != nil && game.ResourceManager != nil {
+		resourceCheck := resource.NewResourceHealthCheck(game.ResourceManager)
+		healthChecker.AddCheck(resourceCheck)
+	}
 
 	healthPort := determineHealthPort()
 	healthServer := createHealthServer(healthPort, healthChecker)
@@ -187,7 +203,7 @@ func startGameServer(logger *logging.Logger, ctx context.Context, server *networ
 }
 
 // handleGracefulShutdown waits for shutdown signals and gracefully stops all services.
-func handleGracefulShutdown(logger *logging.Logger, ctx context.Context, healthServer *http.Server, server *network.GameServer) {
+func handleGracefulShutdown(logger *logging.Logger, ctx context.Context, healthServer *http.Server, server *network.GameServer, game *engine.Game) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
@@ -201,6 +217,13 @@ func handleGracefulShutdown(logger *logging.Logger, ctx context.Context, healthS
 	// Shutdown health check server
 	if err := healthServer.Shutdown(shutdownCtx); err != nil {
 		logger.Error(ctx, "Health check server shutdown failed", err)
+	}
+
+	// Shutdown resource manager
+	if game != nil && game.ResourceManager != nil {
+		if err := game.ResourceManager.Shutdown(shutdownCtx); err != nil {
+			logger.Error(ctx, "Resource manager shutdown failed", err)
+		}
 	}
 
 	// Stop game server
