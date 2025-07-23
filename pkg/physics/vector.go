@@ -39,10 +39,12 @@ func (v Vector2D) Length() float64 {
 }
 
 // Normalize returns a unit vector in the same direction
+// For zero-length vectors, returns a default unit vector (1, 0)
 func (v Vector2D) Normalize() Vector2D {
 	length := v.Length()
 	if length == 0 {
-		return Vector2D{}
+		// Return default unit vector to maintain mathematical consistency
+		return Vector2D{X: 1, Y: 0}
 	}
 	return Vector2D{
 		X: v.X / length,

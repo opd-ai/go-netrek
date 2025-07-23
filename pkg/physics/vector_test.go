@@ -241,10 +241,16 @@ func TestVector2D_Normalize(t *testing.T) {
 	t.Run("zero_vector", func(t *testing.T) {
 		vector := Vector2D{X: 0, Y: 0}
 		result := vector.Normalize()
-		expected := Vector2D{X: 0, Y: 0}
+		expected := Vector2D{X: 1, Y: 0} // Default unit vector for zero-length input
 
 		if result.X != expected.X || result.Y != expected.Y {
 			t.Errorf("Normalize() = %v, expected %v", result, expected)
+		}
+
+		// Verify the result is actually a unit vector
+		length := result.Length()
+		if math.Abs(length-1) > 1e-9 {
+			t.Errorf("Normalized zero vector length = %v, expected 1", length)
 		}
 	})
 
@@ -276,6 +282,33 @@ func TestVector2D_Normalize(t *testing.T) {
 			t.Errorf("Normalized vector length = %v, expected 1", length)
 		}
 	})
+}
+
+func TestVector2D_NormalizeZeroVectorInconsistency(t *testing.T) {
+	// This test verifies the fix: normalizing a zero vector now returns a unit vector
+	zeroVector := Vector2D{X: 0, Y: 0}
+	normalized := zeroVector.Normalize()
+
+	// The fix: normalized should be a unit vector (length 1)
+	length := normalized.Length()
+	if math.Abs(length-1) < 1e-9 {
+		// This is the correct behavior after the fix
+		t.Log("Zero vector normalization returns unit vector (correct)")
+	} else {
+		t.Errorf("Zero vector normalization should return unit vector, got length=%v", length)
+	}
+
+	// Verify the mathematical consistency: using this normalized vector in calculations
+	velocity := Vector2D{X: 0, Y: 0}
+	direction := velocity.Normalize() // Now returns {1, 0}
+
+	// Applying thrust in this direction now works correctly
+	thrust := direction.Scale(10.0) // Should move ship forward
+	if thrust.X != 10.0 || thrust.Y != 0.0 {
+		t.Errorf("Expected thrust of (10, 0), got (%v, %v)", thrust.X, thrust.Y)
+	} else {
+		t.Log("Applying thrust in normalized zero direction now works correctly")
+	}
 }
 
 func TestVector2D_Distance(t *testing.T) {
