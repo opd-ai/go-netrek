@@ -3,9 +3,9 @@
 ## AUDIT SUMMARY
 
 ~~~~
-**Total Issues Found:** 8 (5 remaining)
+**Total Issues Found:** 8 (4 remaining)
 - **CRITICAL BUG:** 0 (3 FIXED)
-- **FUNCTIONAL MISMATCH:** 3
+- **FUNCTIONAL MISMATCH:** 2 (1 FIXED)
 - **MISSING FEATURE:** 2
 - **EDGE CASE BUG:** 1
 - **PERFORMANCE ISSUE:** 0
@@ -13,7 +13,7 @@
 **Analysis Methodology:** Dependency-based file analysis from Level 0 (utilities) to Level N (applications)
 **Files Audited:** 45+ Go files across all packages
 **Test Coverage Analysis:** Comprehensive review of test files for expected vs actual behavior
-**Last Updated:** Bug fixes in progress - Vector normalization FIXED, Race condition FIXED, Ship-to-ship combat VERIFIED WORKING
+**Last Updated:** Bug fixes in progress - Vector normalization FIXED, Race condition FIXED, Ship-to-ship combat VERIFIED WORKING, Ship class differentiation FIXED
 ~~~~
 
 ## DETAILED FINDINGS
@@ -197,21 +197,34 @@ func validateEnvironmentConfig(config *EnvironmentConfig) error {
 ~~~~
 
 ~~~~
-### FUNCTIONAL MISMATCH: Ship Class Differentiation Not Implemented
-**File:** pkg/entity/ship.go:getShipStats function missing
-**Severity:** Medium
-**Description:** README.md shows different ship classes with varying capabilities, and ShipClass enumeration exists (Scout, Destroyer, Cruiser, Battleship, Assault), but the getShipStats function that should provide different statistics per class is not implemented.
+### FUNCTIONAL MISMATCH: Ship Class Differentiation Not Implemented - **FIXED**
+**File:** pkg/entity/ship.go:getShipStats function missing implementations
+**Severity:** Medium → **RESOLVED**  
+**Status:** **FIXED** (commit: 535dbe2)
+**Description:** ~~README.md shows different ship classes with varying capabilities, and ShipClass enumeration exists (Scout, Destroyer, Cruiser, Battleship, Assault), but the getShipStats function that should provide different statistics per class is not implemented.~~ **FIX APPLIED:** All ship classes now have distinct, balanced statistics that differentiate their gameplay roles.
 **Expected Behavior:** Different ship classes should have distinct stats (speed, armor, weapons) affecting gameplay balance
-**Actual Behavior:** All ships likely have identical capabilities regardless of class selection
-**Impact:** No strategic ship selection; gameplay lacks tactical depth and balance
-**Reproduction:** Create ships of different classes - they behave identically despite different class names
+**Actual Behavior:** ~~All ships likely have identical capabilities regardless of class selection~~ **FIXED:** Each ship class now has unique stats - Scout (fast, lightly armored), Destroyer (balanced), Cruiser (heavy), Battleship (slowest, most armored), Assault (specialized for army transport)
+**Impact:** ~~No strategic ship selection; gameplay lacks tactical depth and balance~~ **RESOLVED:** Strategic ship selection now meaningful with balanced progression and specialized roles
+**Reproduction:** ~~Create ships of different classes - they behave identically despite different class names~~ **FIXED:** Ships of different classes have significantly different capabilities
+**Fix Applied:** Implemented complete ship class differentiation with balanced stats. Ship progression: Scout (fast scout), Destroyer (balanced fighter), Cruiser (heavy cruiser), Battleship (slow tank), Assault (army specialist).
 **Code Reference:**
 ```go
-func NewShip(id ID, class ShipClass, teamID int, position physics.Vector2D) *Ship {
-    stats := getShipStats(class) // Function not implemented
-    // Ship creation continues with undefined stats
+func getShipStats(class ShipClass) ShipStats {
+    switch class {
+    case Scout:
+        return ShipStats{MaxHull: 100, MaxShields: 100, MaxSpeed: 300, Acceleration: 200, MaxArmies: 2}
+    case Destroyer:
+        return ShipStats{MaxHull: 150, MaxShields: 150, MaxSpeed: 250, Acceleration: 150, MaxArmies: 5}
+    case Cruiser:
+        return ShipStats{MaxHull: 200, MaxShields: 200, MaxSpeed: 220, Acceleration: 120, MaxArmies: 8}
+    case Battleship:
+        return ShipStats{MaxHull: 300, MaxShields: 250, MaxSpeed: 180, Acceleration: 80, MaxArmies: 12}
+    case Assault:
+        return ShipStats{MaxHull: 180, MaxShields: 120, MaxSpeed: 240, Acceleration: 140, MaxArmies: 15}
+    }
 }
 ```
+**Test Coverage:** Added comprehensive ship class differentiation tests that verify each class has unique stats and follows logical progression patterns.
 ~~~~
 
 ## AUDIT CONCLUSION
@@ -222,11 +235,12 @@ The go-netrek codebase has a solid architectural foundation with clean separatio
 1. ✅ **Vector normalization bug** - Fixed to return unit vector (1,0) for zero-length vectors
 2. ✅ **Race condition in entity management** - Fixed with proper locking throughout game engine  
 3. ✅ **Ship-to-ship combat** - **FALSE POSITIVE**: Comprehensive testing confirms the collision detection and damage system works correctly
+4. ✅ **Ship class differentiation** - Fixed by implementing distinct, balanced stats for all ship classes
 
 **Priority Recommendations:**
-1. Complete network message handling for player input (HIGH)
-2. Implement planet conquest mechanics (HIGH)
-3. Add ship class differentiation and win condition checking (MEDIUM)
+1. Complete network message handling for player input (HIGH) - **INVESTIGATION NEEDED**: Initial audit may be outdated
+2. Implement planet conquest mechanics (HIGH) - **INVESTIGATION NEEDED**: BeamArmies and planet capture appear to be implemented
+3. Add win condition checking (MEDIUM)
 4. Enhance configuration validation for edge cases (LOW)
 
 The project structure and API design demonstrate good Go practices. The core combat and physics systems are working correctly, providing a solid foundation for the multiplayer Netrek experience.
