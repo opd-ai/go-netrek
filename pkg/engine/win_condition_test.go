@@ -25,7 +25,7 @@ func TestWinCondition_ConquestWin(t *testing.T) {
 
 	// Team 1 conquers all planets (including the default ones)
 	for _, planet := range game.Planets {
-		planet.TeamID = 1  // Team 1 takes control of all planets
+		planet.TeamID = 1 // Team 1 takes control of all planets
 	}
 
 	// Game should end when team 1 controls all planets
