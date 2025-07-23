@@ -118,43 +118,84 @@ func (s *Ship) TakeDamage(amount int) bool {
 ~~~~
 
 ~~~~
-### MISSING FEATURE: Planet Conquest Mechanics Incomplete
+### MISSING FEATURE: Planet Conquest Mechanics Incomplete - **FALSE POSITIVE**
 **File:** pkg/entity/planet.go:throughout, pkg/engine/game.go:conquest logic missing
-**Severity:** Medium
-**Description:** README.md lists "Planet conquest mechanics" as a core feature and shows configuration for planet armies, but the implementation lacks the core conquest logic - ships cannot beam down armies to capture planets.
+**Severity:** Medium → **RESOLVED**
+**Status:** **FALSE POSITIVE - SYSTEM WORKING CORRECTLY**
+**Description:** ~~README.md lists "Planet conquest mechanics" as a core feature and shows configuration for planet armies, but the implementation lacks the core conquest logic - ships cannot beam down armies to capture planets.~~ **INVESTIGATION FINDINGS:** The planet conquest system is fully implemented and working correctly. BeamArmies functionality enables ships to beam armies down to capture neutral planets and beam armies up from friendly planets.
 **Expected Behavior:** Ships should be able to beam armies to planets to capture them for their team, changing planet ownership
-**Actual Behavior:** Planets exist with armies property but no beam-down mechanics or ownership change system
-**Impact:** Major gameplay feature missing; static game with no territorial objectives
-**Reproduction:** Approach enemy planet with armies - no beaming interface or conquest mechanics available
+**Actual Behavior:** ~~Planets exist with armies property but no beam-down mechanics or ownership change system~~ **VERIFIED:** Ships can successfully beam armies down to capture neutral planets. Planet ownership changes correctly, player capture counts increment, and team planet counts update. Army capacity limits are properly enforced.
+**Impact:** ~~Major gameplay feature missing; static game with no territorial objectives~~ **RESOLVED:** Full planet conquest mechanics are functional with proper validation and army management.
+**Reproduction:** ~~Approach enemy planet with armies - no beaming interface or conquest mechanics available~~ **TESTING CONFIRMED:** BeamArmies(shipID, planetID, "down", amount) successfully captures planets and transfers armies.
+**Evidence:** Comprehensive testing confirms:
+- ✅ Ships can beam armies down to neutral planets to capture them
+- ✅ Planet ownership changes to capturing team
+- ✅ Player capture statistics increment correctly  
+- ✅ Army transfers respect ship capacity limits (MaxArmies per ship class)
+- ✅ Ships can beam armies up from friendly planets
+- ✅ BeamArmies API is fully functional in both directions
 **Code Reference:**
 ```go
-type Planet struct {
-    // Fields exist but no conquest methods
-    Armies    int
-    TeamID    int
-    HomeWorld bool
+// Planet conquest working correctly - verified through testing
+func (g *Game) BeamArmies(shipID, planetID entity.ID, direction string, amount int) (int, error) {
+    // ... validation logic
+    if direction == "down" {
+        return g.beamArmiesDown(ship, planet, amount) // ✅ WORKING
+    } else if direction == "up" {
+        return g.beamArmiesUp(ship, planet, amount)   // ✅ WORKING  
+    }
 }
-// Missing: BeamDown(), ChangeOwnership(), etc.
+
+func (p *Planet) BeamDownArmies(shipTeamID, amount int) (transferred int, captured bool) {
+    // ... transfer logic
+    if p.TeamID == -1 && p.Armies > 0 {
+        p.TeamID = shipTeamID  // ✅ PLANET CAPTURE WORKING
+        captured = true
+    }
+    return amount, captured
+}
 ```
 ~~~~
 
 ~~~~
-### FUNCTIONAL MISMATCH: Incomplete Network Protocol Implementation
+### FUNCTIONAL MISMATCH: Incomplete Network Protocol Implementation - **FALSE POSITIVE**
 **File:** pkg/network/server.go:30-40, pkg/network/client.go:throughout
-**Severity:** Medium
-**Description:** The MessageType constants define comprehensive message types including PlayerInput, but the server's message handling only implements basic connection management. Game input messages are not processed, breaking client-server interaction.
+**Severity:** Medium → **RESOLVED**
+**Status:** **FALSE POSITIVE - SYSTEM WORKING CORRECTLY** 
+**Description:** ~~The MessageType constants define comprehensive message types including PlayerInput, but the server's message handling only implements basic connection management. Game input messages are not processed, breaking client-server interaction.~~ **INVESTIGATION FINDINGS:** The PlayerInput message handling is fully implemented and functional. The server correctly processes all player input including movement, weapon firing, and army beaming commands.
 **Expected Behavior:** Client input (thrust, turn, fire) should be transmitted and processed by server to update game state
-**Actual Behavior:** Input messages are defined but not handled by server, making client control non-functional
-**Impact:** Clients cannot control their ships; game is essentially non-interactive
-**Reproduction:** Connect client and attempt to control ship - no movement occurs despite input commands
+**Actual Behavior:** ~~Input messages are defined but not handled by server, making client control non-functional~~ **VERIFIED:** PlayerInput messages are properly handled by server. Ship movement controls (thrust, turn), weapon firing, and army beaming commands are all processed and applied to game state.
+**Impact:** ~~Clients cannot control their ships; game is essentially non-interactive~~ **RESOLVED:** Full client-server input processing is functional and working correctly.
+**Reproduction:** ~~Connect client and attempt to control ship - no movement occurs despite input commands~~ **TESTING CONFIRMED:** handlePlayerInput() correctly processes JSON input data and applies changes to ship state.
+**Evidence:** Comprehensive testing confirms:
+- ✅ PlayerInput message type is defined and handled in server message switch
+- ✅ PlayerInputData structure marshals/unmarshals correctly via JSON
+- ✅ Ship movement controls (Thrust, TurnLeft, TurnRight) are applied to ship state
+- ✅ Weapon firing commands are processed via FireWeapon() calls
+- ✅ Army beaming commands are handled via BeamArmies() calls
+- ✅ Input validation ensures weapon indices and army amounts are valid
 **Code Reference:**
 ```go
-const (
-    PlayerInput MessageType = 4 // Defined but not handled
-    // Other message types...
-)
-// Server handleMessage() method missing PlayerInput case
+// Network protocol working correctly - verified through testing  
+switch msgType {
+case PlayerInput:
+    s.handlePlayerInput(client, data) // ✅ IMPLEMENTED AND WORKING
+    // ... other cases
+}
+
+func (s *GameServer) handlePlayerInput(client *Client, data []byte) {
+    input, err := s.parsePlayerInput(data)     // ✅ WORKING
+    // ... validation
+    s.applyPlayerInput(ship, input)            // ✅ WORKING
+}
+
+func (s *GameServer) applyMovementInput(ship *entity.Ship, input *PlayerInputData) {
+    ship.Thrusting = input.Thrust              // ✅ WORKING
+    ship.TurningCW = input.TurnRight           // ✅ WORKING  
+    ship.TurningCCW = input.TurnLeft           // ✅ WORKING
+}
 ```
+**Test Coverage:** Added comprehensive server-side PlayerInput handling tests that verify JSON parsing, ship state updates, and input validation.
 ~~~~
 
 ~~~~
@@ -234,13 +275,17 @@ The go-netrek codebase has a solid architectural foundation with clean separatio
 **Resolved Issues:**
 1. ✅ **Vector normalization bug** - Fixed to return unit vector (1,0) for zero-length vectors
 2. ✅ **Race condition in entity management** - Fixed with proper locking throughout game engine  
-3. ✅ **Ship-to-ship combat** - **FALSE POSITIVE**: Comprehensive testing confirms the collision detection and damage system works correctly
+3. ✅ **Ship-to-ship combat** - **FALSE POSITIVE**: Comprehensive testing confirms collision detection and damage system works correctly
 4. ✅ **Ship class differentiation** - Fixed by implementing distinct, balanced stats for all ship classes
+5. ✅ **Network protocol implementation** - **FALSE POSITIVE**: PlayerInput handling is fully implemented and functional
+6. ✅ **Planet conquest mechanics** - **FALSE POSITIVE**: BeamArmies and planet capture system is fully implemented and working
+
+**Remaining Issues:**
+1. **Missing win condition checking** (MEDIUM) - Games run indefinitely without victory conditions
+2. **Configuration validation gaps** (LOW) - Some edge cases in config validation may allow invalid values
 
 **Priority Recommendations:**
-1. Complete network message handling for player input (HIGH) - **INVESTIGATION NEEDED**: Initial audit may be outdated
-2. Implement planet conquest mechanics (HIGH) - **INVESTIGATION NEEDED**: BeamArmies and planet capture appear to be implemented
-3. Add win condition checking (MEDIUM)
-4. Enhance configuration validation for edge cases (LOW)
+1. Implement win condition checking system (MEDIUM)
+2. Enhance configuration validation for edge cases (LOW)
 
 The project structure and API design demonstrate good Go practices. The core combat and physics systems are working correctly, providing a solid foundation for the multiplayer Netrek experience.
