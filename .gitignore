@@ -26,3 +26,4 @@ go.work.sum
 client
 server
 ai_client
+simple_server

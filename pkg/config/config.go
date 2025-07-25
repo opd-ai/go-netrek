@@ -574,3 +574,130 @@ func createDefaultShipTypes() map[string]ShipTypeConfig {
 		},
 	}
 }
+
+// GalaxyTemplate represents a preset galaxy configuration
+type GalaxyTemplate struct {
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	WorldSize   float64        `json:"worldSize"`
+	Teams       []TeamConfig   `json:"teams"`
+	Planets     []PlanetConfig `json:"planets"`
+}
+
+// galaxyTemplates contains built-in galaxy map templates
+var galaxyTemplates = map[string]GalaxyTemplate{
+	"classic_netrek": {
+		Name:        "Classic Netrek",
+		Description: "Traditional 2-team Netrek galaxy with 4 home worlds",
+		WorldSize:   10000,
+		Teams: []TeamConfig{
+			{Name: "Federation", Color: "#0000FF", MaxShips: 8, StartingShip: "Scout"},
+			{Name: "Romulans", Color: "#00FF00", MaxShips: 8, StartingShip: "Scout"},
+			{Name: "Klingons", Color: "#FF0000", MaxShips: 8, StartingShip: "Scout"},
+			{Name: "Orions", Color: "#FFFF00", MaxShips: 8, StartingShip: "Scout"},
+		},
+		Planets: []PlanetConfig{
+			{Name: "Earth", X: -4000, Y: -4000, Type: entity.Homeworld, HomeWorld: true, TeamID: 0, InitialArmies: 30},
+			{Name: "Romulus", X: 4000, Y: -4000, Type: entity.Homeworld, HomeWorld: true, TeamID: 1, InitialArmies: 30},
+			{Name: "Qo'noS", X: -4000, Y: 4000, Type: entity.Homeworld, HomeWorld: true, TeamID: 2, InitialArmies: 30},
+			{Name: "Orion", X: 4000, Y: 4000, Type: entity.Homeworld, HomeWorld: true, TeamID: 3, InitialArmies: 30},
+			{Name: "Centauri", X: 0, Y: 0, Type: entity.Industrial, HomeWorld: false, TeamID: -1, InitialArmies: 15},
+			{Name: "Alpha", X: -2000, Y: 0, Type: entity.Military, HomeWorld: false, TeamID: -1, InitialArmies: 20},
+			{Name: "Beta", X: 2000, Y: 0, Type: entity.Agricultural, HomeWorld: false, TeamID: -1, InitialArmies: 10},
+			{Name: "Gamma", X: 0, Y: -2000, Type: entity.Industrial, HomeWorld: false, TeamID: -1, InitialArmies: 15},
+			{Name: "Delta", X: 0, Y: 2000, Type: entity.Agricultural, HomeWorld: false, TeamID: -1, InitialArmies: 10},
+		},
+	},
+	"small_galaxy": {
+		Name:        "Small Galaxy",
+		Description: "Compact 2-team galaxy for quick games",
+		WorldSize:   6000,
+		Teams: []TeamConfig{
+			{Name: "Federation", Color: "#0000FF", MaxShips: 4, StartingShip: "Scout"},
+			{Name: "Klingons", Color: "#FF0000", MaxShips: 4, StartingShip: "Scout"},
+		},
+		Planets: []PlanetConfig{
+			{Name: "Earth", X: -2000, Y: 0, Type: entity.Homeworld, HomeWorld: true, TeamID: 0, InitialArmies: 25},
+			{Name: "Qo'noS", X: 2000, Y: 0, Type: entity.Homeworld, HomeWorld: true, TeamID: 1, InitialArmies: 25},
+			{Name: "Neutral Station", X: 0, Y: 1000, Type: entity.Industrial, HomeWorld: false, TeamID: -1, InitialArmies: 15},
+			{Name: "Mining Colony", X: 0, Y: -1000, Type: entity.Agricultural, HomeWorld: false, TeamID: -1, InitialArmies: 10},
+		},
+	},
+	"balanced_4team": {
+		Name:        "Balanced 4-Team",
+		Description: "Perfectly balanced 4-team galaxy with symmetric layout",
+		WorldSize:   12000,
+		Teams: []TeamConfig{
+			{Name: "Federation", Color: "#0000FF", MaxShips: 6, StartingShip: "Scout"},
+			{Name: "Romulans", Color: "#00FF00", MaxShips: 6, StartingShip: "Scout"},
+			{Name: "Klingons", Color: "#FF0000", MaxShips: 6, StartingShip: "Scout"},
+			{Name: "Cardassians", Color: "#FF8800", MaxShips: 6, StartingShip: "Scout"},
+		},
+		Planets: []PlanetConfig{
+			// Home worlds in corners
+			{Name: "Earth", X: -3000, Y: -3000, Type: entity.Homeworld, HomeWorld: true, TeamID: 0, InitialArmies: 30},
+			{Name: "Romulus", X: 3000, Y: -3000, Type: entity.Homeworld, HomeWorld: true, TeamID: 1, InitialArmies: 30},
+			{Name: "Qo'noS", X: -3000, Y: 3000, Type: entity.Homeworld, HomeWorld: true, TeamID: 2, InitialArmies: 30},
+			{Name: "Cardassia", X: 3000, Y: 3000, Type: entity.Homeworld, HomeWorld: true, TeamID: 3, InitialArmies: 30},
+			// Strategic neutral planets
+			{Name: "Center Core", X: 0, Y: 0, Type: entity.Industrial, HomeWorld: false, TeamID: -1, InitialArmies: 25},
+			{Name: "North Gate", X: 0, Y: -1500, Type: entity.Military, HomeWorld: false, TeamID: -1, InitialArmies: 20},
+			{Name: "South Gate", X: 0, Y: 1500, Type: entity.Military, HomeWorld: false, TeamID: -1, InitialArmies: 20},
+			{Name: "East Gate", X: 1500, Y: 0, Type: entity.Military, HomeWorld: false, TeamID: -1, InitialArmies: 20},
+			{Name: "West Gate", X: -1500, Y: 0, Type: entity.Military, HomeWorld: false, TeamID: -1, InitialArmies: 20},
+		},
+	},
+}
+
+// GetGalaxyTemplate returns a galaxy template by name
+func GetGalaxyTemplate(name string) *GalaxyTemplate {
+	if template, ok := galaxyTemplates[name]; ok {
+		// Return a copy to prevent modification of the original
+		templateCopy := template
+		return &templateCopy
+	}
+	return nil
+}
+
+// ListGalaxyTemplates returns a list of available galaxy template names and descriptions
+func ListGalaxyTemplates() map[string]string {
+	templates := make(map[string]string)
+	for name, template := range galaxyTemplates {
+		templates[name] = template.Description
+	}
+	return templates
+}
+
+// ApplyGalaxyTemplate applies a galaxy template to a GameConfig
+func ApplyGalaxyTemplate(config *GameConfig, templateName string) error {
+	template := GetGalaxyTemplate(templateName)
+	if template == nil {
+		return fmt.Errorf("galaxy template '%s' not found", templateName)
+	}
+
+	// Apply template settings to config
+	config.WorldSize = template.WorldSize
+	config.Teams = make([]TeamConfig, len(template.Teams))
+	copy(config.Teams, template.Teams)
+	config.Planets = make([]PlanetConfig, len(template.Planets))
+	copy(config.Planets, template.Planets)
+
+	return nil
+}
+
+// LoadConfigWithTemplate loads a base config and applies a galaxy template
+func LoadConfigWithTemplate(configPath, templateName string) (*GameConfig, error) {
+	// Load base config
+	config, err := LoadConfig(configPath)
+	if err != nil {
+		// If base config fails, start with default
+		config = DefaultConfig()
+	}
+
+	// Apply template
+	if err := ApplyGalaxyTemplate(config, templateName); err != nil {
+		return nil, fmt.Errorf("failed to apply galaxy template: %w", err)
+	}
+
+	return config, nil
+}

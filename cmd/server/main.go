@@ -47,20 +47,41 @@ func main() {
 func parseCommandLineFlags(logger *logging.Logger, ctx context.Context) string {
 	configPath := flag.String("config", "config.json", "Path to configuration file")
 	createDefault := flag.Bool("default", false, "Create default configuration file")
+	galaxyTemplate := flag.String("template", "", "Galaxy map template to use (classic_netrek, small_galaxy, balanced_4team)")
+	listTemplates := flag.Bool("list-templates", false, "List available galaxy map templates")
 	flag.Parse()
+	// Handle listing templates
+	if *listTemplates {
+		logger.Info(ctx, "Available galaxy map templates:")
+		templates := config.ListGalaxyTemplates()
+		for name, description := range templates {
+			logger.Info(ctx, "Template available", "name", name, "description", description)
+		}
+		os.Exit(0)
+	}
 
-	// Create default configuration file if requested
+	// Handle default config creation with optional template
 	if *createDefault {
-		defaultConfig := config.DefaultConfig()
-		if err := config.SaveConfig(defaultConfig, *configPath); err != nil {
-			logger.Error(ctx, "Failed to create default configuration", err,
-				"config_path", *configPath,
-			)
+		var gameConfig *config.GameConfig
+
+		if *galaxyTemplate != "" {
+			logger.Info(ctx, "Creating default configuration with galaxy template", "template", *galaxyTemplate)
+			var err error
+			gameConfig, err = config.LoadConfigWithTemplate("", *galaxyTemplate)
+			if err != nil {
+				logger.Error(ctx, "Failed to create config with template", err, "template", *galaxyTemplate)
+				os.Exit(1)
+			}
+		} else {
+			logger.Info(ctx, "Creating default configuration file")
+			gameConfig = config.DefaultConfig()
+		}
+
+		if err := config.SaveConfig(gameConfig, *configPath); err != nil {
+			logger.Error(ctx, "Failed to create default configuration", err)
 			os.Exit(1)
 		}
-		logger.Info(ctx, "Created default configuration file",
-			"config_path", *configPath,
-		)
+		logger.Info(ctx, "Default configuration created", "path", *configPath)
 		os.Exit(0)
 	}
 
