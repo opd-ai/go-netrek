@@ -384,79 +384,120 @@ type connectRequest struct {
 
 // handleClientMessages processes messages from a connected client
 func (s *GameServer) handleClientMessages(client *Client) {
-	clientID := client.Conn.RemoteAddr().String() + "/" + strconv.FormatUint(uint64(client.ID), 10)
-
-	// Create context with correlation ID for this client session
+	clientID := s.buildClientIdentifier(client)
 	ctx := logging.WithCorrelationID(context.Background(), "")
 
 	for client.Connected && s.running {
-		// Create context with read timeout for each message
-		msgCtx, msgCancel := context.WithTimeout(client.ctx, s.readTimeout)
-
-		msgType, data, err := s.readMessage(msgCtx, client.Conn)
-		msgCancel() // Clean up timeout context
-
-		if err != nil {
-			if err != io.EOF && err != context.DeadlineExceeded && err != context.Canceled {
-				s.logger.Error(ctx, "Error reading message from client", err,
-					"client_id", client.ID,
-					"remote_addr", client.Conn.RemoteAddr().String(),
-				)
-			}
+		msgType, data, shouldContinue := s.readAndValidateMessage(ctx, client, clientID)
+		if !shouldContinue {
 			break
 		}
 
-		// Validate message for all types except disconnect
-		if msgType != DisconnectNotification {
-			if err := s.validator.ValidateMessage(data, clientID); err != nil {
-				s.logger.Warn(ctx, "Message validation failed for client",
-					"client_id", client.ID,
-					"error", err,
-					"message_type", msgType,
-					"message_size", len(data),
-				)
-				// Don't disconnect client for validation errors, just skip the message
-				continue
-			}
-		}
-
-		// Process message based on type
-		switch msgType {
-		case PlayerInput:
-			s.handlePlayerInput(client, data)
-
-		case PingRequest:
-			// Respond to ping request with ping response
-			responseCtx, responseCancel := context.WithTimeout(client.ctx, s.writeTimeout)
-			if err := s.sendMessage(responseCtx, client.Conn, PingResponse, data); err != nil {
-				s.logger.Error(ctx, "Failed to send ping response to client", err,
-					"client_id", client.ID,
-				)
-			}
-			responseCancel()
-
-		case ChatMessage:
-			// Broadcast chat message to all clients
-			s.broadcastChatMessage(client, data)
-
-		case DisconnectNotification:
-			// Client is disconnecting gracefully
-			s.logger.Info(ctx, "Client disconnecting",
-				"client_id", client.ID,
-				"player_name", client.PlayerName,
-			)
-			client.Connected = false
-
-		default:
-			s.logger.Warn(ctx, "Unknown message type from client",
-				"message_type", msgType,
-				"client_id", client.ID,
-			)
-		}
+		s.processClientMessage(ctx, client, msgType, data)
 	}
 
-	// Client disconnected, clean up
 	s.removeClient(client)
+}
+
+// buildClientIdentifier creates a unique identifier for the client
+func (s *GameServer) buildClientIdentifier(client *Client) string {
+	return client.Conn.RemoteAddr().String() + "/" + strconv.FormatUint(uint64(client.ID), 10)
+}
+
+// readAndValidateMessage reads and validates a message from client, returns message data and whether to continue processing
+func (s *GameServer) readAndValidateMessage(ctx context.Context, client *Client, clientID string) (MessageType, []byte, bool) {
+	msgCtx, msgCancel := context.WithTimeout(client.ctx, s.readTimeout)
+	defer msgCancel()
+
+	msgType, data, err := s.readMessage(msgCtx, client.Conn)
+	if err != nil {
+		s.handleMessageReadError(ctx, client, err)
+		return 0, nil, false
+	}
+
+	if !s.validateClientMessage(ctx, client, msgType, data, clientID) {
+		return 0, nil, true // Continue processing, skip this message
+	}
+
+	return msgType, data, true
+}
+
+// handleMessageReadError handles errors that occur during message reading
+func (s *GameServer) handleMessageReadError(ctx context.Context, client *Client, err error) {
+	if err != io.EOF && err != context.DeadlineExceeded && err != context.Canceled {
+		s.logger.Error(ctx, "Error reading message from client", err,
+			"client_id", client.ID,
+			"remote_addr", client.Conn.RemoteAddr().String(),
+		)
+	}
+}
+
+// validateClientMessage validates incoming messages, returns true if message should be processed
+func (s *GameServer) validateClientMessage(ctx context.Context, client *Client, msgType MessageType, data []byte, clientID string) bool {
+	if msgType == DisconnectNotification {
+		return true // Skip validation for disconnect messages
+	}
+
+	if err := s.validator.ValidateMessage(data, clientID); err != nil {
+		s.logger.Warn(ctx, "Message validation failed for client",
+			"client_id", client.ID,
+			"error", err,
+			"message_type", msgType,
+			"message_size", len(data),
+		)
+		return false
+	}
+
+	return true
+}
+
+// processClientMessage handles different message types from clients
+func (s *GameServer) processClientMessage(ctx context.Context, client *Client, msgType MessageType, data []byte) {
+	switch msgType {
+	case PlayerInput:
+		s.handlePlayerInput(client, data)
+
+	case PingRequest:
+		s.handlePingRequest(ctx, client, data)
+
+	case ChatMessage:
+		s.broadcastChatMessage(client, data)
+
+	case DisconnectNotification:
+		s.handleClientDisconnect(ctx, client)
+
+	default:
+		s.handleUnknownMessageType(ctx, client, msgType)
+	}
+}
+
+// handlePingRequest responds to ping requests from clients
+func (s *GameServer) handlePingRequest(ctx context.Context, client *Client, data []byte) {
+	responseCtx, responseCancel := context.WithTimeout(client.ctx, s.writeTimeout)
+	defer responseCancel()
+
+	if err := s.sendMessage(responseCtx, client.Conn, PingResponse, data); err != nil {
+		s.logger.Error(ctx, "Failed to send ping response to client", err,
+			"client_id", client.ID,
+		)
+	}
+}
+
+// handleClientDisconnect handles graceful client disconnection
+func (s *GameServer) handleClientDisconnect(ctx context.Context, client *Client) {
+	s.logger.Info(ctx, "Client disconnecting",
+		"client_id", client.ID,
+		"player_name", client.PlayerName,
+	)
+	client.Connected = false
+}
+
+// handleUnknownMessageType logs warnings for unknown message types
+func (s *GameServer) handleUnknownMessageType(ctx context.Context, client *Client, msgType MessageType) {
+	s.logger.Warn(ctx, "Unknown message type from client",
+		"message_type", msgType,
+		"client_id", client.ID,
+	)
 }
 
 // PlayerInputData represents the structure of player input messages
