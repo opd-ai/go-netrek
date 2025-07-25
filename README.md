@@ -11,7 +11,7 @@ Go Netrek is a reinterpretation of the classic Netrek game, implementing its cor
 - Team-based space combat for up to 16 players
 - Ship-to-ship combat with various weapon systems
 - Planet conquest mechanics
-- Real-time multiplayer over TCP/IP
+- Real-time multiplayer networking (supports TCP, Unix sockets, and other net.Conn implementations)
 - Configurable game rules and galaxy maps
 - Extensible, event-driven architecture
 
