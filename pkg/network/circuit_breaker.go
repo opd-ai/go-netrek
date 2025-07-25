@@ -81,54 +81,79 @@ func (ns *NetworkService) Execute(ctx context.Context, operation NetworkOperatio
 // It will attempt the operation multiple times with increasing delays between attempts.
 // The circuit breaker state is checked before each retry attempt.
 func (ns *NetworkService) ExecuteWithRetry(ctx context.Context, operation NetworkOperation) error {
-	maxRetries := 3
-	baseDelay := 1 * time.Second
+	const maxRetries = 3
+	const baseDelay = 1 * time.Second
 
 	for attempt := 0; attempt < maxRetries; attempt++ {
 		err := ns.Execute(ctx, operation)
 		if err == nil {
-			// Operation succeeded
 			return nil
 		}
 
-		// Check if this is a circuit breaker error (circuit is open)
-		if ns.breaker.State() == gobreaker.StateOpen {
-			// Circuit is open, no point in retrying
-			ns.logger.LogWithContext(ctx, slog.LevelWarn, "circuit breaker is open, skipping retries",
-				"attempt", attempt+1,
-				"max_retries", maxRetries,
-			)
+		if ns.shouldSkipRetries(ctx, err, attempt, maxRetries) {
 			return err
 		}
 
-		// If this is the last attempt, return the error
-		if attempt == maxRetries-1 {
-			ns.logger.LogWithContext(ctx, slog.LevelError, "all retry attempts failed",
-				"attempts", maxRetries,
-				"final_error", err,
-			)
-			return fmt.Errorf("max retries (%d) exceeded: %w", maxRetries, err)
+		if ns.isLastAttempt(attempt, maxRetries) {
+			return ns.handleFinalAttemptFailure(ctx, maxRetries, err)
 		}
 
-		// Calculate delay with exponential backoff
-		delay := time.Duration(attempt+1) * baseDelay
-		ns.logger.LogWithContext(ctx, slog.LevelWarn, "operation failed, retrying",
-			"attempt", attempt+1,
-			"max_retries", maxRetries,
-			"delay", delay,
-			"error", err,
-		)
-
-		// Wait before retrying, respecting context cancellation
-		select {
-		case <-time.After(delay):
-			// Continue to next retry
-		case <-ctx.Done():
-			return fmt.Errorf("retry cancelled: %w", ctx.Err())
+		if err := ns.waitBeforeRetry(ctx, attempt, baseDelay, maxRetries, err); err != nil {
+			return err
 		}
 	}
 
 	return fmt.Errorf("unexpected exit from retry loop")
+}
+
+// shouldSkipRetries checks if retries should be skipped due to circuit breaker state.
+func (ns *NetworkService) shouldSkipRetries(ctx context.Context, err error, attempt, maxRetries int) bool {
+	if ns.breaker.State() == gobreaker.StateOpen {
+		ns.logger.LogWithContext(ctx, slog.LevelWarn, "circuit breaker is open, skipping retries",
+			"attempt", attempt+1,
+			"max_retries", maxRetries,
+		)
+		return true
+	}
+	return false
+}
+
+// isLastAttempt checks if this is the final retry attempt.
+func (ns *NetworkService) isLastAttempt(attempt, maxRetries int) bool {
+	return attempt == maxRetries-1
+}
+
+// handleFinalAttemptFailure logs and returns error for the final failed attempt.
+func (ns *NetworkService) handleFinalAttemptFailure(ctx context.Context, maxRetries int, err error) error {
+	ns.logger.LogWithContext(ctx, slog.LevelError, "all retry attempts failed",
+		"attempts", maxRetries,
+		"final_error", err,
+	)
+	return fmt.Errorf("max retries (%d) exceeded: %w", maxRetries, err)
+}
+
+// waitBeforeRetry implements exponential backoff delay with context cancellation support.
+func (ns *NetworkService) waitBeforeRetry(ctx context.Context, attempt int, baseDelay time.Duration, maxRetries int, err error) error {
+	delay := ns.calculateBackoffDelay(attempt, baseDelay)
+
+	ns.logger.LogWithContext(ctx, slog.LevelWarn, "operation failed, retrying",
+		"attempt", attempt+1,
+		"max_retries", maxRetries,
+		"delay", delay,
+		"error", err,
+	)
+
+	select {
+	case <-time.After(delay):
+		return nil
+	case <-ctx.Done():
+		return fmt.Errorf("retry cancelled: %w", ctx.Err())
+	}
+}
+
+// calculateBackoffDelay computes the exponential backoff delay for the given attempt.
+func (ns *NetworkService) calculateBackoffDelay(attempt int, baseDelay time.Duration) time.Duration {
+	return time.Duration(attempt+1) * baseDelay
 }
 
 // GetState returns the current state of the circuit breaker.
