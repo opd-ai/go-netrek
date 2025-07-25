@@ -216,10 +216,18 @@ func (g *Game) checkTimeLimit() {
 	}
 }
 
-// checkWinConditions checks if win conditions have been met (conquest or score-based).
+// checkWinConditions checks if win conditions have been met (conquest, score-based, or custom).
 func (g *Game) checkWinConditions() {
 	if g.Status != GameStatusActive {
 		return
+	}
+
+	// Check custom win condition first if present
+	if g.CustomWinCondition != nil {
+		if _, hasWinner := g.CustomWinCondition.CheckWinner(g); hasWinner {
+			g.endGameInternal()
+			return
+		}
 	}
 
 	winCondition := g.Config.GameRules.WinCondition
