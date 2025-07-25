@@ -183,13 +183,25 @@ func (am *AssetManager) loadUIAssets() error {
 
 // createShipSprite creates a sprite from a 2D pattern
 func (am *AssetManager) createShipSprite(width, height int, pattern [][]int) common.Drawable {
-	// Create an image
+	// Create base RGBA image
+	img := am.createBaseImage(width, height)
+
+	// Draw pattern onto the image
+	am.drawPatternOnImage(img, pattern, width, height)
+
+	// Convert to Engo-compatible texture
+	return am.convertToEngoTexture(img)
+}
+
+// createBaseImage creates a transparent RGBA image with the specified dimensions.
+func (am *AssetManager) createBaseImage(width, height int) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
-
-	// Fill with transparent
 	draw.Draw(img, img.Bounds(), &image.Uniform{color.RGBA{0, 0, 0, 0}}, image.Point{}, draw.Src)
+	return img
+}
 
-	// Draw pattern
+// drawPatternOnImage draws a 2D pixel pattern onto the provided RGBA image.
+func (am *AssetManager) drawPatternOnImage(img *image.RGBA, pattern [][]int, width, height int) {
 	for y, row := range pattern {
 		if y >= height {
 			break
@@ -203,8 +215,10 @@ func (am *AssetManager) createShipSprite(width, height int, pattern [][]int) com
 			}
 		}
 	}
+}
 
-	// Convert RGBA to NRGBA for Engo
+// convertToEngoTexture converts an RGBA image to an Engo-compatible texture.
+func (am *AssetManager) convertToEngoTexture(img *image.RGBA) common.Drawable {
 	bounds := img.Bounds()
 	nrgbaImg := image.NewNRGBA(bounds)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
@@ -213,7 +227,6 @@ func (am *AssetManager) createShipSprite(width, height int, pattern [][]int) com
 		}
 	}
 
-	// Convert to Engo texture
 	texture := common.NewImageObject(nrgbaImg)
 	return common.NewTextureSingle(texture)
 }
