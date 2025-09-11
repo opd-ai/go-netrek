@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"html"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Message size and content limits as defined in the roadmap
@@ -19,6 +22,23 @@ const (
 	MaxChatMessageLen = 256
 	MaxMessagesPerMin = 100
 )
+
+// getValidationCallerInfo returns the calling function name for validation logging
+func getValidationCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
+}
+
+// validationLogger is the package-level logger for validation operations
+var validationLogger *logrus.Logger
+
+func init() {
+	validationLogger = logrus.New()
+	validationLogger.SetFormatter(&logrus.JSONFormatter{})
+	validationLogger.SetReportCaller(true)
+}
 
 // Regular expressions for input validation
 var (
@@ -34,9 +54,21 @@ type MessageValidator struct {
 
 // NewMessageValidator creates a new message validator with rate limiting
 func NewMessageValidator() *MessageValidator {
-	return &MessageValidator{
+	caller := getValidationCallerInfo()
+	validationLogger.WithField("caller", caller).WithField("function", "NewMessageValidator").Info("Creating new message validator")
+
+	validationLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":          "NewMessageValidator",
+		"max_msgs_per_min":  MaxMessagesPerMin,
+		"rate_limit_window": "1 minute",
+	}).Debug("Initializing rate limiter")
+
+	validator := &MessageValidator{
 		rateLimiter: NewRateLimiter(MaxMessagesPerMin, time.Minute),
 	}
+
+	validationLogger.WithField("caller", caller).WithField("function", "NewMessageValidator").Info("Message validator created successfully")
+	return validator
 }
 
 // Close releases resources used by the message validator

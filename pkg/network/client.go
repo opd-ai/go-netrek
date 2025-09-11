@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"runtime"
 	"sync"
 	"time"
 
@@ -16,7 +17,16 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/engine"
 	"github.com/opd-ai/go-netrek/pkg/entity"
 	"github.com/opd-ai/go-netrek/pkg/event"
+	"github.com/sirupsen/logrus"
 )
+
+// getClientCallerInfo returns the calling function name for logging context
+func getClientCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
+}
 
 // GameClient handles network communication with the server
 type GameClient struct {
@@ -45,21 +55,62 @@ type GameClient struct {
 
 	// Circuit breaker for reliable network operations
 	networkService *NetworkService
+
+	// Logger for structured logging
+	logger *logrus.Logger
 }
 
 // NewGameClient creates a new game client
 func NewGameClient(eventBus *event.Bus) *GameClient {
+	// Initialize logger with caller reporting
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetReportCaller(true)
+
+	caller := getClientCallerInfo()
+	logger.WithField("caller", caller).WithField("function", "NewGameClient").Info("Creating new game client")
+
 	// Load environment configuration for timeouts
+	logger.WithField("caller", caller).WithField("function", "NewGameClient").Info("Loading environment configuration")
 	envConfig, err := config.LoadConfigFromEnv()
 	if err != nil {
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "NewGameClient",
+			"error":    err.Error(),
+		}).Warn("Failed to load environment config, using defaults")
+
 		// Use defaults if config loading fails
 		envConfig = &config.EnvironmentConfig{
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		}
+
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":      "NewGameClient",
+			"read_timeout":  envConfig.ReadTimeout,
+			"write_timeout": envConfig.WriteTimeout,
+		}).Info("Using default environment configuration")
+	} else {
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":      "NewGameClient",
+			"read_timeout":  envConfig.ReadTimeout,
+			"write_timeout": envConfig.WriteTimeout,
+		}).Info("Loaded environment configuration successfully")
 	}
 
-	return &GameClient{
+	logger.WithField("caller", caller).WithField("function", "NewGameClient").Info("Creating network service")
+	networkService := NewNetworkService(envConfig)
+
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":               "NewGameClient",
+		"states_channel_buffer":  10,
+		"ping_interval":          time.Second * 5,
+		"reconnect_delay":        time.Second * 3,
+		"max_reconnect_attempts": 5,
+		"connection_timeout":     30 * time.Second,
+	}).Info("Initializing client configuration")
+
+	client := &GameClient{
 		receivedStates:       make(chan *engine.GameState, 10),
 		eventBus:             eventBus,
 		pingInterval:         time.Second * 5,
@@ -68,12 +119,26 @@ func NewGameClient(eventBus *event.Bus) *GameClient {
 		connectionTimeout:    30 * time.Second,
 		readTimeout:          envConfig.ReadTimeout,
 		writeTimeout:         envConfig.WriteTimeout,
-		networkService:       NewNetworkService(envConfig),
+		networkService:       networkService,
+		logger:               logger,
 	}
+
+	logger.WithField("caller", caller).WithField("function", "NewGameClient").Info("Game client created successfully")
+	return client
 }
 
 func (c *GameClient) RequestShipClass(class entity.ShipClass) error {
+	caller := getClientCallerInfo()
+	c.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "RequestShipClass",
+		"ship_class": class,
+	}).Info("Requesting ship class change")
+
 	c.DesiredShipClass = class
+	c.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":           "RequestShipClass",
+		"desired_ship_class": c.DesiredShipClass,
+	}).Debug("Updated desired ship class")
 
 	// Send request to server
 	request := struct {
@@ -82,7 +147,27 @@ func (c *GameClient) RequestShipClass(class entity.ShipClass) error {
 		ShipClass: class,
 	}
 
-	return c.sendMessage(RequestShipClass, request)
+	c.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function": "RequestShipClass",
+		"request":  request,
+	}).Debug("Sending ship class request to server")
+
+	err := c.sendMessage(RequestShipClass, request)
+	if err != nil {
+		c.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":   "RequestShipClass",
+			"error":      err.Error(),
+			"ship_class": class,
+		}).Error("Failed to send ship class request")
+		return err
+	}
+
+	c.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "RequestShipClass",
+		"ship_class": class,
+	}).Info("Ship class request sent successfully")
+
+	return nil
 }
 
 // Connect connects to the game server

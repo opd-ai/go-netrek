@@ -2,7 +2,10 @@
 package event
 
 import (
+	"runtime"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Type represents the type of event
@@ -21,6 +24,23 @@ const (
 	GameEnded        Type = "game_ended"
 	TeamScoreChanged Type = "team_score_changed"
 )
+
+// getEventCallerInfo returns the calling function name for event logging
+func getEventCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
+}
+
+// eventLogger is the package-level logger for event operations
+var eventLogger *logrus.Logger
+
+func init() {
+	eventLogger = logrus.New()
+	eventLogger.SetFormatter(&logrus.JSONFormatter{})
+	eventLogger.SetReportCaller(true)
+}
 
 // Subscription represents a subscription token
 type Subscription struct {
@@ -68,19 +88,46 @@ type Bus struct {
 
 // NewEventBus creates a new event bus
 func NewEventBus() *Bus {
-	return &Bus{
+	caller := getEventCallerInfo()
+	eventLogger.WithField("caller", caller).WithField("function", "NewEventBus").Info("Creating new event bus")
+
+	bus := &Bus{
 		handlers: make(map[Type][]handlerWrapper),
 		nextID:   1,
 	}
+
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function": "NewEventBus",
+		"next_id":  bus.nextID,
+	}).Debug("Event bus initialized successfully")
+
+	return bus
 }
 
 // Subscribe registers a handler for a specific event type and returns a subscription token
 func (b *Bus) Subscribe(eventType Type, handler Handler) *Subscription {
+	caller := getEventCallerInfo()
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "Subscribe",
+		"event_type": string(eventType),
+	}).Info("Subscribing to event type")
+
+	eventLogger.WithField("caller", caller).WithField("function", "Subscribe").Debug("Acquiring event bus lock")
 	b.mu.Lock()
-	defer b.mu.Unlock()
+	defer func() {
+		b.mu.Unlock()
+		eventLogger.WithField("caller", caller).WithField("function", "Subscribe").Debug("Released event bus lock")
+	}()
 
 	id := b.nextID
 	b.nextID++
+
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":        "Subscribe",
+		"event_type":      string(eventType),
+		"subscription_id": id,
+		"next_id":         b.nextID,
+	}).Debug("Generated subscription ID")
 
 	wrapper := handlerWrapper{
 		id:      id,
@@ -89,12 +136,30 @@ func (b *Bus) Subscribe(eventType Type, handler Handler) *Subscription {
 
 	b.handlers[eventType] = append(b.handlers[eventType], wrapper)
 
+	currentHandlerCount := len(b.handlers[eventType])
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "Subscribe",
+		"event_type":    string(eventType),
+		"handler_count": currentHandlerCount,
+	}).Debug("Handler added to event type")
+
 	sub := &Subscription{
 		ID: id,
 		Cancel: func() {
+			eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":        "Subscribe.Cancel",
+				"event_type":      string(eventType),
+				"subscription_id": id,
+			}).Debug("Cancelling subscription")
 			b.unsubscribeByID(eventType, id)
 		},
 	}
+
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":        "Subscribe",
+		"event_type":      string(eventType),
+		"subscription_id": id,
+	}).Info("Successfully subscribed to event type")
 
 	return sub
 }
@@ -126,18 +191,59 @@ func (b *Bus) Unsubscribe(eventType Type, handler Handler) {
 
 // Publish sends an event to all subscribed handlers
 func (b *Bus) Publish(event Event) {
+	caller := getEventCallerInfo()
+	eventType := event.GetType()
+
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "Publish",
+		"event_type": string(eventType),
+	}).Info("Publishing event")
+
+	eventLogger.WithField("caller", caller).WithField("function", "Publish").Debug("Acquiring read lock for event handlers")
 	b.mu.RLock()
-	handlers, ok := b.handlers[event.GetType()]
+	handlers, ok := b.handlers[eventType]
+	handlerCount := len(handlers)
 	b.mu.RUnlock()
+	eventLogger.WithField("caller", caller).WithField("function", "Publish").Debug("Released read lock for event handlers")
 
 	if !ok {
+		eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":   "Publish",
+			"event_type": string(eventType),
+		}).Debug("No handlers registered for event type")
 		return
 	}
 
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "Publish",
+		"event_type":    string(eventType),
+		"handler_count": handlerCount,
+	}).Debug("Found handlers for event type")
+
 	// Call each handler
-	for _, wrapper := range handlers {
+	for i, wrapper := range handlers {
+		eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":      "Publish",
+			"event_type":    string(eventType),
+			"handler_index": i,
+			"handler_id":    wrapper.id,
+		}).Debug("Calling event handler")
+
 		wrapper.handler(event)
+
+		eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":      "Publish",
+			"event_type":    string(eventType),
+			"handler_index": i,
+			"handler_id":    wrapper.id,
+		}).Debug("Event handler completed")
 	}
+
+	eventLogger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":        "Publish",
+		"event_type":      string(eventType),
+		"handlers_called": handlerCount,
+	}).Info("Event published to all handlers successfully")
 }
 
 // Specific event implementations

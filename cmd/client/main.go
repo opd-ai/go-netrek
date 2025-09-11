@@ -2,15 +2,18 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
 	"github.com/EngoEngine/engo"
+	"github.com/sirupsen/logrus"
 
 	"github.com/opd-ai/go-netrek/pkg/config"
 	"github.com/opd-ai/go-netrek/pkg/event"
@@ -18,15 +21,46 @@ import (
 	engorender "github.com/opd-ai/go-netrek/pkg/render/engo"
 )
 
-func main() {
-	args := parseCommandLineArguments()
-	gameConfig := loadGameConfiguration(args.configPath)
-	serverAddr := resolveServerAddress(args.serverAddr, gameConfig)
+// getMainCallerInfo returns the calling function name for logging context
+func getMainCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(1); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
+}
 
+func main() {
+	// Initialize logger with caller reporting
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetReportCaller(true)
+	ctx := context.Background()
+
+	caller := getMainCallerInfo()
+	logger.WithField("caller", caller).WithField("function", "main").Info("Starting netrek client")
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Parsing command line arguments")
+	args := parseCommandLineArguments(logger, ctx)
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Loading game configuration")
+	gameConfig := loadGameConfiguration(logger, ctx, args.configPath)
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Resolving server address")
+	serverAddr := resolveServerAddress(logger, ctx, args.serverAddr, gameConfig)
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Creating event bus")
 	eventBus := event.NewEventBus()
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Initializing game client")
 	client := initializeGameClient(eventBus, serverAddr, args.playerName, args.teamID)
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Setting up event subscriptions")
 	setupEventSubscriptions(eventBus)
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Starting selected renderer")
 	startSelectedRenderer(args.renderer, client, eventBus, args.teamID, args.width, args.height, args.fullscreen)
+
+	logger.WithField("caller", caller).WithField("function", "main").Info("Client shutdown completed")
 }
 
 // clientArgs holds parsed command line arguments for the client application.
@@ -42,7 +76,10 @@ type clientArgs struct {
 }
 
 // parseCommandLineArguments parses and returns command line arguments for the client.
-func parseCommandLineArguments() *clientArgs {
+func parseCommandLineArguments(logger *logrus.Logger, ctx context.Context) *clientArgs {
+	caller := getMainCallerInfo()
+	logger.WithField("caller", caller).WithField("function", "parseCommandLineArguments").Info("Parsing command line flags")
+
 	args := &clientArgs{}
 	flag.StringVar(&args.configPath, "config", "config.json", "Path to configuration file")
 	flag.StringVar(&args.serverAddr, "server", "", "Server address (overrides config)")
@@ -53,41 +90,88 @@ func parseCommandLineArguments() *clientArgs {
 	flag.IntVar(&args.width, "width", 1024, "Window width (Engo only)")
 	flag.IntVar(&args.height, "height", 768, "Window height (Engo only)")
 	flag.Parse()
+
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":    "parseCommandLineArguments",
+		"config_path": args.configPath,
+		"server_addr": args.serverAddr,
+		"player_name": args.playerName,
+		"team_id":     args.teamID,
+		"renderer":    args.renderer,
+		"fullscreen":  args.fullscreen,
+		"width":       args.width,
+		"height":      args.height,
+	}).Info("Command line arguments parsed successfully")
+
 	return args
 }
 
 // loadGameConfiguration loads the game configuration from file or returns default configuration.
-func loadGameConfiguration(configPath string) *config.GameConfig {
+func loadGameConfiguration(logger *logrus.Logger, ctx context.Context, configPath string) *config.GameConfig {
+	caller := getMainCallerInfo()
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":    "loadGameConfiguration",
+		"config_path": configPath,
+	}).Info("Loading game configuration")
+
 	var gameConfig *config.GameConfig
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Printf("Configuration file not found, using default configuration")
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":    "loadGameConfiguration",
+			"config_path": configPath,
+		}).Warn("Configuration file not found, using default configuration")
 		gameConfig = config.DefaultConfig()
 	} else {
 		var err error
 		gameConfig, err = config.LoadConfig(configPath)
 		if err != nil {
-			log.Fatalf("Failed to load configuration: %v", err)
+			logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":    "loadGameConfiguration",
+				"config_path": configPath,
+				"error":       err.Error(),
+			}).Fatal("Failed to load configuration")
 		}
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":    "loadGameConfiguration",
+			"config_path": configPath,
+		}).Info("Configuration loaded successfully from file")
 	}
 
 	// Apply environment variable overrides
+	logger.WithField("caller", caller).WithField("function", "loadGameConfiguration").Info("Applying environment variable overrides")
 	if err := config.ApplyEnvironmentOverrides(gameConfig); err != nil {
-		log.Fatalf("Failed to apply environment configuration: %v", err)
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "loadGameConfiguration",
+			"error":    err.Error(),
+		}).Fatal("Failed to apply environment configuration")
 	}
 
+	logger.WithField("caller", caller).WithField("function", "loadGameConfiguration").Info("Game configuration loaded and configured successfully")
 	return gameConfig
 }
 
 // resolveServerAddress determines the final server address to use for connection.
-func resolveServerAddress(cmdLineAddr string, gameConfig *config.GameConfig) string {
+func resolveServerAddress(logger *logrus.Logger, ctx context.Context, cmdLineAddr string, gameConfig *config.GameConfig) string {
+	caller := getMainCallerInfo()
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "resolveServerAddress",
+		"cmd_line_addr": cmdLineAddr,
+	}).Info("Resolving server address")
+
 	// Command line argument takes highest priority
 	if cmdLineAddr != "" {
+		logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "resolveServerAddress",
+			"source":   "command_line",
+			"address":  cmdLineAddr,
+		}).Info("Using command line server address")
 		return cmdLineAddr
 	}
 
 	// Check environment variable
-	if envAddr := os.Getenv("NETREK_SERVER_ADDR"); envAddr != "" {
+	envAddr := os.Getenv("NETREK_SERVER_ADDR")
+	if envAddr != "" {
 		port := os.Getenv("NETREK_SERVER_PORT")
 		if port == "" {
 			port = "4566" // Default port

@@ -1,12 +1,34 @@
 // pkg/physics/vector.go
 package physics
 
-import "math"
+import (
+	"math"
+	"runtime"
+
+	"github.com/sirupsen/logrus"
+)
 
 // Vector2D represents a 2D vector with x and y components
 type Vector2D struct {
 	X float64
 	Y float64
+}
+
+// getPhysicsCallerInfo returns the calling function name for physics logging
+func getPhysicsCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
+}
+
+// logger is the package-level logger for physics operations
+var physicsLogger *logrus.Logger
+
+func init() {
+	physicsLogger = logrus.New()
+	physicsLogger.SetFormatter(&logrus.JSONFormatter{})
+	physicsLogger.SetReportCaller(true)
 }
 
 // Add returns the sum of two vectors

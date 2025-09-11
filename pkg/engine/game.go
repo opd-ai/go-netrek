@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"math/rand/v2"
+	"runtime"
 	"sync"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/opd-ai/go-netrek/pkg/event"
 	"github.com/opd-ai/go-netrek/pkg/physics"
 	"github.com/opd-ai/go-netrek/pkg/resource"
+	"github.com/sirupsen/logrus"
 )
 
 // pkg/engine/game.go
@@ -54,6 +56,17 @@ type Game struct {
 
 	// Resource management
 	ResourceManager *resource.ResourceManager
+
+	// Logger for structured logging
+	logger *logrus.Logger
+}
+
+// getCallerInfo returns the calling function name for logging context
+func getCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
 }
 
 // Team represents a player team in the game
@@ -83,6 +96,20 @@ type Player struct {
 
 // NewGame creates a new game with the specified configuration
 func NewGame(config *config.GameConfig) *Game {
+	// Initialize logger with caller reporting
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetReportCaller(true)
+
+	caller := getCallerInfo()
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "NewGame",
+		"max_players":   config.MaxPlayers,
+		"world_size":    config.WorldSize,
+		"teams_count":   len(config.Teams),
+		"planets_count": len(config.Planets),
+	}).Info("Creating new game instance")
+
 	game := &Game{
 		Config:      config,
 		Ships:       make(map[entity.ID]*entity.Ship),
@@ -93,12 +120,34 @@ func NewGame(config *config.GameConfig) *Game {
 		CurrentTick: 0,
 		LastUpdate:  time.Now(),
 		EventBus:    event.NewEventBus(),
+		logger:      logger,
 	}
 
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":     "NewGame",
+		"time_step":    game.TimeStep,
+		"current_tick": game.CurrentTick,
+	}).Info("Game struct initialized")
+
 	// Initialize game components first
+	logger.WithField("caller", caller).WithField("function", "NewGame").Info("Initializing spatial index")
 	game.initSpatialIndex()
+
+	logger.WithField("caller", caller).WithField("function", "NewGame").Info("Initializing teams")
 	game.initTeams()
+
+	logger.WithField("caller", caller).WithField("function", "NewGame").Info("Initializing planets")
 	game.initPlanets()
+
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "NewGame",
+		"ships_count":   len(game.Ships),
+		"planets_count": len(game.Planets),
+		"teams_count":   len(game.Teams),
+		"status":        game.Status,
+	}).Info("Game initialization completed successfully")
+
+	logger.WithField("caller", caller).WithField("function", "NewGame").Info("Registering event handlers")
 	game.registerEventHandlers()
 
 	return game
@@ -107,8 +156,16 @@ func NewGame(config *config.GameConfig) *Game {
 // InitializeResourceManager initializes the resource manager with environment configuration.
 // This is called separately to avoid circular dependencies during game creation.
 func (g *Game) InitializeResourceManager() error {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithField("function", "InitializeResourceManager").Info("Starting resource manager initialization")
+
 	envConfig, err := config.LoadConfigFromEnv()
 	if err != nil {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "InitializeResourceManager",
+			"error":    err.Error(),
+		}).Warn("Failed to load environment config, using safe defaults")
+
 		// Use safe defaults if environment config fails
 		envConfig = &config.EnvironmentConfig{
 			MaxMemoryMB:           500,
@@ -116,14 +173,51 @@ func (g *Game) InitializeResourceManager() error {
 			ShutdownTimeout:       30 * time.Second,
 			ResourceCheckInterval: 10 * time.Second,
 		}
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":                "InitializeResourceManager",
+			"max_memory_mb":           envConfig.MaxMemoryMB,
+			"max_goroutines":          envConfig.MaxGoroutines,
+			"shutdown_timeout":        envConfig.ShutdownTimeout,
+			"resource_check_interval": envConfig.ResourceCheckInterval,
+		}).Info("Using default environment configuration")
+	} else {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":                "InitializeResourceManager",
+			"max_memory_mb":           envConfig.MaxMemoryMB,
+			"max_goroutines":          envConfig.MaxGoroutines,
+			"shutdown_timeout":        envConfig.ShutdownTimeout,
+			"resource_check_interval": envConfig.ResourceCheckInterval,
+		}).Info("Loaded environment configuration successfully")
 	}
+
+	g.logger.WithField("caller", caller).WithField("function", "InitializeResourceManager").Info("Creating resource manager instance")
 	g.ResourceManager = resource.NewResourceManager(envConfig)
-	return g.ResourceManager.Start()
+
+	g.logger.WithField("caller", caller).WithField("function", "InitializeResourceManager").Info("Starting resource manager")
+	err = g.ResourceManager.Start()
+	if err != nil {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "InitializeResourceManager",
+			"error":    err.Error(),
+		}).Error("Failed to start resource manager")
+		return err
+	}
+
+	g.logger.WithField("caller", caller).WithField("function", "InitializeResourceManager").Info("Resource manager initialized successfully")
+	return nil
 }
 
 // initSpatialIndex creates the spatial index for collision detection.
 func (g *Game) initSpatialIndex() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithField("function", "initSpatialIndex").Info("Initializing spatial index for collision detection")
+
 	worldSize := g.Config.WorldSize
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "initSpatialIndex",
+		"world_size": worldSize,
+	}).Debug("Creating QuadTree with world bounds")
+
 	g.SpatialIndex = physics.NewQuadTree(
 		physics.Rect{
 			Center: physics.Vector2D{X: 0, Y: 0},
@@ -132,11 +226,33 @@ func (g *Game) initSpatialIndex() {
 		},
 		10, // Maximum entities per quad before subdivision
 	)
+
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":              "initSpatialIndex",
+		"max_entities_per_quad": 10,
+		"quad_tree_center_x":    0,
+		"quad_tree_center_y":    0,
+		"quad_tree_width":       worldSize,
+		"quad_tree_height":      worldSize,
+	}).Info("Spatial index QuadTree created successfully")
 }
 
 // initTeams initializes the teams based on the game configuration.
 func (g *Game) initTeams() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":        "initTeams",
+		"teams_to_create": len(g.Config.Teams),
+	}).Info("Initializing game teams")
+
 	for i, teamConfig := range g.Config.Teams {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":   "initTeams",
+			"team_index": i,
+			"team_name":  teamConfig.Name,
+			"team_color": teamConfig.Color,
+		}).Debug("Creating team")
+
 		team := &Team{
 			ID:      i,
 			Name:    teamConfig.Name,
@@ -144,12 +260,41 @@ func (g *Game) initTeams() {
 			Players: make(map[entity.ID]*Player),
 		}
 		g.Teams[i] = team
+
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":   "initTeams",
+			"team_id":    team.ID,
+			"team_name":  team.Name,
+			"team_color": team.Color,
+		}).Info("Team created successfully")
 	}
+
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":            "initTeams",
+		"total_teams_created": len(g.Teams),
+	}).Info("All teams initialized successfully")
 }
 
 // initPlanets initializes the planets based on the game configuration.
 func (g *Game) initPlanets() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":          "initPlanets",
+		"planets_to_create": len(g.Config.Planets),
+	}).Info("Initializing game planets")
+
 	for _, planetConfig := range g.Config.Planets {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":       "initPlanets",
+			"planet_name":    planetConfig.Name,
+			"planet_x":       planetConfig.X,
+			"planet_y":       planetConfig.Y,
+			"planet_type":    planetConfig.Type,
+			"home_world":     planetConfig.HomeWorld,
+			"team_id":        planetConfig.TeamID,
+			"initial_armies": planetConfig.InitialArmies,
+		}).Debug("Creating planet")
+
 		planet := entity.NewPlanet(
 			entity.GenerateID(),
 			planetConfig.Name,
@@ -161,130 +306,337 @@ func (g *Game) initPlanets() {
 			planet.TeamID = planetConfig.TeamID
 			planet.Armies = planetConfig.InitialArmies
 
+			g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":         "initPlanets",
+				"planet_id":        planet.GetID(),
+				"planet_name":      planetConfig.Name,
+				"is_home_world":    true,
+				"assigned_team_id": planetConfig.TeamID,
+				"armies":           planetConfig.InitialArmies,
+			}).Info("Configured home world planet")
+
 			// Update team planet count
 			if team, ok := g.Teams[planetConfig.TeamID]; ok {
 				team.PlanetCount++
+				g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+					"function":     "initPlanets",
+					"team_id":      planetConfig.TeamID,
+					"team_name":    team.Name,
+					"planet_count": team.PlanetCount,
+				}).Debug("Updated team planet count")
 			}
 		}
 
 		g.Planets[planet.GetID()] = planet
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":    "initPlanets",
+			"planet_id":   planet.GetID(),
+			"planet_name": planetConfig.Name,
+		}).Info("Planet added to game")
 	}
+
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":              "initPlanets",
+		"total_planets_created": len(g.Planets),
+	}).Info("All planets initialized successfully")
 }
 
 // Start begins the game update loop
 func (g *Game) Start() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithField("function", "Start").Info("Starting game")
+
 	g.Running = true
 	g.Status = GameStatusActive
 	g.StartTime = time.Now()
 	g.LastUpdate = time.Now()
+
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":    "Start",
+		"running":     g.Running,
+		"status":      g.Status,
+		"start_time":  g.StartTime,
+		"last_update": g.LastUpdate,
+	}).Info("Game state updated to active")
+
+	g.logger.WithField("caller", caller).WithField("function", "Start").Info("Publishing game started event")
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.GameStarted,
 		Source:    g,
 	})
+
+	g.logger.WithField("caller", caller).WithField("function", "Start").Info("Game started successfully")
 }
 
 // Stop halts the game update loop
 func (g *Game) Stop() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithField("function", "Stop").Info("Stopping game")
+
 	g.Running = false
+
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":     "Stop",
+		"running":      g.Running,
+		"final_tick":   g.CurrentTick,
+		"elapsed_time": g.ElapsedTime,
+	}).Info("Game state updated to stopped")
+
+	g.logger.WithField("caller", caller).WithField("function", "Stop").Info("Publishing game ended event")
 	g.EventBus.Publish(&event.BaseEvent{
 		EventType: event.GameEnded,
 		Source:    g,
 	})
+
+	g.logger.WithField("caller", caller).WithField("function", "Stop").Info("Game stopped successfully")
 }
 
 // Update advances the game state by one tick
 func (g *Game) Update() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":     "Update",
+		"current_tick": g.CurrentTick,
+		"running":      g.Running,
+	}).Debug("Starting game update cycle")
+
 	deltaTime := g.calculateDeltaTime()
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "Update",
+		"delta_time": deltaTime,
+	}).Debug("Calculated delta time")
 
 	// Lock the entire update to ensure consistency across all entity operations
+	g.logger.WithField("caller", caller).WithField("function", "Update").Debug("Acquiring entity lock")
 	g.EntityLock.Lock()
-	defer g.EntityLock.Unlock()
+	defer func() {
+		g.EntityLock.Unlock()
+		g.logger.WithField("caller", caller).WithField("function", "Update").Debug("Released entity lock")
+	}()
 
+	g.logger.WithField("caller", caller).WithField("function", "Update").Debug("Checking time limit")
 	g.checkTimeLimit()
+
+	g.logger.WithField("caller", caller).WithField("function", "Update").Debug("Checking win conditions")
 	g.checkWinConditions() // Check for conquest/score-based win conditions
+
+	g.logger.WithField("caller", caller).WithField("function", "Update").Debug("Updating game state")
 	g.updateGameState(deltaTime)
+
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":     "Update",
+		"current_tick": g.CurrentTick,
+		"elapsed_time": g.ElapsedTime,
+	}).Debug("Game update cycle completed")
 }
 
 // checkTimeLimit checks if the game has ended due to the time limit.
 func (g *Game) checkTimeLimit() {
+	caller := getCallerInfo()
+
 	if g.Status == GameStatusActive {
 		g.ElapsedTime = time.Since(g.StartTime).Seconds()
+
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":           "checkTimeLimit",
+			"elapsed_time":       g.ElapsedTime,
+			"time_limit":         g.Config.GameRules.TimeLimit,
+			"time_limit_enabled": g.Config.GameRules.TimeLimit > 0,
+		}).Debug("Checking time limit")
+
 		if g.Config.GameRules.TimeLimit > 0 &&
 			g.ElapsedTime >= float64(g.Config.GameRules.TimeLimit) {
+
+			g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":     "checkTimeLimit",
+				"elapsed_time": g.ElapsedTime,
+				"time_limit":   g.Config.GameRules.TimeLimit,
+			}).Info("Time limit exceeded, ending game")
+
 			g.endGameInternal()
 		}
+	} else {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "checkTimeLimit",
+			"status":   g.Status,
+		}).Debug("Game not active, skipping time limit check")
 	}
 }
 
 // checkWinConditions checks if win conditions have been met (conquest, score-based, or custom).
 func (g *Game) checkWinConditions() {
+	caller := getCallerInfo()
+
 	if g.Status != GameStatusActive {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function": "checkWinConditions",
+			"status":   g.Status,
+		}).Debug("Game not active, skipping win condition check")
 		return
 	}
 
+	g.logger.WithField("caller", caller).WithField("function", "checkWinConditions").Debug("Checking win conditions")
+
 	// Check custom win condition first if present
 	if g.CustomWinCondition != nil {
+		g.logger.WithField("caller", caller).WithField("function", "checkWinConditions").Debug("Checking custom win condition")
 		if _, hasWinner := g.CustomWinCondition.CheckWinner(g); hasWinner {
+			g.logger.WithField("caller", caller).WithField("function", "checkWinConditions").Info("Custom win condition met, ending game")
 			g.endGameInternal()
 			return
 		}
 	}
 
 	winCondition := g.Config.GameRules.WinCondition
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "checkWinConditions",
+		"win_condition": winCondition,
+	}).Debug("Checking standard win conditions")
+
 	switch winCondition {
 	case "conquest":
+		g.logger.WithField("caller", caller).WithField("function", "checkWinConditions").Debug("Checking conquest win condition")
 		g.checkConquestWin()
 	case "score":
+		g.logger.WithField("caller", caller).WithField("function", "checkWinConditions").Debug("Checking score win condition")
 		g.checkScoreWin()
+	default:
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":          "checkWinConditions",
+			"unknown_condition": winCondition,
+		}).Warn("Unknown win condition specified")
 	}
 }
 
 // checkConquestWin checks if any team has conquered all planets.
 func (g *Game) checkConquestWin() {
+	caller := getCallerInfo()
+	g.logger.WithField("caller", caller).WithField("function", "checkConquestWin").Debug("Checking conquest win condition")
+
 	// Count planets per team
 	teamPlanetCounts := make(map[int]int)
 	totalPlanets := len(g.Planets)
 
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "checkConquestWin",
+		"total_planets": totalPlanets,
+	}).Debug("Starting planet count calculation")
+
 	for _, planet := range g.Planets {
 		if planet.TeamID >= 0 { // Only count conquered planets
 			teamPlanetCounts[planet.TeamID]++
+			g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":    "checkConquestWin",
+				"planet_id":   planet.GetID(),
+				"planet_name": planet.Name,
+				"team_id":     planet.TeamID,
+			}).Debug("Planet controlled by team")
+		} else {
+			g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":    "checkConquestWin",
+				"planet_id":   planet.GetID(),
+				"planet_name": planet.Name,
+			}).Debug("Planet is neutral/uncontrolled")
 		}
 	}
 
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":           "checkConquestWin",
+		"team_planet_counts": teamPlanetCounts,
+		"total_planets":      totalPlanets,
+	}).Debug("Planet count calculation completed")
+
 	// Check if any team has conquered all planets
-	for _, planetCount := range teamPlanetCounts {
+	for teamID, planetCount := range teamPlanetCounts {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":      "checkConquestWin",
+			"team_id":       teamID,
+			"planet_count":  planetCount,
+			"total_planets": totalPlanets,
+		}).Debug("Checking team conquest status")
+
 		if planetCount == totalPlanets && totalPlanets > 0 {
+			g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":          "checkConquestWin",
+				"winning_team_id":   teamID,
+				"conquered_planets": planetCount,
+				"total_planets":     totalPlanets,
+			}).Info("Conquest win condition met, ending game")
+
 			g.endGameInternal()
 			return
 		}
 	}
+
+	g.logger.WithField("caller", caller).WithField("function", "checkConquestWin").Debug("No team has achieved conquest victory")
 }
 
 // checkScoreWin checks if any team has reached the maximum score.
 func (g *Game) checkScoreWin() {
+	caller := getCallerInfo()
+
 	maxScore := g.Config.GameRules.MaxScore
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":            "checkScoreWin",
+		"max_score":           maxScore,
+		"score_limit_enabled": maxScore > 0,
+	}).Debug("Checking score win condition")
+
 	if maxScore <= 0 {
+		g.logger.WithField("caller", caller).WithField("function", "checkScoreWin").Debug("No score limit configured, skipping check")
 		return // No score limit configured
 	}
 
-	for _, team := range g.Teams {
+	for teamID, team := range g.Teams {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":      "checkScoreWin",
+			"team_id":       teamID,
+			"team_name":     team.Name,
+			"current_score": team.Score,
+			"max_score":     maxScore,
+		}).Debug("Checking team score")
+
 		if team.Score >= maxScore {
+			g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+				"function":          "checkScoreWin",
+				"winning_team_id":   teamID,
+				"winning_team_name": team.Name,
+				"final_score":       team.Score,
+				"max_score":         maxScore,
+			}).Info("Score win condition met, ending game")
+
 			g.endGameInternal()
 			return
 		}
 	}
+
+	g.logger.WithField("caller", caller).WithField("function", "checkScoreWin").Debug("No team has achieved score victory")
 }
 
 // calculateDeltaTime calculates the time since the last update and caps it.
 func (g *Game) calculateDeltaTime() float64 {
+	caller := getCallerInfo()
+
 	now := time.Now()
 	deltaTime := now.Sub(g.LastUpdate).Seconds()
 	g.LastUpdate = now
 
+	g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":       "calculateDeltaTime",
+		"raw_delta_time": deltaTime,
+		"last_update":    g.LastUpdate,
+	}).Debug("Calculated raw delta time")
+
 	// Cap delta time to prevent physics issues
 	if deltaTime > 0.1 {
+		g.logger.WithField("caller", caller).WithFields(logrus.Fields{
+			"function":          "calculateDeltaTime",
+			"raw_delta_time":    deltaTime,
+			"capped_delta_time": 0.1,
+		}).Debug("Delta time capped to prevent physics issues")
 		deltaTime = 0.1
 	}
+
 	return deltaTime
 }
 

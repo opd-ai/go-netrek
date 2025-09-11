@@ -2,9 +2,11 @@
 package entity
 
 import (
+	"runtime"
 	"time"
 
 	"github.com/opd-ai/go-netrek/pkg/physics"
+	"github.com/sirupsen/logrus"
 )
 
 // ShipClass defines the type of ship and its capabilities
@@ -56,8 +58,29 @@ type Ship struct {
 
 // NewShip creates a new ship with the specified class and team
 func NewShip(id ID, class ShipClass, teamID int, position physics.Vector2D) *Ship {
+	caller := getShipCallerInfo()
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":   "NewShip",
+		"ship_id":    id,
+		"ship_class": class.String(),
+		"team_id":    teamID,
+		"pos_x":      position.X,
+		"pos_y":      position.Y,
+	}).Info("Creating new ship")
+
+	logger.WithField("caller", caller).WithField("function", "NewShip").Debug("Retrieving ship class statistics")
 	stats := getShipStats(class)
 
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":     "NewShip",
+		"ship_id":      id,
+		"max_hull":     stats.MaxHull,
+		"max_shields":  stats.MaxShields,
+		"max_fuel":     stats.MaxFuel,
+		"weapon_slots": stats.WeaponSlots,
+	}).Debug("Ship statistics retrieved")
+
+	logger.WithField("caller", caller).WithField("function", "NewShip").Debug("Initializing ship structure")
 	ship := &Ship{
 		BaseEntity: BaseEntity{
 			ID:       id,
@@ -79,11 +102,51 @@ func NewShip(id ID, class ShipClass, teamID int, position physics.Vector2D) *Shi
 		LastFired: make(map[string]time.Time),
 	}
 
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":        "NewShip",
+		"ship_id":         id,
+		"initial_hull":    ship.Hull,
+		"initial_shields": ship.Shields,
+		"initial_fuel":    ship.Fuel,
+		"collider_radius": ship.Collider.Radius,
+		"active":          ship.Active,
+	}).Debug("Ship base structure initialized")
+
 	// Add default weapons
-	ship.Weapons = append(ship.Weapons, NewTorpedo(id))
-	ship.Weapons = append(ship.Weapons, NewPhaser(id))
+	logger.WithField("caller", caller).WithField("function", "NewShip").Debug("Adding default weapons")
+	torpedoWeapon := NewTorpedo(id)
+	ship.Weapons = append(ship.Weapons, torpedoWeapon)
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":    "NewShip",
+		"ship_id":     id,
+		"weapon_type": "torpedo",
+		"weapon_name": torpedoWeapon.GetName(),
+	}).Debug("Torpedo weapon added")
+
+	phaserWeapon := NewPhaser(id)
+	ship.Weapons = append(ship.Weapons, phaserWeapon)
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":    "NewShip",
+		"ship_id":     id,
+		"weapon_type": "phaser",
+		"weapon_name": phaserWeapon.GetName(),
+	}).Debug("Phaser weapon added")
+
+	logger.WithField("caller", caller).WithFields(logrus.Fields{
+		"function":      "NewShip",
+		"ship_id":       id,
+		"total_weapons": len(ship.Weapons),
+	}).Info("Ship created successfully with default weapons")
 
 	return ship
+}
+
+// getShipCallerInfo returns the calling function name for ship logging
+func getShipCallerInfo() string {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return "unknown"
 }
 
 // Update handles the ship's state update for a single game tick
