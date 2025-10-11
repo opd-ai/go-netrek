@@ -121,7 +121,7 @@ func (hud *HUDSystem) clearHUDEntities() {
 			hud.renderSystem.Remove(*entity)
 		}
 	}
-	
+
 	// Clear the entities list
 	hud.hudEntities = hud.hudEntities[:0]
 }
@@ -184,7 +184,7 @@ func (hud *HUDSystem) renderTeamStatus() {
 		ID    int
 		State engine.TeamState
 	}
-	
+
 	var teams []teamEntry
 	for teamID, teamState := range hud.teamStates {
 		teams = append(teams, teamEntry{ID: teamID, State: teamState})
@@ -261,8 +261,8 @@ func (hud *HUDSystem) renderMinimap() {
 // renderText renders text at the specified position
 func (hud *HUDSystem) renderText(text string, x, y float32, textColor color.Color) {
 	// Calculate approximate text dimensions
-	textWidth := float32(len(text) * 8)  // Approximate width
-	textHeight := float32(16)            // Approximate height
+	textWidth := float32(len(text) * 8) // Approximate width
+	textHeight := float32(16)           // Approximate height
 
 	// Validate bounds before rendering
 	pos := Position{X: x, Y: y}

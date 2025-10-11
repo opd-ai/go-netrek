@@ -289,14 +289,14 @@ func (lm *LayoutManager) GetTeamStatusDimensions() Dimensions {
 
 	margin := lm.GetStandardMargin()
 	teamPos := lm.GetTeamStatusPosition()
-	
+
 	// Calculate maximum width (left side of screen minus margins)
 	maxWidth := lm.viewport.Width/2 - margin*2
-	
+
 	// Calculate maximum height (from team status position to chat window)
 	chatPos := lm.GetChatPosition()
 	maxHeight := chatPos.Y - teamPos.Y - margin
-	
+
 	// Ensure minimum dimensions
 	if maxWidth < 200 {
 		maxWidth = 200
