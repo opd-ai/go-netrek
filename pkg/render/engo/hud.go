@@ -57,14 +57,14 @@ type ChatMessage struct {
 func NewHUDSystem() *HUDSystem {
 	return &HUDSystem{
 		connectionStatus: "Connected",
-		maxChatLines:     10,
+		maxChatLines:     MaxChatLines,
 		minimapEnabled:   true,
-		minimapSize:      200.0,
+		minimapSize:      MinimapDefaultSize,
 		teamStates:       make(map[int]engine.TeamState),
-		hudColor:         color.RGBA{255, 255, 255, 255},
-		friendlyColor:    color.RGBA{0, 255, 0, 255},
-		enemyColor:       color.RGBA{255, 0, 0, 255},
-		neutralColor:     color.RGBA{128, 128, 128, 255},
+		hudColor:         ColorTextPrimary,
+		friendlyColor:    ColorTeamGreen,
+		enemyColor:       ColorTeamRed,
+		neutralColor:     ColorNeutral,
 	}
 }
 
@@ -117,29 +117,29 @@ func (hud *HUDSystem) renderShipStatus() {
 	)
 
 	// Render status text at top-left corner
-	hud.renderText(statusText, 10, 10, hud.hudColor)
+	hud.renderText(statusText, MarginSmall, MarginSmall, hud.hudColor)
 }
 
 // renderChatWindow renders the chat message window
 func (hud *HUDSystem) renderChatWindow() {
-	chatStartY := float32(engo.GameHeight()) - 200
+	chatStartY := float32(engo.GameHeight()) - ChatWindowHeight
 
 	// Render chat background
-	hud.renderRect(10, chatStartY, 400, 150, color.RGBA{0, 0, 0, 128})
+	hud.renderRect(MarginSmall, chatStartY, ChatWindowWidth, ChatWindowHeight, ColorBackgroundChat)
 
 	// Render chat messages
-	y := chatStartY + 10
+	y := chatStartY + MarginSmall
 	for i := len(hud.chatMessages) - 1; i >= 0 && i >= len(hud.chatMessages)-hud.maxChatLines; i-- {
 		msg := hud.chatMessages[i]
 		chatLine := fmt.Sprintf("[%s]: %s", msg.Sender, msg.Message)
-		hud.renderText(chatLine, 15, y, msg.Color)
-		y += 15
+		hud.renderText(chatLine, MarginMedium, y, msg.Color)
+		y += ChatLineHeight
 	}
 }
 
 // renderTeamStatus renders team scores and status
 func (hud *HUDSystem) renderTeamStatus() {
-	startY := float32(100)
+	startY := float32(100) // Position below ship status
 
 	for teamID, teamState := range hud.teamStates {
 		teamText := fmt.Sprintf(
@@ -150,9 +150,9 @@ func (hud *HUDSystem) renderTeamStatus() {
 			teamState.PlanetCount,
 		)
 
-		teamColor := hud.getTeamColor(teamID)
-		hud.renderText(teamText, 10, startY, teamColor)
-		startY += 20
+		teamColor := GetTeamColor(teamID)
+		hud.renderText(teamText, MarginSmall, startY, teamColor)
+		startY += TeamStatusLineHeight
 	}
 }
 
@@ -165,19 +165,19 @@ func (hud *HUDSystem) renderConnectionStatus() {
 
 	hud.renderText(
 		"Status: "+hud.connectionStatus,
-		float32(engo.GameWidth())-150,
-		10,
+		float32(engo.GameWidth())-ConnectionStatusWidth,
+		MarginSmall,
 		statusColor,
 	)
 }
 
 // renderMinimap renders a minimap showing the game world
 func (hud *HUDSystem) renderMinimap() {
-	minimapX := float32(engo.GameWidth()) - hud.minimapSize - 10
-	minimapY := float32(10)
+	minimapX := float32(engo.GameWidth()) - hud.minimapSize - MarginSmall
+	minimapY := float32(MarginSmall)
 
 	// Render minimap background
-	hud.renderRect(minimapX, minimapY, hud.minimapSize, hud.minimapSize, color.RGBA{0, 0, 0, 128})
+	hud.renderRect(minimapX, minimapY, hud.minimapSize, hud.minimapSize, ColorBackgroundChat)
 
 	// Render minimap border
 	hud.renderRectOutline(minimapX, minimapY, hud.minimapSize, hud.minimapSize, hud.hudColor)
@@ -300,22 +300,6 @@ func (hud *HUDSystem) UpdateGameState(gameState *engine.GameState) {
 		hud.currentShip = &shipState
 		break
 	}
-}
-
-// getTeamColor returns the color for a specific team
-func (hud *HUDSystem) getTeamColor(teamID int) color.Color {
-	teamColors := []color.Color{
-		color.RGBA{255, 0, 0, 255},   // Red
-		color.RGBA{0, 255, 0, 255},   // Green
-		color.RGBA{0, 0, 255, 255},   // Blue
-		color.RGBA{255, 255, 0, 255}, // Yellow
-	}
-
-	if teamID >= 0 && teamID < len(teamColors) {
-		return teamColors[teamID]
-	}
-
-	return hud.neutralColor
 }
 
 // SetMinimapEnabled enables or disables the minimap

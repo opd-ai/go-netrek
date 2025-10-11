@@ -130,7 +130,7 @@ func TestAlphaConstants(t *testing.T) {
 	alphas := []uint8{AlphaTransparent, AlphaSemiTransparent, AlphaBackground, AlphaSubtle, AlphaOpaque}
 	for i := 1; i < len(alphas); i++ {
 		if alphas[i] <= alphas[i-1] {
-			t.Errorf("Alpha values should be in ascending order, but alphas[%d]=%d <= alphas[%d]=%d", 
+			t.Errorf("Alpha values should be in ascending order, but alphas[%d]=%d <= alphas[%d]=%d",
 				i, alphas[i], i-1, alphas[i-1])
 		}
 	}
@@ -178,9 +178,9 @@ func TestGetTeamColor(t *testing.T) {
 		{1, ColorTeamGreen},
 		{2, ColorTeamBlue},
 		{3, ColorTeamYellow},
-		{4, ColorNeutral},    // Invalid team ID
-		{-1, ColorNeutral},   // Invalid team ID
-		{999, ColorNeutral},  // Invalid team ID
+		{4, ColorNeutral},   // Invalid team ID
+		{-1, ColorNeutral},  // Invalid team ID
+		{999, ColorNeutral}, // Invalid team ID
 	}
 
 	for _, tt := range tests {
@@ -196,7 +196,7 @@ func TestGetTeamColor(t *testing.T) {
 // TestTeamColors verifies the team colors array matches individual color constants
 func TestTeamColors(t *testing.T) {
 	expectedColors := []color.Color{ColorTeamRed, ColorTeamGreen, ColorTeamBlue, ColorTeamYellow}
-	
+
 	if len(TeamColors) != len(expectedColors) {
 		t.Errorf("TeamColors length = %d, want %d", len(TeamColors), len(expectedColors))
 		return
@@ -214,7 +214,7 @@ func TestColorConsistency(t *testing.T) {
 	for i, expectedColor := range TeamColors {
 		actualColor := GetTeamColor(i)
 		if actualColor != expectedColor {
-			t.Errorf("Color inconsistency: GetTeamColor(%d) = %v, but TeamColors[%d] = %v", 
+			t.Errorf("Color inconsistency: GetTeamColor(%d) = %v, but TeamColors[%d] = %v",
 				i, actualColor, i, expectedColor)
 		}
 	}
@@ -223,7 +223,7 @@ func TestColorConsistency(t *testing.T) {
 // BenchmarkGetTeamColor benchmarks team color lookup performance
 func BenchmarkGetTeamColor(b *testing.B) {
 	teamIDs := []int{0, 1, 2, 3, 4, -1, 999} // Mix of valid and invalid IDs
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, teamID := range teamIDs {

@@ -2,8 +2,6 @@
 package engo
 
 import (
-	"image/color"
-
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
@@ -99,7 +97,7 @@ func (r *EngoRenderer) getOrCreateShipEntity(id entity.ID) *ecs.BasicEntity {
 	// Add to render system with initial components
 	renderComponent := common.RenderComponent{
 		Drawable: r.assets.GetShipSprite(entity.Scout), // Default ship
-		Color:    color.RGBA{255, 255, 255, 255},
+		Color:    ColorEntityDefault,
 	}
 
 	spaceComponent := common.SpaceComponent{
@@ -126,7 +124,7 @@ func (r *EngoRenderer) getOrCreatePlanetEntity(id entity.ID) *ecs.BasicEntity {
 	// Add to render system with initial components
 	renderComponent := common.RenderComponent{
 		Drawable: r.assets.GetPlanetSprite(entity.Homeworld), // Default planet
-		Color:    color.RGBA{255, 255, 255, 255},
+		Color:    ColorEntityDefault,
 	}
 
 	spaceComponent := common.SpaceComponent{
@@ -153,7 +151,7 @@ func (r *EngoRenderer) getOrCreateProjectileEntity(id entity.ID) *ecs.BasicEntit
 	// Add to render system with initial components
 	renderComponent := common.RenderComponent{
 		Drawable: r.assets.GetProjectileSprite("torpedo"), // Default projectile
-		Color:    color.RGBA{255, 255, 0, 255},
+		Color:    ColorEntityHighlight,
 	}
 
 	spaceComponent := common.SpaceComponent{
@@ -179,7 +177,7 @@ func (r *EngoRenderer) updateShipComponents(basicEntity *ecs.BasicEntity, ship *
 	// Update ship sprite and color based on class and team
 	if renderComponent := r.getRenderComponent(basicEntity); renderComponent != nil {
 		renderComponent.Drawable = r.assets.GetShipSprite(ship.Class)
-		renderComponent.Color = r.getTeamColor(ship.TeamID)
+		renderComponent.Color = GetTeamColor(ship.TeamID)
 	}
 }
 
@@ -195,9 +193,9 @@ func (r *EngoRenderer) updatePlanetComponents(basicEntity *ecs.BasicEntity, plan
 	if renderComponent := r.getRenderComponent(basicEntity); renderComponent != nil {
 		renderComponent.Drawable = r.assets.GetPlanetSprite(planet.Type)
 		if planet.TeamID >= 0 {
-			renderComponent.Color = r.getTeamColor(planet.TeamID)
+			renderComponent.Color = GetTeamColor(planet.TeamID)
 		} else {
-			renderComponent.Color = color.RGBA{128, 128, 128, 255} // Neutral
+			renderComponent.Color = ColorNeutral
 		}
 	}
 }
@@ -213,7 +211,7 @@ func (r *EngoRenderer) updateProjectileComponents(basicEntity *ecs.BasicEntity, 
 	// Update projectile sprite and color based on type and team
 	if renderComponent := r.getRenderComponent(basicEntity); renderComponent != nil {
 		renderComponent.Drawable = r.assets.GetProjectileSprite(projectile.Type)
-		renderComponent.Color = r.getTeamColor(projectile.TeamID)
+		renderComponent.Color = GetTeamColor(projectile.TeamID)
 	}
 }
 
@@ -238,22 +236,6 @@ func (r *EngoRenderer) worldToScreen(worldPos physics.Vector2D) engo.Point {
 		X: float32(worldPos.X) + engo.GameWidth()/2,
 		Y: float32(worldPos.Y) + engo.GameHeight()/2,
 	}
-}
-
-// getTeamColor returns the color for a specific team
-func (r *EngoRenderer) getTeamColor(teamID int) color.Color {
-	teamColors := []color.Color{
-		color.RGBA{255, 0, 0, 255},   // Red
-		color.RGBA{0, 255, 0, 255},   // Green
-		color.RGBA{0, 0, 255, 255},   // Blue
-		color.RGBA{255, 255, 0, 255}, // Yellow
-	}
-
-	if teamID >= 0 && teamID < len(teamColors) {
-		return teamColors[teamID]
-	}
-
-	return color.RGBA{255, 255, 255, 255} // White for unknown teams
 }
 
 // cleanupInactiveEntities removes entities that are no longer active

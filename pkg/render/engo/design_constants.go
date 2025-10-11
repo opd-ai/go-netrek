@@ -91,7 +91,7 @@ const (
 // These colors maintain visual hierarchy and team identification.
 var (
 	// Primary text colors
-	
+
 	// ColorTextPrimary is the primary text color for main content
 	ColorTextPrimary = color.RGBA{R: 255, G: 255, B: 255, A: AlphaOpaque} // White
 
@@ -102,7 +102,7 @@ var (
 	ColorTextDisabled = color.RGBA{R: 128, G: 128, B: 128, A: AlphaOpaque} // Gray
 
 	// Background colors
-	
+
 	// ColorBackgroundChat provides semi-transparent background for chat window
 	ColorBackgroundChat = color.RGBA{R: 0, G: 0, B: 0, A: AlphaBackground} // Semi-transparent Black
 
@@ -110,11 +110,11 @@ var (
 	ColorBackgroundPanel = color.RGBA{R: 32, G: 32, B: 32, A: AlphaSubtle} // Dark Gray
 
 	// Team identification colors
-	
+
 	// ColorTeamRed represents team 1 (red team)
 	ColorTeamRed = color.RGBA{R: 255, G: 0, B: 0, A: AlphaOpaque} // Red
 
-	// ColorTeamGreen represents team 2 (green team)  
+	// ColorTeamGreen represents team 2 (green team)
 	ColorTeamGreen = color.RGBA{R: 0, G: 255, B: 0, A: AlphaOpaque} // Green
 
 	// ColorTeamBlue represents team 3 (blue team)
@@ -127,7 +127,7 @@ var (
 	ColorNeutral = color.RGBA{R: 128, G: 128, B: 128, A: AlphaOpaque} // Gray
 
 	// Entity colors
-	
+
 	// ColorEntityDefault is the default color for game entities
 	ColorEntityDefault = color.RGBA{R: 255, G: 255, B: 255, A: AlphaOpaque} // White
 
