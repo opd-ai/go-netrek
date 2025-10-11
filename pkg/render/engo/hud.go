@@ -43,6 +43,9 @@ type HUDSystem struct {
 	friendlyColor color.Color
 	enemyColor    color.Color
 	neutralColor  color.Color
+
+	// Layout manager for responsive positioning
+	layoutManager *LayoutManager
 }
 
 // ChatMessage represents a chat message in the HUD
@@ -65,6 +68,7 @@ func NewHUDSystem() *HUDSystem {
 		friendlyColor:    ColorTeamGreen,
 		enemyColor:       ColorTeamRed,
 		neutralColor:     ColorNeutral,
+		layoutManager:    NewLayoutManager(),
 	}
 }
 
@@ -116,30 +120,35 @@ func (hud *HUDSystem) renderShipStatus() {
 		hud.currentShip.Armies,
 	)
 
-	// Render status text at top-left corner
-	hud.renderText(statusText, MarginSmall, MarginSmall, hud.hudColor)
+	// Render status text using layout manager for responsive positioning
+	hud.layoutManager.UpdateViewport() // Ensure viewport is current
+	pos := hud.layoutManager.GetShipStatusPosition()
+	hud.renderText(statusText, pos.X, pos.Y, hud.hudColor)
 }
 
 // renderChatWindow renders the chat message window
 func (hud *HUDSystem) renderChatWindow() {
-	chatStartY := float32(engo.GameHeight()) - ChatWindowHeight
+	// Use layout manager for responsive positioning
+	chatPos := hud.layoutManager.GetChatPosition()
+	chatDims := hud.layoutManager.GetChatDimensions()
 
 	// Render chat background
-	hud.renderRect(MarginSmall, chatStartY, ChatWindowWidth, ChatWindowHeight, ColorBackgroundChat)
+	hud.renderRect(chatPos.X, chatPos.Y, chatDims.Width, chatDims.Height, ColorBackgroundChat)
 
 	// Render chat messages
-	y := chatStartY + MarginSmall
+	y := chatPos.Y + hud.layoutManager.GetStandardMargin()
 	for i := len(hud.chatMessages) - 1; i >= 0 && i >= len(hud.chatMessages)-hud.maxChatLines; i-- {
 		msg := hud.chatMessages[i]
 		chatLine := fmt.Sprintf("[%s]: %s", msg.Sender, msg.Message)
-		hud.renderText(chatLine, MarginMedium, y, msg.Color)
+		hud.renderText(chatLine, chatPos.X+MarginMedium, y, msg.Color)
 		y += ChatLineHeight
 	}
 }
 
 // renderTeamStatus renders team scores and status
 func (hud *HUDSystem) renderTeamStatus() {
-	startY := float32(100) // Position below ship status
+	pos := hud.layoutManager.GetTeamStatusPosition()
+	startY := pos.Y
 
 	for teamID, teamState := range hud.teamStates {
 		teamText := fmt.Sprintf(
@@ -151,7 +160,7 @@ func (hud *HUDSystem) renderTeamStatus() {
 		)
 
 		teamColor := GetTeamColor(teamID)
-		hud.renderText(teamText, MarginSmall, startY, teamColor)
+		hud.renderText(teamText, pos.X, startY, teamColor)
 		startY += TeamStatusLineHeight
 	}
 }
@@ -163,24 +172,25 @@ func (hud *HUDSystem) renderConnectionStatus() {
 		statusColor = hud.enemyColor
 	}
 
+	pos := hud.layoutManager.GetConnectionStatusPosition()
 	hud.renderText(
 		"Status: "+hud.connectionStatus,
-		float32(engo.GameWidth())-ConnectionStatusWidth,
-		MarginSmall,
+		pos.X,
+		pos.Y,
 		statusColor,
 	)
 }
 
 // renderMinimap renders a minimap showing the game world
 func (hud *HUDSystem) renderMinimap() {
-	minimapX := float32(engo.GameWidth()) - hud.minimapSize - MarginSmall
-	minimapY := float32(MarginSmall)
+	pos := hud.layoutManager.GetMinimapPosition()
+	size := hud.layoutManager.GetMinimapSize()
 
 	// Render minimap background
-	hud.renderRect(minimapX, minimapY, hud.minimapSize, hud.minimapSize, ColorBackgroundChat)
+	hud.renderRect(pos.X, pos.Y, size, size, ColorBackgroundChat)
 
 	// Render minimap border
-	hud.renderRectOutline(minimapX, minimapY, hud.minimapSize, hud.minimapSize, hud.hudColor)
+	hud.renderRectOutline(pos.X, pos.Y, size, size, hud.hudColor)
 
 	// Note: In a real implementation, you would render planets and ships on the minimap
 	// based on the current game state
