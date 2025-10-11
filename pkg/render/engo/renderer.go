@@ -267,3 +267,8 @@ func (r *EngoRenderer) RemoveProjectile(id entity.ID) {
 		delete(r.projectileEntities, id)
 	}
 }
+
+// GetAssetManager returns the asset manager for external access
+func (r *EngoRenderer) GetAssetManager() *AssetManager {
+	return r.assets
+}

@@ -24,6 +24,9 @@ type AssetManager struct {
 
 	// UI textures
 	backgroundTexture common.Drawable
+
+	// Fonts by size
+	fonts map[float64]*common.Font
 }
 
 // NewAssetManager creates a new asset manager
@@ -32,11 +35,17 @@ func NewAssetManager() *AssetManager {
 		shipSprites:       make(map[entity.ShipClass]common.Drawable),
 		planetSprites:     make(map[entity.PlanetType]common.Drawable),
 		projectileSprites: make(map[string]common.Drawable),
+		fonts:             make(map[float64]*common.Font),
 	}
 }
 
 // LoadAssets loads all game assets
 func (am *AssetManager) LoadAssets() error {
+	// Load fonts first (needed by other systems)
+	if err := am.loadFonts(); err != nil {
+		return err
+	}
+
 	// Load ship sprites
 	if err := am.loadShipSprites(); err != nil {
 		return err
@@ -181,6 +190,40 @@ func (am *AssetManager) loadUIAssets() error {
 	return nil
 }
 
+// loadFonts loads different font sizes for the UI
+func (am *AssetManager) loadFonts() error {
+	// Note: Engo can use default fonts or you need to preload .ttf files
+	// For now, we'll create fonts with default system font
+	// In production, you would load specific .ttf files
+
+	// Create fonts for each size using design constants
+	fontSizes := []float64{
+		float64(FontSizeSmall),  // 12
+		float64(FontSizeMedium), // 16
+		float64(FontSizeLarge),  // 20
+		float64(FontSizeXLarge), // 24
+	}
+
+	for _, size := range fontSizes {
+		// Create font with white text and transparent background
+		font, err := common.LoadedFont("", size, color.Transparent, color.White)
+		if err != nil {
+			// If LoadedFont fails, create a basic font
+			font = &common.Font{
+				Size: size,
+				BG:   color.Transparent,
+				FG:   color.White,
+			}
+			if err := font.Create(); err != nil {
+				return err
+			}
+		}
+		am.fonts[size] = font
+	}
+
+	return nil
+}
+
 // createShipSprite creates a sprite from a 2D pattern
 func (am *AssetManager) createShipSprite(width, height int, pattern [][]int) common.Drawable {
 	// Create base RGBA image
@@ -258,4 +301,33 @@ func (am *AssetManager) GetProjectileSprite(projectileType string) common.Drawab
 // GetBackgroundTexture returns the background texture
 func (am *AssetManager) GetBackgroundTexture() common.Drawable {
 	return am.backgroundTexture
+}
+
+// GetFont returns a font of the specified size
+func (am *AssetManager) GetFont(size float64) *common.Font {
+	if font, exists := am.fonts[size]; exists {
+		return font
+	}
+	// Return medium font as fallback
+	return am.fonts[float64(FontSizeMedium)]
+}
+
+// GetSmallFont returns the small font
+func (am *AssetManager) GetSmallFont() *common.Font {
+	return am.GetFont(float64(FontSizeSmall))
+}
+
+// GetMediumFont returns the medium font
+func (am *AssetManager) GetMediumFont() *common.Font {
+	return am.GetFont(float64(FontSizeMedium))
+}
+
+// GetLargeFont returns the large font
+func (am *AssetManager) GetLargeFont() *common.Font {
+	return am.GetFont(float64(FontSizeLarge))
+}
+
+// GetXLargeFont returns the extra large font
+func (am *AssetManager) GetXLargeFont() *common.Font {
+	return am.GetFont(float64(FontSizeXLarge))
 }

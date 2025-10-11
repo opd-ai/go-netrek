@@ -46,6 +46,9 @@ type HUDSystem struct {
 
 	// Layout manager for responsive positioning
 	layoutManager *LayoutManager
+
+	// Asset manager for accessing fonts and textures
+	assetManager *AssetManager
 }
 
 // ChatMessage represents a chat message in the HUD
@@ -57,8 +60,8 @@ type ChatMessage struct {
 }
 
 // NewHUDSystem creates a new HUD system
-func NewHUDSystem() *HUDSystem {
-	return &HUDSystem{
+func NewHUDSystem(assetManager *AssetManager) *HUDSystem {
+	hud := &HUDSystem{
 		connectionStatus: "Connected",
 		maxChatLines:     MaxChatLines,
 		minimapEnabled:   true,
@@ -69,7 +72,15 @@ func NewHUDSystem() *HUDSystem {
 		enemyColor:       ColorTeamRed,
 		neutralColor:     ColorNeutral,
 		layoutManager:    NewLayoutManager(),
+		assetManager:     assetManager,
 	}
+
+	// Initialize font from asset manager
+	if assetManager != nil {
+		hud.font = assetManager.GetMediumFont()
+	}
+
+	return hud
 }
 
 // Add satisfies the ecs.System interface
@@ -335,6 +346,28 @@ func (hud *HUDSystem) GetMinimapSize() float32 {
 // SetFont sets the font used for HUD text rendering
 func (hud *HUDSystem) SetFont(font *common.Font) {
 	hud.font = font
+}
+
+// SetFontSize sets the font size using the asset manager
+func (hud *HUDSystem) SetFontSize(size float64) {
+	if hud.assetManager != nil {
+		hud.font = hud.assetManager.GetFont(size)
+	}
+}
+
+// SetSmallFont sets the font to small size
+func (hud *HUDSystem) SetSmallFont() {
+	hud.SetFontSize(float64(FontSizeSmall))
+}
+
+// SetMediumFont sets the font to medium size
+func (hud *HUDSystem) SetMediumFont() {
+	hud.SetFontSize(float64(FontSizeMedium))
+}
+
+// SetLargeFont sets the font to large size
+func (hud *HUDSystem) SetLargeFont() {
+	hud.SetFontSize(float64(FontSizeLarge))
 }
 
 // GetChatMessages returns the current chat messages

@@ -76,7 +76,7 @@ func (scene *GameScene) Setup(u engo.Updater) {
 	scene.world.AddSystem(scene.input)
 
 	// Initialize HUD system
-	scene.hud = NewHUDSystem()
+	scene.hud = NewHUDSystem(scene.renderer.GetAssetManager())
 	scene.world.AddSystem(scene.hud)
 
 	// Subscribe to game state updates
