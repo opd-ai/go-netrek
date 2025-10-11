@@ -14,7 +14,7 @@ func TestNewHUDSystem_WithAssetManager(t *testing.T) {
 	am.fonts = make(map[float64]*common.Font)
 	am.fonts[float64(FontSizeMedium)] = &common.Font{Size: float64(FontSizeMedium)}
 
-	hud := NewHUDSystem(am)
+	hud := NewHUDSystem(am, &common.RenderSystem{})
 
 	if hud == nil {
 		t.Fatal("NewHUDSystem returned nil")
@@ -35,7 +35,7 @@ func TestNewHUDSystem_WithAssetManager(t *testing.T) {
 
 // TestNewHUDSystem_WithNilAssetManager tests HUD system creation with nil asset manager
 func TestNewHUDSystem_WithNilAssetManager(t *testing.T) {
-	hud := NewHUDSystem(nil)
+	hud := NewHUDSystem(nil, &common.RenderSystem{})
 
 	if hud == nil {
 		t.Fatal("NewHUDSystem returned nil")
@@ -52,7 +52,7 @@ func TestNewHUDSystem_WithNilAssetManager(t *testing.T) {
 
 // TestHUDSystem_SetFont tests the SetFont method
 func TestHUDSystem_SetFont(t *testing.T) {
-	hud := NewHUDSystem(nil)
+	hud := NewHUDSystem(nil, &common.RenderSystem{})
 
 	testFont := &common.Font{Size: 18.0}
 	hud.SetFont(testFont)
@@ -75,7 +75,7 @@ func TestHUDSystem_FontSizeMethods(t *testing.T) {
 	am.fonts[float64(FontSizeMedium)] = &common.Font{Size: float64(FontSizeMedium)}
 	am.fonts[float64(FontSizeLarge)] = &common.Font{Size: float64(FontSizeLarge)}
 
-	hud := NewHUDSystem(am)
+	hud := NewHUDSystem(am, &common.RenderSystem{})
 
 	tests := []struct {
 		name         string
@@ -124,7 +124,7 @@ func TestHUDSystem_SetFontSize(t *testing.T) {
 	am.fonts[18.0] = &common.Font{Size: 18.0}
 	am.fonts[22.0] = &common.Font{Size: 22.0}
 
-	hud := NewHUDSystem(am)
+	hud := NewHUDSystem(am, &common.RenderSystem{})
 
 	// Test setting existing font size
 	hud.SetFontSize(18.0)
@@ -141,7 +141,7 @@ func TestHUDSystem_SetFontSize(t *testing.T) {
 
 // TestHUDSystem_SetFontSize_WithNilAssetManager tests SetFontSize with nil asset manager
 func TestHUDSystem_SetFontSize_WithNilAssetManager(t *testing.T) {
-	hud := NewHUDSystem(nil)
+	hud := NewHUDSystem(nil, &common.RenderSystem{})
 
 	// This should not panic even with nil asset manager
 	hud.SetFontSize(18.0)
@@ -154,7 +154,7 @@ func TestHUDSystem_SetFontSize_WithNilAssetManager(t *testing.T) {
 
 // TestHUDSystem_FontMethods_WithNilAssetManager tests font size methods with nil asset manager
 func TestHUDSystem_FontMethods_WithNilAssetManager(t *testing.T) {
-	hud := NewHUDSystem(nil)
+	hud := NewHUDSystem(nil, &common.RenderSystem{})
 
 	// These should not panic even with nil asset manager
 	methods := []struct {
@@ -198,7 +198,7 @@ func TestHUDSystem_FontIntegration(t *testing.T) {
 	}
 
 	// Create HUD
-	hud := NewHUDSystem(am)
+	hud := NewHUDSystem(am, &common.RenderSystem{})
 
 	// Should start with medium font
 	if hud.font.Size != float64(FontSizeMedium) {
@@ -233,7 +233,7 @@ func TestHUDSystem_FontFallback(t *testing.T) {
 	am.fonts = make(map[float64]*common.Font)
 	am.fonts[float64(FontSizeMedium)] = &common.Font{Size: float64(FontSizeMedium)}
 
-	hud := NewHUDSystem(am)
+	hud := NewHUDSystem(am, &common.RenderSystem{})
 
 	// Try to set a font size that doesn't exist
 	hud.SetFontSize(99.0)

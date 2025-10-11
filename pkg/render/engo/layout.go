@@ -275,6 +275,45 @@ func (lm *LayoutManager) GetTeamStatusPosition() Position {
 	return pos
 }
 
+// GetTeamStatusDimensions calculates the available dimensions for team status display.
+// Returns the maximum width and height available for team status rendering.
+//
+// Returns:
+//   - Dimensions: Available width and height for team status container
+func (lm *LayoutManager) GetTeamStatusDimensions() Dimensions {
+	const cacheKey = "team_status_dims"
+
+	if dims, exists := lm.cachedDimensions[cacheKey]; exists {
+		return dims
+	}
+
+	margin := lm.GetStandardMargin()
+	teamPos := lm.GetTeamStatusPosition()
+	
+	// Calculate maximum width (left side of screen minus margins)
+	maxWidth := lm.viewport.Width/2 - margin*2
+	
+	// Calculate maximum height (from team status position to chat window)
+	chatPos := lm.GetChatPosition()
+	maxHeight := chatPos.Y - teamPos.Y - margin
+	
+	// Ensure minimum dimensions
+	if maxWidth < 200 {
+		maxWidth = 200
+	}
+	if maxHeight < TeamStatusLineHeight {
+		maxHeight = TeamStatusLineHeight
+	}
+
+	dims := Dimensions{
+		Width:  maxWidth,
+		Height: maxHeight,
+	}
+
+	lm.cachedDimensions[cacheKey] = dims
+	return dims
+}
+
 // GetConnectionStatusPosition calculates position for connection status display.
 // Positions at top-right with appropriate spacing from screen edge.
 //

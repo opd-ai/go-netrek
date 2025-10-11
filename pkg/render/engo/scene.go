@@ -21,10 +21,11 @@ type GameScene struct {
 	eventBus *event.Bus
 
 	// Rendering components
-	renderer *EngoRenderer
-	camera   *CameraSystem
-	input    *InputSystem
-	hud      *HUDSystem
+	renderer     *EngoRenderer
+	renderSystem *common.RenderSystem
+	camera       *CameraSystem
+	input        *InputSystem
+	hud          *HUDSystem
 
 	// Game state
 	gameState *engine.GameState
@@ -57,7 +58,8 @@ func (scene *GameScene) Setup(u engo.Updater) {
 	scene.world = &ecs.World{}
 
 	// Add the common systems (required for Engo)
-	scene.world.AddSystem(&common.RenderSystem{})
+	scene.renderSystem = &common.RenderSystem{}
+	scene.world.AddSystem(scene.renderSystem)
 	scene.world.AddSystem(&common.MouseSystem{})
 
 	// Initialize renderer
@@ -76,7 +78,7 @@ func (scene *GameScene) Setup(u engo.Updater) {
 	scene.world.AddSystem(scene.input)
 
 	// Initialize HUD system
-	scene.hud = NewHUDSystem(scene.renderer.GetAssetManager())
+	scene.hud = NewHUDSystem(scene.renderer.GetAssetManager(), scene.renderSystem)
 	scene.world.AddSystem(scene.hud)
 
 	// Subscribe to game state updates

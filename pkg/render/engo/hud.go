@@ -49,6 +49,9 @@ type HUDSystem struct {
 
 	// Asset manager for accessing fonts and textures
 	assetManager *AssetManager
+
+	// Render system for adding HUD entities
+	renderSystem *common.RenderSystem
 }
 
 // ChatMessage represents a chat message in the HUD
@@ -60,7 +63,7 @@ type ChatMessage struct {
 }
 
 // NewHUDSystem creates a new HUD system
-func NewHUDSystem(assetManager *AssetManager) *HUDSystem {
+func NewHUDSystem(assetManager *AssetManager, renderSystem *common.RenderSystem) *HUDSystem {
 	hud := &HUDSystem{
 		connectionStatus: "Connected",
 		maxChatLines:     MaxChatLines,
@@ -73,6 +76,7 @@ func NewHUDSystem(assetManager *AssetManager) *HUDSystem {
 		neutralColor:     ColorNeutral,
 		layoutManager:    NewLayoutManager(),
 		assetManager:     assetManager,
+		renderSystem:     renderSystem,
 	}
 
 	// Initialize font from asset manager
@@ -109,9 +113,16 @@ func (hud *HUDSystem) Update(dt float32) {
 	}
 }
 
-// clearHUDEntities removes previous HUD entities
+// clearHUDEntities removes previous HUD entities from the render system
 func (hud *HUDSystem) clearHUDEntities() {
-	// In a real implementation, you would properly remove entities from ECS
+	// Remove all HUD entities from the render system
+	if hud.renderSystem != nil {
+		for _, entity := range hud.hudEntities {
+			hud.renderSystem.Remove(*entity)
+		}
+	}
+	
+	// Clear the entities list
 	hud.hudEntities = hud.hudEntities[:0]
 }
 
@@ -156,23 +167,63 @@ func (hud *HUDSystem) renderChatWindow() {
 	}
 }
 
-// renderTeamStatus renders team scores and status
+// renderTeamStatus renders team scores and status with overflow handling
 func (hud *HUDSystem) renderTeamStatus() {
 	pos := hud.layoutManager.GetTeamStatusPosition()
+	dims := hud.layoutManager.GetTeamStatusDimensions()
 	startY := pos.Y
 
+	// Calculate how many team lines can fit in available space
+	maxLines := int(dims.Height / TeamStatusLineHeight)
+	if maxLines < 1 {
+		maxLines = 1 // Always show at least one line if possible
+	}
+
+	// Convert map to sorted slice for consistent ordering
+	type teamEntry struct {
+		ID    int
+		State engine.TeamState
+	}
+	
+	var teams []teamEntry
 	for teamID, teamState := range hud.teamStates {
+		teams = append(teams, teamEntry{ID: teamID, State: teamState})
+	}
+
+	// Sort teams by ID for consistent display order
+	for i := 0; i < len(teams)-1; i++ {
+		for j := i + 1; j < len(teams); j++ {
+			if teams[i].ID > teams[j].ID {
+				teams[i], teams[j] = teams[j], teams[i]
+			}
+		}
+	}
+
+	// Render teams that fit in available space
+	renderedLines := 0
+	for _, team := range teams {
+		if renderedLines >= maxLines {
+			break
+		}
+
 		teamText := fmt.Sprintf(
 			"%s: Score %d, Ships %d, Planets %d",
-			teamState.Name,
-			teamState.Score,
-			teamState.ShipCount,
-			teamState.PlanetCount,
+			team.State.Name,
+			team.State.Score,
+			team.State.ShipCount,
+			team.State.PlanetCount,
 		)
 
-		teamColor := GetTeamColor(teamID)
+		teamColor := GetTeamColor(team.ID)
 		hud.renderText(teamText, pos.X, startY, teamColor)
 		startY += TeamStatusLineHeight
+		renderedLines++
+	}
+
+	// Show overflow indicator if there are more teams than we can display
+	if len(teams) > maxLines {
+		overflowText := fmt.Sprintf("... and %d more teams", len(teams)-maxLines)
+		hud.renderText(overflowText, pos.X, startY, ColorTextSecondary)
 	}
 }
 
@@ -209,6 +260,18 @@ func (hud *HUDSystem) renderMinimap() {
 
 // renderText renders text at the specified position
 func (hud *HUDSystem) renderText(text string, x, y float32, textColor color.Color) {
+	// Calculate approximate text dimensions
+	textWidth := float32(len(text) * 8)  // Approximate width
+	textHeight := float32(16)            // Approximate height
+
+	// Validate bounds before rendering
+	pos := Position{X: x, Y: y}
+	dims := Dimensions{Width: textWidth, Height: textHeight}
+	if !hud.layoutManager.IsElementVisible(pos, dims) {
+		// Skip rendering if element would be outside visible bounds
+		return
+	}
+
 	// Create a text entity
 	basic := ecs.NewBasic()
 
@@ -222,21 +285,29 @@ func (hud *HUDSystem) renderText(text string, x, y float32, textColor color.Colo
 
 	spaceComponent := common.SpaceComponent{
 		Position: engo.Point{X: x, Y: y},
-		Width:    float32(len(text) * 8), // Approximate width
-		Height:   16,                     // Approximate height
+		Width:    textWidth,
+		Height:   textHeight,
 	}
 
-	// Add to HUD entities
+	// Add to HUD entities list for cleanup
 	hud.hudEntities = append(hud.hudEntities, &basic)
 
-	// Note: In a real implementation, you would add these components to the render system
-	// This is a simplified version for demonstration
-	_ = renderComponent // Use the component
-	_ = spaceComponent  // Use the component
+	// Add to render system so it actually appears on screen
+	if hud.renderSystem != nil {
+		hud.renderSystem.Add(&basic, &renderComponent, &spaceComponent)
+	}
 }
 
 // renderRect renders a filled rectangle
 func (hud *HUDSystem) renderRect(x, y, width, height float32, rectColor color.Color) {
+	// Validate bounds before rendering
+	pos := Position{X: x, Y: y}
+	dims := Dimensions{Width: width, Height: height}
+	if !hud.layoutManager.IsElementVisible(pos, dims) {
+		// Skip rendering if element would be outside visible bounds
+		return
+	}
+
 	// Create a rectangle entity
 	basic := ecs.NewBasic()
 
@@ -254,16 +325,25 @@ func (hud *HUDSystem) renderRect(x, y, width, height float32, rectColor color.Co
 		Height:   height,
 	}
 
-	// Add to HUD entities
+	// Add to HUD entities list for cleanup
 	hud.hudEntities = append(hud.hudEntities, &basic)
 
-	// Note: In a real implementation, you would add these components to the render system
-	_ = renderComponent // Use the component
-	_ = spaceComponent  // Use the component
+	// Add to render system so it actually appears on screen
+	if hud.renderSystem != nil {
+		hud.renderSystem.Add(&basic, &renderComponent, &spaceComponent)
+	}
 }
 
 // renderRectOutline renders a rectangle outline
 func (hud *HUDSystem) renderRectOutline(x, y, width, height float32, outlineColor color.Color) {
+	// Validate bounds before rendering
+	pos := Position{X: x, Y: y}
+	dims := Dimensions{Width: width, Height: height}
+	if !hud.layoutManager.IsElementVisible(pos, dims) {
+		// Skip rendering if element would be outside visible bounds
+		return
+	}
+
 	// Create a rectangle outline entity
 	basic := ecs.NewBasic()
 
@@ -281,12 +361,13 @@ func (hud *HUDSystem) renderRectOutline(x, y, width, height float32, outlineColo
 		Height:   height,
 	}
 
-	// Add to HUD entities
+	// Add to HUD entities list for cleanup
 	hud.hudEntities = append(hud.hudEntities, &basic)
 
-	// Note: In a real implementation, you would add these components to the render system
-	_ = renderComponent // Use the component
-	_ = spaceComponent  // Use the component
+	// Add to render system so it actually appears on screen
+	if hud.renderSystem != nil {
+		hud.renderSystem.Add(&basic, &renderComponent, &spaceComponent)
+	}
 }
 
 // AddChatMessage adds a new chat message to the display
