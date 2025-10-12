@@ -341,6 +341,25 @@ func (lm *LayoutManager) GetConnectionStatusPosition() Position {
 	return pos
 }
 
+// GetRightAlignedPosition calculates position for right-aligned text with dynamic width
+// Uses actual text width instead of estimated width for precise positioning
+//
+// Parameters:
+//   - text: The text to be positioned
+//   - textWidth: The actual measured width of the text
+//   - yPosition: The Y coordinate for the text
+//
+// Returns:
+//   - Position: X, Y coordinates for right-aligned text
+func (lm *LayoutManager) GetRightAlignedPosition(text string, textWidth, yPosition float32) Position {
+	margin := lm.GetStandardMargin()
+
+	return Position{
+		X: lm.viewport.Width - textWidth - margin,
+		Y: yPosition,
+	}
+}
+
 // GetMinimapPosition calculates position for minimap display.
 // Positions at top-right below connection status.
 //

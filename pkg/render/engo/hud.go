@@ -47,6 +47,9 @@ type HUDSystem struct {
 	// Layout manager for responsive positioning
 	layoutManager *LayoutManager
 
+	// Typography system for consistent text styling
+	typography *Typography
+
 	// Asset manager for accessing fonts and textures
 	assetManager *AssetManager
 
@@ -75,6 +78,7 @@ func NewHUDSystem(assetManager *AssetManager, renderSystem *common.RenderSystem)
 		enemyColor:       ColorTeamRed,
 		neutralColor:     ColorNeutral,
 		layoutManager:    NewLayoutManager(),
+		typography:       NewTypography(assetManager),
 		assetManager:     assetManager,
 		renderSystem:     renderSystem,
 	}
@@ -145,7 +149,7 @@ func (hud *HUDSystem) renderShipStatus() {
 	// Render status text using layout manager for responsive positioning
 	hud.layoutManager.UpdateViewport() // Ensure viewport is current
 	pos := hud.layoutManager.GetShipStatusPosition()
-	hud.renderText(statusText, pos.X, pos.Y, hud.hudColor)
+	hud.renderStyledText(statusText, pos.X, pos.Y, hud.typography.GetShipStatus())
 }
 
 // renderChatWindow renders the chat message window
@@ -162,7 +166,16 @@ func (hud *HUDSystem) renderChatWindow() {
 	for i := len(hud.chatMessages) - 1; i >= 0 && i >= len(hud.chatMessages)-hud.maxChatLines; i-- {
 		msg := hud.chatMessages[i]
 		chatLine := fmt.Sprintf("[%s]: %s", msg.Sender, msg.Message)
-		hud.renderText(chatLine, chatPos.X+MarginMedium, y, msg.Color)
+
+		// Use chat message typography style but override color with message color
+		chatStyle := &TextStyle{
+			Font:   hud.typography.GetChatMessage().Font,
+			Color:  msg.Color,
+			Size:   hud.typography.GetChatMessage().Size,
+			Weight: hud.typography.GetChatMessage().Weight,
+		}
+
+		hud.renderStyledText(chatLine, chatPos.X+MarginMedium, y, chatStyle)
 		y += ChatLineHeight
 	}
 }
@@ -214,8 +227,17 @@ func (hud *HUDSystem) renderTeamStatus() {
 			team.State.PlanetCount,
 		)
 
-		teamColor := GetTeamColor(team.ID)
-		hud.renderText(teamText, pos.X, startY, teamColor)
+		// Use appropriate typography style based on team relationship
+		// For now, we'll use the body style with team color
+		// In the future, this could be enhanced to use semantic styles
+		teamStyle := &TextStyle{
+			Font:   hud.typography.GetBody().Font,
+			Color:  GetTeamColor(team.ID),
+			Size:   hud.typography.GetBody().Size,
+			Weight: "normal",
+		}
+
+		hud.renderStyledText(teamText, pos.X, startY, teamStyle)
 		startY += TeamStatusLineHeight
 		renderedLines++
 	}
@@ -223,24 +245,37 @@ func (hud *HUDSystem) renderTeamStatus() {
 	// Show overflow indicator if there are more teams than we can display
 	if len(teams) > maxLines {
 		overflowText := fmt.Sprintf("... and %d more teams", len(teams)-maxLines)
-		hud.renderText(overflowText, pos.X, startY, ColorTextSecondary)
+		hud.renderStyledText(overflowText, pos.X, startY, hud.typography.GetCaption())
 	}
 }
 
 // renderConnectionStatus renders the connection status
 func (hud *HUDSystem) renderConnectionStatus() {
-	statusColor := hud.friendlyColor
+	statusText := "Status: " + hud.connectionStatus
+
+	// Choose appropriate style based on connection state
+	var style *TextStyle
 	if hud.connectionStatus != "Connected" {
-		statusColor = hud.enemyColor
+		style = hud.typography.GetStatusWarning()
+	} else {
+		style = hud.typography.GetConnectionStatus()
 	}
 
-	pos := hud.layoutManager.GetConnectionStatusPosition()
-	hud.renderText(
-		"Status: "+hud.connectionStatus,
-		pos.X,
-		pos.Y,
-		statusColor,
-	)
+	// Use dynamic text measurement for precise right-alignment
+	font := hud.typography.GetStyleFont(style)
+	if font != nil {
+		textWidth := MeasureText(statusText, font)
+
+		// Get right-aligned position using actual text width
+		pos := hud.layoutManager.GetRightAlignedPosition(statusText, textWidth, hud.layoutManager.GetStandardMargin())
+
+		// Render with typography style
+		hud.renderStyledText(statusText, pos.X, pos.Y, style)
+	} else {
+		// Fallback to legacy positioning if font is not available
+		pos := hud.layoutManager.GetConnectionStatusPosition()
+		hud.renderStyledText(statusText, pos.X, pos.Y, style)
+	}
 }
 
 // renderMinimap renders a minimap showing the game world
@@ -281,6 +316,57 @@ func (hud *HUDSystem) renderText(text string, x, y float32, textColor color.Colo
 			Text: text,
 		},
 		Color: textColor,
+	}
+
+	spaceComponent := common.SpaceComponent{
+		Position: engo.Point{X: x, Y: y},
+		Width:    textWidth,
+		Height:   textHeight,
+	}
+
+	// Add to HUD entities list for cleanup
+	hud.hudEntities = append(hud.hudEntities, &basic)
+
+	// Add to render system so it actually appears on screen
+	if hud.renderSystem != nil {
+		hud.renderSystem.Add(&basic, &renderComponent, &spaceComponent)
+	}
+}
+
+// renderStyledText renders text using a typography style
+func (hud *HUDSystem) renderStyledText(text string, x, y float32, style *TextStyle) {
+	// Use the style's font and color
+	font := hud.typography.GetStyleFont(style)
+	color := style.Color
+
+	// Calculate text dimensions using font-aware measurement
+	var textWidth, textHeight float32
+	if font != nil {
+		textWidth = MeasureText(text, font)
+		textHeight = float32(font.Size)
+	} else {
+		// Fallback to approximate dimensions
+		textWidth = float32(len(text) * 8)
+		textHeight = float32(16)
+	}
+
+	// Validate bounds before rendering
+	pos := Position{X: x, Y: y}
+	dims := Dimensions{Width: textWidth, Height: textHeight}
+	if !hud.layoutManager.IsElementVisible(pos, dims) {
+		// Skip rendering if element would be outside visible bounds
+		return
+	}
+
+	// Create a text entity
+	basic := ecs.NewBasic()
+
+	renderComponent := common.RenderComponent{
+		Drawable: common.Text{
+			Font: font,
+			Text: text,
+		},
+		Color: color,
 	}
 
 	spaceComponent := common.SpaceComponent{
